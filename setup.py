@@ -17,13 +17,13 @@ from setuptools import setup
 
 setup(
     name='PyPowerFlex',
-    version='1.0.0',
+    version='1.1.0',
     description='Python library for Dell EMC PowerFlex',
-    author='Ivan Pchelintsev',
-    author_email='Ivan.Pchelintsev@dell.com',
+    author='Ansible Team at Dell EMC',
+    author_email='ansible.team@dell.com',
     install_requires=[
         'packaging==20.4',
-        'requests==2.23.0',
+        'requests>=2.23.0',
     ],
     packages=[
         'PyPowerFlex',

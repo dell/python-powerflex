@@ -153,7 +153,7 @@ class EntityRequest(Request):
             params=params
         )
         if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailCreating(self.entity)
+            exc = exceptions.PowerFlexFailCreating(self.entity, response)
             LOG.error(exc.message)
             raise exc
 
@@ -169,7 +169,8 @@ class EntityRequest(Request):
                                              entity_id=entity_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailDeleting(self.entity, entity_id)
+            exc = exceptions.PowerFlexFailDeleting(self.entity, entity_id,
+                                                   response)
             LOG.error(exc.message)
             raise exc
 
@@ -180,7 +181,8 @@ class EntityRequest(Request):
                                              entity_id=entity_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailRenaming(self.entity, entity_id)
+            exc = exceptions.PowerFlexFailRenaming(self.entity, entity_id,
+                                                   response)
             LOG.error(exc.message)
             raise exc
 
@@ -199,7 +201,8 @@ class EntityRequest(Request):
 
         r, response = self.send_get_request(url, **url_params)
         if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailQuerying(self.entity, entity_id)
+            exc = exceptions.PowerFlexFailQuerying(self.entity, entity_id,
+                                                   response)
             LOG.error(exc.message)
             raise exc
         if filter_fields:
@@ -220,9 +223,11 @@ class EntityRequest(Request):
         if r.status_code != requests.codes.ok:
             msg = (
                 'Failed to query related {related} entities for PowerFlex '
-                '{entity} with id {_id}.'.format(related=related,
-                                                 entity=self.entity,
-                                                 _id=entity_id)
+                '{entity} with id {_id}.'
+                ' Error: {response}'.format(related=related,
+                                            entity=self.entity,
+                                            _id=entity_id,
+                                            response=response)
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)

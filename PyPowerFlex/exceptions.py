@@ -15,8 +15,9 @@
 
 
 class PowerFlexClientException(Exception):
-    def __init__(self, message):
+    def __init__(self, message, response=None):
         self.message = message
+        self.response = response
 
     def __str__(self):
         return self.message
@@ -45,25 +46,45 @@ class InvalidInput(PowerFlexClientException):
 class PowerFlexFailCreating(PowerFlexClientException):
     base = 'Failed to create PowerFlex {entity}.'
 
-    def __init__(self, entity):
+    def __init__(self, entity, response=None):
         self.message = self.base.format(entity=entity)
+        self.response = response
+        if response:
+            self.message = '{msg} Error: ' \
+                           '{response}'.format(msg=self.message,
+                                               response=response)
 
 
 class PowerFlexFailDeleting(PowerFlexClientException):
     base = 'Failed to delete PowerFlex {entity} with id {_id}.'
 
-    def __init__(self, entity, entity_id):
+    def __init__(self, entity, entity_id, response=None):
         self.message = self.base.format(entity=entity, _id=entity_id)
+        self.response = response
+        if response:
+            self.message = '{msg} Error: ' \
+                           '{response}'.format(msg=self.message,
+                                               response=response)
 
 
 class PowerFlexFailQuerying(PowerFlexClientException):
     base = 'Failed to query PowerFlex {entity}'
 
-    def __init__(self, entity, entity_id=None):
+    def __init__(self, entity, entity_id=None, response=None):
         base = self.base.format(entity=entity)
-        if entity_id:
+        self.response = response
+        if entity_id and response is None:
             self.message = '{base} with id {_id}.'.format(base=base,
                                                           _id=entity_id)
+        elif entity is None and response:
+            self.message = '{base} Error: ' \
+                           '{response}'.format(base=base,
+                                               response=response)
+        elif entity and response:
+            self.message = '{base} with id {_id}.' \
+                           ' Error: {response}'.format(base=base,
+                                                       _id=entity_id,
+                                                       response=response)
         else:
             self.message = '{base}.'.format(base=base)
 
@@ -71,5 +92,10 @@ class PowerFlexFailQuerying(PowerFlexClientException):
 class PowerFlexFailRenaming(PowerFlexClientException):
     base = 'Failed to rename PowerFlex {entity} with id {_id}.'
 
-    def __init__(self, entity, entity_id):
+    def __init__(self, entity, entity_id, response=None):
         self.message = self.base.format(entity=entity, _id=entity_id)
+        self.response = response
+        if response:
+            self.message = '{msg} Error: ' \
+                           '{response}'.format(msg=self.message,
+                                               response=response)

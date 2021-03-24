@@ -105,8 +105,10 @@ class System(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to remove consistency group snapshots from '
-                   'PowerFlex {entity} with '
-                   'id {_id}.'.format(entity=self.entity, _id=system_id))
+                   'PowerFlex {entity} with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=system_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -115,9 +117,13 @@ class System(base_client.EntityRequest):
     def snapshot_volumes(self,
                          system_id,
                          snapshot_defs,
+                         access_mode=None,
+                         retention_period=None,
                          allow_ext_managed=None):
         """Create snapshots of PowerFlex volumes.
 
+        :type retention_period: str
+        :type access_mode: str
         :type system_id: str
         :type snapshot_defs: list[dict]
         :type allow_ext_managed: bool
@@ -128,7 +134,9 @@ class System(base_client.EntityRequest):
 
         params = dict(
             snapshotDefs=snapshot_defs,
-            allowOnExtManagedVol=allow_ext_managed
+            allowOnExtManagedVol=allow_ext_managed,
+            accessModeLimit=access_mode,
+            retentionPeriodInMin=retention_period
         )
 
         r, response = self.send_post_request(self.base_action_url,
@@ -138,8 +146,10 @@ class System(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to snapshot volumes on PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=system_id))
+                   'with id {_id}.'
+                   ' Error: {response}'.format(entity=self.entity,
+                                               _id=system_id,
+                                               response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

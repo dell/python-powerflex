@@ -57,3 +57,30 @@ class Sdc(base_client.EntityRequest):
         )
 
         return self._rename_entity(action, sdc_id, params)
+
+    def set_performance_profile(self, sdc_id, perf_profile):
+        """Apply a performance profile to the specified SDC.
+
+        :type sdc_id: str
+        :type perf_profile: str
+        :rtype: dict
+        """
+
+        action = 'setSdcPerformanceParameters'
+
+        params = dict(
+            perfProfile=perf_profile
+        )
+
+        r, response = self.send_post_request(self.base_action_url, action, sdc_id, params)
+
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to set Performance Profile on '
+                   'PowerFlex {entity} with id {_id} '
+                   '. Error: {response}'.format(entity=self.entity,
+                                                _id=sdc_id,
+                                                response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=sdc_id)

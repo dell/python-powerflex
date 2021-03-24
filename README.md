@@ -24,7 +24,7 @@ python setup.py install
 | password | (str) PowerFlex API password. |
 | verify_certificate | (bool) Verify server's certificate. **Default**: False. |
 | certificate_path | (str) Path to server's certificate. **Default**: None. |
-| timeout | (int) Timeout for PowerFlex API request. **Default**: 120.
+| timeout | (int) Timeout for PowerFlex API request **Default**: 120.
 | log_level | (int) Logging level (e. g. logging.DEBUG). **Default**: logging.ERROR. |
 
 #### Available resources

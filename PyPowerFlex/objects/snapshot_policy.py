@@ -53,8 +53,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to add source volume to PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=snapshot_policy_id))
+                   'with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=snapshot_policy_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -118,8 +120,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to modify PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=snapshot_policy_id))
+                   'with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=snapshot_policy_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -139,9 +143,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to pause PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=snapshot_policy_id))
+            msg = ('Failed to pause PowerFlex {entity} with id {_id}.'
+                   ' Error: {response}'.format(entity=self.entity,
+                                               _id=snapshot_policy_id,
+                                               response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -178,8 +183,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to remove source volume from PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=snapshot_policy_id))
+                   'with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=snapshot_policy_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -215,9 +222,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to resume PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=snapshot_policy_id))
+            msg = ('Failed to resume PowerFlex {entity} with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=snapshot_policy_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

@@ -20,7 +20,6 @@ import requests
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 
-
 LOG = logging.getLogger(__name__)
 
 
@@ -58,7 +57,8 @@ class Volume(base_client.EntityRequest):
                        sdc_id=None,
                        sdc_guid=None,
                        allow_multiple_mappings=None,
-                       allow_ext_managed=None):
+                       allow_ext_managed=None,
+                       access_mode=None):
         """Map PowerFlex volume to SDC.
 
         :param volume_id: str
@@ -66,6 +66,7 @@ class Volume(base_client.EntityRequest):
         :param sdc_guid: str
         :param allow_multiple_mappings: bool
         :param allow_ext_managed: bool
+        :type access_mode: str
         :return: dict
         """
 
@@ -78,7 +79,8 @@ class Volume(base_client.EntityRequest):
             sdcId=sdc_id,
             guid=sdc_guid,
             allowMultipleMappings=allow_multiple_mappings,
-            allowOnExtManagedVol=allow_ext_managed
+            allowOnExtManagedVol=allow_ext_managed,
+            accessMode=access_mode
         )
 
         r, response = self.send_post_request(self.base_action_url,
@@ -88,7 +90,9 @@ class Volume(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to map PowerFlex {entity} with id {_id} '
-                   'to SDC.'.format(entity=self.entity, _id=volume_id))
+                   'to SDC. Error: {response}'.format(entity=self.entity,
+                                                      _id=volume_id,
+                                                      response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -164,8 +168,10 @@ class Volume(base_client.EntityRequest):
                                              entity_id=volume_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to extend PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity, _id=volume_id))
+            msg = ('Failed to extend PowerFlex {entity} with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=volume_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -186,7 +192,10 @@ class Volume(base_client.EntityRequest):
                                              entity_id=volume_id)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to lock AutoSnapshot for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity, _id=volume_id))
+                   'with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=volume_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -233,8 +242,10 @@ class Volume(base_client.EntityRequest):
                                              entity_id=volume_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to unmap PowerFlex {entity} with id {_id} '
-                   'from SDC.'.format(entity=self.entity, _id=volume_id))
+            msg = ('Failed to unmap PowerFlex {entity} with id {_id} from '
+                   'SDC. Error: {response}'.format(entity=self.entity,
+                                                   _id=volume_id,
+                                                   response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -279,7 +290,224 @@ class Volume(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to unlock AutoSnapshot for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity, _id=volume_id))
+                   'with id {_id}. Error: '
+                   '{response}'.format(entity=self.entity, _id=volume_id,
+                                       response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=volume_id)
+
+    def set_mapped_sdc_limits(self, volume_id, sdc_id, bandwidth_limit=None,
+                              iops_limit=None):
+        """Set the bandwidth limit and IOPS limit for the mapped SDC.
+
+        :param volume_id: ID of the volume
+        :type volume_id: str
+        :param sdc_id: ID of the SDC
+        :type sdc_id: str
+        :param bandwidth_limit: Limit for the volume network bandwidth
+        :type bandwidth_limit: str
+        :param iops_limit: Limit for the volume IOPS
+        :type iops_limit: str
+        :return: dict
+        """
+
+        action = 'setMappedSdcLimits'
+
+        params = dict(
+            sdcId=sdc_id,
+            bandwidthLimitInKbps=bandwidth_limit,
+            iopsLimit=iops_limit
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=volume_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to update the SDC limits of PowerFlex'
+                   ' {entity} with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=volume_id,
+                                              response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=volume_id)
+
+    def set_compression_method(self, volume_id, compression_method):
+        """
+        Modify the compression method to be used for a Volume, relevant only
+        if the volume has a space efficient data layout.
+
+        :param volume_id: ID of the volume
+        :type volume_id: str
+        :param compression_method: one of predefined attributes of
+        CompressionMethod
+        :type compression_method: str
+        :return: dict
+        """
+
+        action = 'modifyCompressionMethod'
+
+        params = dict(
+            compressionMethod=compression_method,
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=volume_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to update the compression method of PowerFlex'
+                   ' {entity} with id'
+                   ' {_id}. Error: {response}'.format(entity=self.entity,
+                                                      _id=volume_id,
+                                                      response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=volume_id)
+
+    def set_use_rmcache(self, volume_id, use_rmcache):
+        """
+        Control the use of Read RAM Cache in the specified volume.
+        If you want to ensure that all I/O operations for this volume are
+        cached, the relevant Storage Pool should be configured to use cache,
+        and the relevant SDSs should all have caching enabled.
+
+        :param volume_id: ID of the volume
+        :type volume_id: str
+        :param use_rmcache: Whether to use Read RAM cache or not
+        :type use_rm_cache: bool
+        :return: dict
+        """
+
+        action = 'setVolumeUseRmcache'
+
+        params = dict(
+            useRmcache=use_rmcache
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=volume_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to update the use_rmcache of PowerFlex'
+                   ' {entity} with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=volume_id,
+                                              response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=volume_id)
+
+    def set_access_mode_for_sdc(self, volume_id, sdc_id, access_mode):
+        """
+        Set the volume access mode for the specified
+        SDC mapped to the volume.
+
+        :param volume_id: ID of the volume
+        :type volume_id: str
+        :param access_mode: The access mode of the volume for the mapped SDC
+        :type access_mode: str
+        :param sdc_id: ID of the SDC.
+        :type sdc_id: str
+        :return: dict
+        """
+
+        action = 'setVolumeMappingAccessMode'
+
+        params = dict(
+            accessMode=access_mode,
+            sdcId=sdc_id
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=volume_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to set the access mode for the SDC {sdc_id}'
+                   ' mapped to PowerFlex {entity} with id {_id}. Error:'
+                   ' {response}'.format(entity=self.entity, _id=volume_id,
+                                        sdc_id=sdc_id, response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=volume_id)
+
+    def set_retention_period(self, snap_id, retention_period):
+        """
+        Set a new retention period for the given snapshot. If the snapshot
+        is already secure, then it can be delayed but not advanced.
+
+        :param snap_id: ID of the volume
+        :type snap_id: str
+        :param retention_period: Retention period for the specified resource
+        :type retention_period: str
+        :return: dict
+        """
+        
+        action = 'setSnapshotSecurity'
+
+        params = dict(
+            retentionPeriodInMin=retention_period,
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=snap_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to set the retention period for PowerFlex'
+                   ' {entity} with id {_id}.'
+                   ' Error: {response}'.format(entity=self.entity,
+                                               _id=snap_id,
+                                               response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=snap_id)
+
+
+    def set_volume_access_mode_limit(self, volume_id, access_mode_limit):
+        """
+        Set the highest mapping access mode allowed for a volume.
+
+        :param volume_id: ID of the volume
+        :type volume_id: str
+        :param access_mode_limit: Define the access mode limit of a volume,
+         options are ReadWrite or ReadOnly
+        :type access_mode_limit: str
+        :return: dict
+        """
+
+        action = 'setVolumeAccessModeLimit'
+
+        params = dict(
+            accessModeLimit=access_mode_limit
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=volume_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to update the Volume Access Mode Limit of PowerFlex'
+                   ' {entity} with id {_id}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              _id=volume_id,
+                                              response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

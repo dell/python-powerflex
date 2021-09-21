@@ -1,0 +1,20 @@
+dist: bionic
+language: python
+branches:
+  only:
+  - master
+  - develop
+  - "/^feature.*$/"
+matrix:
+  include:
+  - python: 3.8
+  - python: 3.7
+  - python: 3.6
+  - python: 3.5
+install:
+  - pip install tox
+script:
+  - tox
+notifications:
+  slack:
+    secure: UngZexgY65GWMHKnJ23Y5zzPilYNyURAQJVkimcd811KmeAcKmmn3jmYY71NSZ5h70zNlEcuxPe8lAMaA04w6rJKZkeTUX/cIToq7qW2cAipGh3zUQC+F3UDQpsH0bJPMnPyGq+rgjjpztmcT2LVFrUGTAt+dDThdnLlIMFrjzqkM+/dVXCJ6R9TJeivRJGJmAGWKhe0VJOopONMsUjqwYlg+SGSSpW/MSqC2q5sD6rPtb+EA+lwPvMj0B0jiP3EDFhmVNcvWWcD5iAl/YFv2vtprX+SSUMCSdv4oMf71ohb1DaFlYBtRXSIu7xygrjATIxrAe/WH9QkptTllwYqPOf4Lk2oUIW+/apAW706XnrKmfSwFVHZ5mZ/6KLVfKZTsd3B1uMH/Wza576shsJ8gTbXY8pfpPeoxWZGTqcH8YwvT0KRbV/e8s/rvHqllbZGZgmQGORdRvvwFIBjF0lLet1TFeVKZgExOab47OFb0VuMV64gIrDnNb0i9+Jna08ddKEybry6jr92o8xQeglzsD3CCfkkCUX2ejtz0VIX/RUxLUuN+HO/c9pJjbXID/A+VYDSxzT9BgTl7slVVm2Vjxqv/vgg9tCb7inzjnlA6jQOCEXooYx9jX5Azi7uHGDWoun5qSverma3jeia2Cdh/7VWc1EmrnFmYv5oUjI9LHQ=

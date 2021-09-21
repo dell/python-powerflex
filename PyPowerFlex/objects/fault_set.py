@@ -40,8 +40,9 @@ class FaultSet(base_client.EntityRequest):
                                              entity_id=fault_set_id)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to clear PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=fault_set_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=fault_set_id,
+                           response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

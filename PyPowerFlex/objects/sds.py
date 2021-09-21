@@ -48,6 +48,13 @@ class SdsIpRoles:
     all = 'all'
 
 
+class PerformanceProfile:
+    """SDS performance profiles."""
+
+    highperformance = 'HighPerformance'
+    compact = 'Compact'
+
+
 class AccelerationDeviceInfo(dict):
     """PowerFlex acceleration device object.
 
@@ -148,8 +155,8 @@ class Sds(base_client.EntityRequest):
                                              params=sds_ip)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to add IP for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=sds_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -279,8 +286,8 @@ class Sds(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to remove IP from PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=sds_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -313,8 +320,8 @@ class Sds(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to set ip role for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=sds_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -341,8 +348,8 @@ class Sds(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to set port for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=sds_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -356,7 +363,7 @@ class Sds(base_client.EntityRequest):
         :rtype: dict
         """
 
-        action = 'disableRfCache'
+        action = 'disableRfcache'
         if rfcache_enabled:
             action = 'enableRfcache'
 
@@ -366,8 +373,8 @@ class Sds(base_client.EntityRequest):
                                              entity_id=sds_id)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to enable/disable Rfcache for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=sds_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -394,8 +401,64 @@ class Sds(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to enable/disable Rmcache for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=sds_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=sds_id)
+
+    def set_rmcache_size(self, sds_id, rmcache_size):
+        """Set Rmcache size for PowerFlex SDS.
+
+        :type sds_id: str
+        :type rmcache_size: int
+        :rtype: dict
+        """
+
+        action = 'setSdsRmcacheSize'
+
+        params = dict(
+            rmcacheSizeInMB=rmcache_size
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=sds_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to set Rmcache size for PowerFlex {entity} '
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=sds_id)
+
+    def set_performance_parameters(self, sds_id, performance_profile):
+        """Set performance parameters for PowerFlex SDS.
+
+        :type sds_id: str
+        :type performance_profile: str
+        :rtype: dict
+        """
+
+        action = 'setSdsPerformanceParameters'
+
+        params = dict(
+            perfProfile=performance_profile
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=sds_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to set performance parameters for PowerFlex '
+                   '{entity} with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=sds_id, response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

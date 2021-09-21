@@ -72,13 +72,14 @@ class Device(base_client.EntityRequest):
                 all([storage_pool_id, acceleration_pool_id]) or
                 not any([storage_pool_id, acceleration_pool_id])
         ):
-            msg = 'Either storage_pool_id or acceleration_pool_id must be set.'
+            msg = 'Either storage_pool_id or acceleration_pool_id must be ' \
+                  'set.'
             raise exceptions.InvalidInput(msg)
 
         params = dict(
             deviceCurrentPathname=current_pathname,
             sdsId=sds_id,
-            AccelerationPoolId=acceleration_pool_id,
+            accelerationPoolId=acceleration_pool_id,
             externalAccelerationType=external_acceleration_type,
             forceDeviceTakeover=force,
             mediaType=media_type,
@@ -142,8 +143,9 @@ class Device(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to set media type for PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=device_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=device_id,
+                           response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

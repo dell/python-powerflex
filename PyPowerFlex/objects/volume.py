@@ -503,11 +503,10 @@ class Volume(base_client.EntityRequest):
                                              entity_id=volume_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to update the Volume Access Mode Limit of PowerFlex'
-                   ' {entity} with id {_id}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              _id=volume_id,
-                                              response=response))
+            msg = ('Failed to update the Volume Access Mode Limit of '
+                   'PowerFlex {entity} with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=volume_id,
+                           response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

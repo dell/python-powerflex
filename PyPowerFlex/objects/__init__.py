@@ -20,6 +20,7 @@ from PyPowerFlex.objects.sdc import Sdc
 from PyPowerFlex.objects.sds import Sds
 from PyPowerFlex.objects.snapshot_policy import SnapshotPolicy
 from PyPowerFlex.objects.storage_pool import StoragePool
+from PyPowerFlex.objects.acceleration_pool import AccelerationPool
 from PyPowerFlex.objects.system import System
 from PyPowerFlex.objects.volume import Volume
 
@@ -32,6 +33,7 @@ __all__ = [
     'Sds',
     'SnapshotPolicy',
     'StoragePool',
+    'AccelerationPool',
     'System',
     'Volume',
 ]

@@ -39,6 +39,7 @@ class PowerFlexClient:
         'sds',
         'snapshot_policy',
         'storage_pool',
+        'acceleration_pool',
         'system',
         'volume'
     )
@@ -81,6 +82,8 @@ class PowerFlexClient:
         self.__add_storage_entity('sds', objects.Sds)
         self.__add_storage_entity('snapshot_policy', objects.SnapshotPolicy)
         self.__add_storage_entity('storage_pool', objects.StoragePool)
+        self.__add_storage_entity('acceleration_pool',
+                                  objects.AccelerationPool)
         self.__add_storage_entity('system', objects.System)
         self.__add_storage_entity('volume', objects.Volume)
         utils.init_logger(self.configuration.log_level)

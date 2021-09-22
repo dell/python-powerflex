@@ -54,6 +54,7 @@ class Request:
 
     def send_get_request(self, url, **url_params):
         request_url = self.base_url + url.format(**url_params)
+        self._login()
         r = requests.get(request_url,
                          auth=(
                              self.configuration.username,
@@ -61,14 +62,14 @@ class Request:
                          ),
                          verify=self.verify_certificate,
                          timeout=self.configuration.timeout)
-        r = self._check_response(r)
+        self._logout()
         response = r.json()
         return r, response
 
     def send_post_request(self, url, params=None, **url_params):
         if params is None:
             params = dict()
-
+        self._login()
         request_url = self.base_url + url.format(**url_params)
         r = requests.post(request_url,
                           auth=(
@@ -79,8 +80,8 @@ class Request:
                           data=utils.prepare_params(params),
                           verify=self.verify_certificate,
                           timeout=self.configuration.timeout)
-        r = self._check_response(r)
         response = r.json()
+        self._logout()
         return r, response
 
     def _login(self):
@@ -100,39 +101,23 @@ class Request:
         token = r.json()
         self.token.set(token)
 
-    def _check_response(self, response):
-        if (
-                response.status_code == requests.codes.unauthorized or
-                response.status_code == requests.codes.forbidden
-        ):
-            LOG.debug('Token is invalid, going to re-login '
-                      'and perform request again.')
-            self._login()
-            # Repeat request with valid token.
-            initial_request = response.request
-            response = requests.request(initial_request.method,
-                                        initial_request.url,
-                                        headers=self.headers,
-                                        auth=(
-                                            self.configuration.username,
-                                            self.token.get()
-                                        ),
-                                        data=initial_request.body,
-                                        verify=self.verify_certificate,
-                                        timeout=self.configuration.timeout)
-        LOG.debug(
-            'REST Request: {url} with body {body}.'.format(
-                url=response.request.url,
-                body=response.request.body
-            )
-        )
-        LOG.debug(
-            'REST Response: {status_code} with data {data}.'.format(
-                status_code=response.status_code,
-                data=response.text
-            )
-        )
-        return response
+    def _logout(self):
+        token = self.token.get()
+
+        if token:
+            request_url = self.base_url + '/logout'
+            r = requests.get(request_url,
+                             auth=(
+                                 self.configuration.username,
+                                 token
+                             ),
+                             verify=self.verify_certificate,
+                             timeout=self.configuration.timeout)
+            if r.status_code != requests.codes.ok:
+                exc = exceptions.PowerFlexFailQuerying('token')
+                LOG.error(exc.message)
+                raise exc
+            self.token.set("")
 
 
 class EntityRequest(Request):

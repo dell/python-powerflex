@@ -46,8 +46,9 @@ class ProtectionDomain(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to activate PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=protection_domain_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=protection_domain_id,
+                           response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -127,8 +128,9 @@ class ProtectionDomain(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to inactivate PowerFlex {entity} '
-                   'with id {_id}.'.format(entity=self.entity,
-                                           _id=protection_domain_id))
+                   'with id {_id}. Error: {response}'
+                   .format(entity=self.entity, _id=protection_domain_id,
+                           response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

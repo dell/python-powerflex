@@ -14,6 +14,7 @@
 # under the License.
 
 from PyPowerFlex import exceptions
+from PyPowerFlex.objects import protection_domain
 import tests
 
 
@@ -46,6 +47,18 @@ class TestProtectionDomainClient(tests.PyPowerFlexTestCase):
                     {'id': self.fake_pd_id},
                 '/instances/ProtectionDomain::{}'
                 '/action/setProtectionDomainName'.format(self.fake_pd_id):
+                    {},
+                '/instances/ProtectionDomain::{}'
+                '/action/setSdsNetworkLimits'.format(self.fake_pd_id):
+                    {},
+                '/instances/ProtectionDomain::{}'
+                '/action/enableSdsRfcache'.format(self.fake_pd_id):
+                    {},
+                '/instances/ProtectionDomain::{}'
+                '/action/disableSdsRfcache'.format(self.fake_pd_id):
+                    {},
+                '/instances/ProtectionDomain::{}'
+                '/action/setRfcacheParameters'.format(self.fake_pd_id):
                     {},
             },
             self.RESPONSE_MODE.Invalid: {
@@ -123,3 +136,42 @@ class TestProtectionDomainClient(tests.PyPowerFlexTestCase):
                               self.client.protection_domain.rename,
                               self.fake_pd_id,
                               name='new_name')
+
+    def test_protection_domain_network_limits(self):
+        self.client.protection_domain.network_limits(self.fake_pd_id,
+                                                     rebuild_limit=10240,
+                                                     rebalance_limit=10240,
+                                                     vtree_migration_limit=
+                                                     10240,
+                                                     overall_limit=10240)
+
+    def test_protection_domain_network_limits_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.protection_domain.network_limits,
+                              self.fake_pd_id)
+
+    def test_protection_domain_set_rfcache_enabled(self):
+        self.client.protection_domain.set_rfcache_enabled(self.fake_pd_id,
+                                                          enable_rfcache=True)
+
+    def test_protection_domain_set_rfcache_enabled_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.protection_domain.set_rfcache_enabled,
+                              self.fake_pd_id)
+
+    def test_protection_domain_rfcache_parameters(self):
+        self.client.protection_domain.rfcache_parameters(self.fake_pd_id,
+                                                         page_size=16,
+                                                         max_io_limit=128,
+                                                         pass_through_mode=
+                                                         protection_domain.
+                                                         RFCacheOperationMode.
+                                                         write)
+
+    def test_protection_domain_rfcache_parameters_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.protection_domain.
+                              rfcache_parameters, self.fake_pd_id)

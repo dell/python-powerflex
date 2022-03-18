@@ -1,6 +1,6 @@
 # PyPowerFlex
 
-Python SDK for Dell EMC PowerFlex.
+Python SDK for Dell PowerFlex.
 
 Supports PowerFlex (VxFlex OS) version 3.0 and later.
 

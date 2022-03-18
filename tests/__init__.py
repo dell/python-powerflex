@@ -64,6 +64,7 @@ class PyPowerFlexTestCase(TestCase):
         RESPONSE_MODE.Valid: {
             '/login': 'token',
             '/version': '3.5',
+            '/logout': '',
         },
         RESPONSE_MODE.Invalid: {
             '/version': '2.5',
@@ -79,6 +80,12 @@ class PyPowerFlexTestCase(TestCase):
                 {
                     'errorCode': 2,
                     'message': 'Test version bad status',
+                }, 400
+            ),
+            '/logout': MockResponse(
+                {
+                    'errorCode': 3,
+                    'message': 'Test logout bad status',
                 }, 400
             )
         }
@@ -127,7 +134,12 @@ class PyPowerFlexTestCase(TestCase):
             mode = self.__http_response_mode
         api_path = url.split('/api')[1]
         try:
-            response = self.MOCK_RESPONSES[mode][api_path]
+            if api_path == "/login":
+                response = self.RESPONSE_MODE.Valid[0]
+            elif api_path == "/logout":
+                response = self.RESPONSE_MODE.Valid[2]
+            else:
+                response = self.MOCK_RESPONSES[mode][api_path]
         except KeyError:
             try:
                 response = self.DEFAULT_MOCK_RESPONSES[mode][api_path]

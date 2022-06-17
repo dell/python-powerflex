@@ -72,7 +72,8 @@ class Sdc(base_client.EntityRequest):
             perfProfile=perf_profile
         )
 
-        r, response = self.send_post_request(self.base_action_url, action, sdc_id, params)
+        r, response = self.send_post_request(self.base_action_url, action,
+                                             sdc_id, params)
 
         if r.status_code != requests.codes.ok:
             msg = ('Failed to set Performance Profile on '

@@ -84,6 +84,27 @@ class Request:
         self._logout()
         return r, response
 
+    def send_mdm_cluster_post_request(self, url, params=None, **url_params):
+        if params is None:
+            params = dict()
+        response = None
+        self._login()
+        request_url = self.base_url + url.format(**url_params)
+        r = requests.post(request_url,
+                          auth=(
+                              self.configuration.username,
+                              self.token.get()
+                          ),
+                          headers=self.headers,
+                          data=utils.prepare_params(params),
+                          verify=self.verify_certificate,
+                          timeout=self.configuration.timeout)
+
+        if r.content != b'':
+            response = r.json()
+        self._logout()
+        return r, response
+
     def _login(self):
         request_url = self.base_url + '/login'
 
@@ -125,6 +146,8 @@ class EntityRequest(Request):
     base_entity_url = '/instances/{entity}::{entity_id}'
     base_entity_list_or_create_url = '/types/{entity}/instances'
     base_relationship_url = base_entity_url + '/relationships/{related}'
+    base_object_url = '/instances/{entity}/action/{action}'
+    query_mdm_cluster_url = '/instances/{entity}/queryMdmCluster'
     entity_name = None
 
     @property
@@ -196,7 +219,8 @@ class EntityRequest(Request):
             response = utils.query_response_fields(response, fields)
         return response
 
-    def get_related(self, entity_id, related, filter_fields=None, fields=None):
+    def get_related(self, entity_id, related, filter_fields=None,
+                    fields=None):
         url_params = dict(
             entity=self.entity,
             entity_id=entity_id,

@@ -455,7 +455,7 @@ class Volume(base_client.EntityRequest):
         :type retention_period: str
         :return: dict
         """
-        
+
         action = 'setSnapshotSecurity'
 
         params = dict(
@@ -477,7 +477,6 @@ class Volume(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=snap_id)
-
 
     def set_volume_access_mode_limit(self, volume_id, access_mode_limit):
         """

@@ -25,6 +25,7 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
         self.fake_system_id = '1'
         self.fake_cg_id = '1'
         self.fake_snapshot_defs = [system.SnapshotDef('123', 'snap_1')]
+        self.fake_mdm_id = '1'
 
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
@@ -34,6 +35,37 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
                     {},
                 '/instances/System::{}'
                 '/action/snapshotVolumes'.format(self.fake_system_id):
+                    {},
+                '/instances/System'
+                '/action'
+                '/addStandbyMdm':
+                    {},
+                '/instances/System'
+                '/action'
+                '/removeStandbyMdm':
+                    {},
+                '/instances/System'
+                '/action'
+                '/changeMdmOwnership':
+                    {},
+                '/instances/System'
+                '/action'
+                '/setMdmPerformanceParameters':
+                    {},
+                '/instances/System'
+                '/action'
+                '/renameMdm':
+                    {},
+                '/instances/System'
+                '/action'
+                '/modifyVirtualIpInterfaces':
+                    {},
+                '/instances/System'
+                '/action'
+                '/switchClusterMode':
+                    {},
+                '/instances/System'
+                '/queryMdmCluster':
                     {},
             },
             self.RESPONSE_MODE.Invalid: {
@@ -84,3 +116,89 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
                               self.client.system.snapshot_volumes,
                               self.fake_system_id,
                               self.fake_snapshot_defs)
+
+    def test_add_standby_mdm(self):
+        self.client.system.add_standby_mdm(mdm_ips=["10.x.x.x"],
+                                           role="Manager")
+
+    def test_add_standby_mdm_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.add_standby_mdm,
+                              mdm_ips=["10.x.x.x"], role="Manager")
+
+    def test_remove_standby_mdm(self):
+        self.client.system.remove_standby_mdm(self.fake_mdm_id)
+
+    def test_remove_standby_mdm_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.remove_standby_mdm,
+                              self.fake_mdm_id)
+
+    def test_get_mdm_cluster(self):
+        self.client.system.get_mdm_cluster_details()
+
+    def test_get_mdm_cluster_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.get_mdm_cluster_details)
+
+    def test_change_mdm_ownership(self):
+        self.client.system.change_mdm_ownership(self.fake_mdm_id)
+
+    def test_change_mdm_ownership_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.change_mdm_ownership,
+                              self.fake_mdm_id)
+
+    def test_change_performance_profile(self):
+        self.client.system.\
+            set_cluster_mdm_performance_profile(performance_profile="Compact")
+
+    def test_change_performance_profile_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.
+                              set_cluster_mdm_performance_profile,
+                              performance_profile="Compact")
+
+    def test_rename_mdm(self):
+        self.client.system.rename_mdm(self.fake_mdm_id, mdm_new_name="fake")
+
+    def test_rename_mdm_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.rename_mdm,
+                              self.fake_mdm_id, mdm_new_name="fake")
+
+    def test_modify_virtual_ip_interface(self):
+        self.client.system.\
+            modify_virtual_ip_interface(self.fake_mdm_id,
+                                        virtual_ip_interfaces=["interface"])
+
+    def test_modify_virtual_ip_interface_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.modify_virtual_ip_interface,
+                              self.fake_mdm_id,
+                              virtual_ip_interfaces=["interface"])
+
+    def test_clear_virtual_ip_interface(self):
+        self.client.system.modify_virtual_ip_interface(self.fake_mdm_id)
+
+    def test_clear_virtual_ip_interface_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.modify_virtual_ip_interface,
+                              self.fake_mdm_id)
+
+    def test_switch_cluster_mode(self):
+        self.client.system.switch_cluster_mode(self.fake_mdm_id)
+
+    def test_switch_cluster_mode_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.switch_cluster_mode,
+                              self.fake_mdm_id)

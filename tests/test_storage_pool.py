@@ -48,6 +48,9 @@ class TestStoragePoolClient(tests.PyPowerFlexTestCase):
                 '/relationships/Volume'.format(self.fake_sp_id):
                     [],
                 '/instances/StoragePool::{}'
+                '/relationships/Statistics'.format(self.fake_sp_id):
+                    {},
+                '/instances/StoragePool::{}'
                 '/action/setStoragePoolName'.format(self.fake_sp_id):
                     {},
                 '/instances/StoragePool::{}'
@@ -142,6 +145,15 @@ class TestStoragePoolClient(tests.PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.storage_pool.get_volumes,
+                              self.fake_sp_id)
+
+    def test_storage_pool_get_statistics(self):
+        self.client.storage_pool.get_statistics(self.fake_sp_id)
+
+    def test_storage_pool_get_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.storage_pool.get_statistics,
                               self.fake_sp_id)
 
     def test_storage_pool_rename(self):

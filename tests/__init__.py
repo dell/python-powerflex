@@ -23,6 +23,7 @@ from unittest import TestCase
 import requests
 
 import PyPowerFlex
+from PyPowerFlex import utils
 
 
 class MockResponse(requests.Response):
@@ -108,6 +109,7 @@ class PyPowerFlexTestCase(TestCase):
         self.post_mock = self.mock_object(requests,
                                           'post',
                                           side_effect=self.get_mock_response)
+        utils.check_version = mock.MagicMock(return_value=False)
 
     def mock_object(self, obj, attr_name, *args, **kwargs):
         """Use python mock to mock an object attribute.

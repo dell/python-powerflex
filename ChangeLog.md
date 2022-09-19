@@ -1,5 +1,8 @@
 # PyPowerFlex Change Log
 
+## Version 1.5.0 - released on 27/09/22
+- Added support for 4.0.x release of PowerFlex OS, adding statistics data for storage pool and volume objects.
+
 ## Version 1.4.0 - released on 28/06/22
 - Added configuration operations includes adding/removing of standby MDM, change cluster ownership, change cluster mode, modify performance profile, rename MDM, modify MDM's virtual interface and getting details of MDM cluster entities.
 

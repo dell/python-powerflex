@@ -180,6 +180,18 @@ class StoragePool(base_client.EntityRequest):
                                 filter_fields,
                                 fields)
 
+    def get_statistics(self, storage_pool_id, fields=None):
+        """Get related PowerFlex Statistics for storage pool.
+
+        :type storage_pool_id: str
+        :type fields: list|tuple
+        :rtype: dict
+        """
+
+        return self.get_related(storage_pool_id,
+                                'Statistics',
+                                fields)
+
     def rename(self, storage_pool_id, name):
         """Rename PowerFlex storage pool.
 

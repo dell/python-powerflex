@@ -128,3 +128,16 @@ def prepare_params(params, dump=True):
     if dump:
         return json.dumps(prepared)
     return prepared
+
+
+def check_version(version):
+    """ Check the API version.
+
+    :param version: Specifies the current API version
+    :return: True if API version is greater than or equal to 4.0
+    :rtype: bool
+    """
+    appliance_version = "4.0"
+    if version >= appliance_version:
+        return True
+    return False

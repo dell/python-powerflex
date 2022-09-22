@@ -177,6 +177,18 @@ class Volume(base_client.EntityRequest):
 
         return self.get(entity_id=volume_id)
 
+    def get_statistics(self, volume_id, fields=None):
+        """Get related PowerFlex Statistics for volume.
+
+        :type volume_id: str
+        :type fields: list|tuple
+        :rtype: dict
+        """
+
+        return self.get_related(volume_id,
+                                'Statistics',
+                                fields)
+
     def lock_auto_snapshot(self, volume_id):
         """Lock auto snapshot of PowerFlex volume.
 

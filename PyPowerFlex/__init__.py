@@ -41,7 +41,8 @@ class PowerFlexClient:
         'storage_pool',
         'acceleration_pool',
         'system',
-        'volume'
+        'volume',
+        'utility'
     )
 
     def __init__(self,
@@ -86,6 +87,7 @@ class PowerFlexClient:
                                   objects.AccelerationPool)
         self.__add_storage_entity('system', objects.System)
         self.__add_storage_entity('volume', objects.Volume)
+        self.__add_storage_entity('utility', objects.PowerFlexUtility)
         utils.init_logger(self.configuration.log_level)
         if version.parse(self.system.api_version()) < version.Version('3.0'):
             raise exceptions.PowerFlexClientException(

@@ -41,6 +41,9 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
                 '/action/setVolumeSize'.format(self.fake_volume_id):
                     {},
                 '/instances/Volume::{}'
+                '/relationships/Statistics'.format(self.fake_sp_id):
+                    {},
+                '/instances/Volume::{}'
                 '/action/lockAutoSnapshot'.format(self.fake_volume_id):
                     {},
                 '/instances/Volume::{}'
@@ -98,6 +101,15 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
                               size_in_gb=8,
                               storage_pool_id=self.fake_sp_id,
                               volume_type=volume.VolumeType.thin)
+
+    def test_volume_get_statistics(self):
+        self.client.volume.get_statistics(self.fake_volume_id)
+
+    def test_volume_get_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.volume.get_statistics,
+                              self.fake_volume_id)
 
     def test_volume_delete(self):
         self.client.volume.delete(self.fake_volume_id,

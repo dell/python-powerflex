@@ -33,6 +33,7 @@ python setup.py install
 * ProtectionDomain
 * Sds
 * SnapshotPolicy
+* ReplicationConsistencyGroup
 * System
 * StoragePool
 * AccelerationPool

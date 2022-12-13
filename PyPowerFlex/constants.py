@@ -79,3 +79,24 @@ class VolumeConstants:
         "descendantVolumeIds","numOfMappedSdcs","reservationType","userDataReadBwc","numOfDescendantVolumes",
         "replicationJournalVolume","userDataTrimBwc","childVolumeIds","userDataSdcWriteLatency"
     ]
+
+class RCGConstants:
+    DEFAULT_STATISTICS_PROPERTIES = [
+        "rcgLocalReadBwc","initialCopyNumPairs","lagPersistentInMillis","rplRemoteUserBwc","rplApplyLatency",
+        "lagReceivedInMillis","nextPlannedCycle","lagPersistentSkew","lastSadBarrierId","readyForTransmit","initialCopyTransmit",
+        "rplLocalUserBwc","rplPairIds","numOfRplPairs","rplReceiveLatency","rplLocalApplyBwc","lagAppliedInMillis",
+        "lastCsadBarrierId","lastCompletedPeriodicBarrier","lastAppliedBarrierId","rplRemoteApplyBwc","readyForApply",
+        "initialCopyApply","lagReceivedSkew","initialCopyProgress","rcgLocalWriteBwc","notReadyForTransmit","rplCgRpoCompliance",
+        "notReadyForApply","rplTransmitBwc","lastCradBarrierId","lagAppliedSkew","lastRadBarrierId","rplReceiveBwc","rcgRemoteWriteBwc",
+        "rcgRemoteReadBwc","rplTransmitLatency"
+    ]
+    DEFAULT_STATISTICS_PROPERTIES_ABOVE_3_5 = [
+        "rcgLocalWriteBwc","nextPlannedCycle","rplTransmitLatency","lagReceivedInMillis","rcgRemoteReadBwc","lastCradBarrierId",
+        "lagAppliedSkew","readyForApply","rplUsedJournalCapacityDst","rplReceiveBwc","lastSadBarrierId","isInSlimMode",
+        "lastRadBarrierId","lastAppliedBarrierId","initialCopyTransmit","initialCopyNumPairs","lagAppliedInMillis",
+        "lastCompletedPeriodicBarrier","rplLocalApplyBwc","rcgLocalReadBwc","notReadyForTransmit","rplCgRpoCompliance",
+        "freezeTransmit","lagPersistentInMillis","lagReceivedSkew","notReadyForApply","initialCopyApply","rplPairIds",
+        "rplLocalUserBwc","numOfRplPairs","rplReceiveLatency","lastCsadBarrierId","rplRemoteApplyBwc","rcgRemoteWriteBwc",
+        "initialCopyProgress","lagPersistentSkew","rplSasBarriersBacklogSize","rplTransmitBwc","rplApplyLatency","readyForTransmit",
+        "rplRemoteUserBwc"
+    ]

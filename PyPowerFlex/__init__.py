@@ -42,7 +42,8 @@ class PowerFlexClient:
         'acceleration_pool',
         'system',
         'volume',
-        'utility'
+        'utility',
+        'replication_consistency_group'
     )
 
     def __init__(self,
@@ -88,6 +89,7 @@ class PowerFlexClient:
         self.__add_storage_entity('system', objects.System)
         self.__add_storage_entity('volume', objects.Volume)
         self.__add_storage_entity('utility', objects.PowerFlexUtility)
+        self.__add_storage_entity('replication_consistency_group', objects.ReplicationConsistencyGroup)
         utils.init_logger(self.configuration.log_level)
         if version.parse(self.system.api_version()) < version.Version('3.0'):
             raise exceptions.PowerFlexClientException(

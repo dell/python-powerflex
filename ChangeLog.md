@@ -1,5 +1,9 @@
 # PyPowerFlex Change Log
 
+## Version 1.6.0 - released on 28/12/22
+- Added block provisioning operations includes getting details, creating, modifying, creating snapshots, pause, resume, freeze, unfreeze,
+  activate, inactivate and deleting a replication consistency group.
+
 ## Version 1.5.0 - released on 27/09/22
 - Added support for 4.0.x release of PowerFlex OS, adding statistics data for storage pool and volume objects.
 

@@ -24,6 +24,7 @@ from PyPowerFlex.objects.acceleration_pool import AccelerationPool
 from PyPowerFlex.objects.system import System
 from PyPowerFlex.objects.volume import Volume
 from PyPowerFlex.objects.utility import PowerFlexUtility
+from PyPowerFlex.objects.replication_consistency_group import ReplicationConsistencyGroup
 
 
 __all__ = [
@@ -37,5 +38,6 @@ __all__ = [
     'AccelerationPool',
     'System',
     'Volume',
-    'PowerFlexUtility'
+    'PowerFlexUtility',
+    'ReplicationConsistencyGroup'
 ]

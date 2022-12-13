@@ -99,3 +99,16 @@ class PowerFlexFailRenaming(PowerFlexClientException):
             self.message = '{msg} Error: ' \
                            '{response}'.format(msg=self.message,
                                                response=response)
+
+
+class PowerFlexFailEntityOperation(PowerFlexClientException):
+    base = 'Failed to perform {action} on PowerFlex {entity} with id {_id}.'
+
+    def __init__(self, entity, entity_id, action, response=None):
+        self.message = \
+            self.base.format(action=action, entity=entity, _id=entity_id)
+        self.response = response
+        if response:
+            self.message = '{msg} Error: ' \
+                           '{response}'.format(msg=self.message,
+                                               response=response)

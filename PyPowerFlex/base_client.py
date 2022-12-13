@@ -323,3 +323,19 @@ class EntityRequest(Request):
         if fields:
             response = utils.query_response_fields(response, fields)
         return response
+
+    def _perform_entity_operation_based_on_action(self, entity_id, action,
+                                                  params=None, add_entity=True):
+        if add_entity:
+            action = action + self.entity
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=entity_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            exc = exceptions.PowerFlexFailEntityOperation(self.entity, entity_id,
+                                                          action, response)
+            LOG.error(exc.message)
+            raise exc

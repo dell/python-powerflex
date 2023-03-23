@@ -25,6 +25,7 @@ from PyPowerFlex.objects.system import System
 from PyPowerFlex.objects.volume import Volume
 from PyPowerFlex.objects.utility import PowerFlexUtility
 from PyPowerFlex.objects.replication_consistency_group import ReplicationConsistencyGroup
+from PyPowerFlex.objects.replication_pair import ReplicationPair
 
 
 __all__ = [
@@ -39,5 +40,6 @@ __all__ = [
     'System',
     'Volume',
     'PowerFlexUtility',
-    'ReplicationConsistencyGroup'
+    'ReplicationConsistencyGroup',
+    'ReplicationPair'
 ]

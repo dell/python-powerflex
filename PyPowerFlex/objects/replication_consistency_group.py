@@ -235,6 +235,16 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         return self._perform_entity_operation_based_on_action\
             (rcg_id, "rename", params=params)
 
+    def get_replication_pairs(self, rcg_id):
+        """Get replication pairs of PowerFlex RCG.
+
+        :param rcg_id: str
+        :return: dict
+        """
+
+        return self.get_related(rcg_id,
+                                'ReplicationPair')
+
     def get_all_statistics(self, api_version_less_than_3_6):
         """list statistics of all replication consistency groups for PowerFlex.
         :param api_version_less_than_3_6: bool

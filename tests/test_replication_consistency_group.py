@@ -76,6 +76,9 @@ class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
                     {'id': self.fake_rcg_id},
                 '/types/ReplicationConsistencyGroup/instances/action/querySelectedStatistics':
                     {},
+                '/instances/ReplicationConsistencyGroup::{}'
+                '/relationships/ReplicationPair'.format(self.fake_rcg_id):
+                    {'id': self.fake_rcg_id},
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/ReplicationConsistencyGroup/instances':
@@ -131,6 +134,9 @@ class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
 
     def test_rename_rcg(self):
         self.client.replication_consistency_group.rename_rcg(self.fake_rcg_id, new_name="rename")
+
+    def test_get_replication_pairs(self):
+        self.client.replication_consistency_group.get_replication_pairs(self.fake_rcg_id)
 
     def test_get_all_statistics(self):
         self.client.replication_consistency_group.get_all_statistics(True)

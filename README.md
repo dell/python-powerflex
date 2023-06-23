@@ -34,6 +34,7 @@ python setup.py install
 * Sds
 * SnapshotPolicy
 * ReplicationConsistencyGroup
+* ReplicationPair
 * System
 * StoragePool
 * AccelerationPool

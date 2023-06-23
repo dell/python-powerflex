@@ -1,5 +1,8 @@
 # PyPowerFlex Change Log
 
+## Version 1.8.0 - released on 30/06/23
+- Added block provisioning operations includes modifying performance profile in SDC, adding statistics data for snapshot policy, adding gateway configuration details for system, failover, restore, reverse, switchover, and sync operations in replication consistency group.
+
 ## Version 1.7.0 - released on 31/03/23
 - Added block provisioning operations includes getting details, adding, pause, resume and removing a replication pair.
 

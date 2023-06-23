@@ -251,6 +251,23 @@ class System(base_client.EntityRequest):
 
         return response
 
+    def get_gateway_configuration_details(self):
+        """
+        Get the gateway configuration details
+        :return: Gateway configuration details
+        :rtype: dict
+        """
+
+        r, response = self.send_get_request('/Configuration')
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to get gateway configuration details on PowerFlex {entity}. '
+                   'Error: {response}'.format(entity=self.entity,
+                                              response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
     def change_mdm_ownership(self, mdm_id):
         """
         Change MDM cluster ownership from current master MDM to different MDM.

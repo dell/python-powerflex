@@ -20,7 +20,7 @@ import requests
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
-from PyPowerFlex.constants import StoragePoolConstants, VolumeConstants
+from PyPowerFlex.constants import StoragePoolConstants, VolumeConstants, SnapshotPolicyConstants
 
 
 LOG = logging.getLogger(__name__)
@@ -85,6 +85,35 @@ class PowerFlexUtility(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = ('Failed to list volume statistics for PowerFlex. '
+                   'Error: {response}'.format(response=response))
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
+    def get_statistics_for_all_snapshot_policies(self, ids=None, properties=None):
+        """list snapshot policy statistics for PowerFlex.
+
+        :param ids: list
+        :param properties: list
+        :return: dict
+        """
+
+        action = 'querySelectedStatistics'
+
+        params = {'properties': SnapshotPolicyConstants.DEFAULT_STATISTICS_PROPERTIES if properties is None else properties}
+        if ids is None:
+            params['allIds'] = ""
+        else:
+            params['ids'] = ids
+
+
+        r, response = self.send_post_request(self.list_statistics_url,
+                                             entity='SnapshotPolicy',
+                                             action=action,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to list snapshot policy statistics for PowerFlex. '
                    'Error: {response}'.format(response=response))
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)

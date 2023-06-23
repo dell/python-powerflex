@@ -14,8 +14,9 @@
 # under the License.
 
 import logging
-
+import requests
 from PyPowerFlex import base_client
+from PyPowerFlex import exceptions
 
 
 LOG = logging.getLogger(__name__)
@@ -71,17 +72,5 @@ class Sdc(base_client.EntityRequest):
         params = dict(
             perfProfile=perf_profile
         )
-
-        r, response = self.send_post_request(self.base_action_url, action,
-                                             sdc_id, params)
-
-        if r.status_code != requests.codes.ok:
-            msg = ('Failed to set Performance Profile on '
-                   'PowerFlex {entity} with id {_id} '
-                   '. Error: {response}'.format(entity=self.entity,
-                                                _id=sdc_id,
-                                                response=response))
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=sdc_id)
+        return self._perform_entity_operation_based_on_action\
+            (sdc_id, action, params=params, add_entity=False)

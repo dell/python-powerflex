@@ -74,6 +74,21 @@ class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
                 '/instances/ReplicationConsistencyGroup::{}'
                 '/action/removeReplicationConsistencyGroup'.format(self.fake_rcg_id):
                     {'id': self.fake_rcg_id},
+                '/instances/ReplicationConsistencyGroup::{}'
+                '/action/failoverReplicationConsistencyGroup'.format(self.fake_rcg_id):
+                    {'id': self.fake_rcg_id},
+                '/instances/ReplicationConsistencyGroup::{}'
+                '/action/reverseReplicationConsistencyGroup'.format(self.fake_rcg_id):
+                    {'id': self.fake_rcg_id},
+                '/instances/ReplicationConsistencyGroup::{}'
+                '/action/restoreReplicationConsistencyGroup'.format(self.fake_rcg_id):
+                    {'id': self.fake_rcg_id},
+                '/instances/ReplicationConsistencyGroup::{}'
+                '/action/switchoverReplicationConsistencyGroup'.format(self.fake_rcg_id):
+                    {'id': self.fake_rcg_id},
+                '/instances/ReplicationConsistencyGroup::{}'
+                '/action/syncNowReplicationConsistencyGroup'.format(self.fake_rcg_id):
+                    {'id': self.fake_rcg_id},
                 '/types/ReplicationConsistencyGroup/instances/action/querySelectedStatistics':
                     {},
                 '/instances/ReplicationConsistencyGroup::{}'
@@ -118,6 +133,21 @@ class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
 
     def test_resume(self):
         self.client.replication_consistency_group.resume(self.fake_rcg_id)
+
+    def test_failover(self):
+        self.client.replication_consistency_group.failover(self.fake_rcg_id)
+
+    def test_reverse(self):
+        self.client.replication_consistency_group.reverse(self.fake_rcg_id)
+
+    def test_restore(self):
+        self.client.replication_consistency_group.restore(self.fake_rcg_id)
+
+    def test_sync(self):
+        self.client.replication_consistency_group.sync(self.fake_rcg_id)
+
+    def test_switchover(self):
+        self.client.replication_consistency_group.switchover(self.fake_rcg_id)
 
     def test_set_as_consistent(self):
         self.client.replication_consistency_group.set_as_consistent(self.fake_rcg_id)

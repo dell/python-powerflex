@@ -100,3 +100,9 @@ class RCGConstants:
         "initialCopyProgress","lagPersistentSkew","rplSasBarriersBacklogSize","rplTransmitBwc","rplApplyLatency","readyForTransmit",
         "rplRemoteUserBwc"
     ]
+
+class SnapshotPolicyConstants:
+    DEFAULT_STATISTICS_PROPERTIES = [
+        "autoSnapshotVolIds","expiredButLockedSnapshotsIds","numOfAutoSnapshots",
+        "numOfExpiredButLockedSnapshots","numOfSrcVols","srcVolIds"
+    ]

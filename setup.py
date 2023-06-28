@@ -25,6 +25,8 @@ setup(
         'packaging>=20.4',
         'requests>=2.23.0',
     ],
+    license_files = ('LICENSE',),
+    classifiers=['License :: OSI Approved :: Apache Software License'],
     packages=[
         'PyPowerFlex',
         'PyPowerFlex.objects',

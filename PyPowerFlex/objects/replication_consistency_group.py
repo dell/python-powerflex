@@ -171,6 +171,54 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
 
         return self._perform_entity_operation_based_on_action(rcg_id, "resume")
 
+    def failover(self, rcg_id):
+        """Failover PowerFlex RCG.
+
+        :param rcg_id: str
+        :return: dict
+        """
+
+        return self._perform_entity_operation_based_on_action(rcg_id, "failover")
+
+    def sync(self, rcg_id):
+        """Synchronize PowerFlex RCG.
+
+        :param rcg_id: str
+        :return: dict
+        """
+
+        return self._perform_entity_operation_based_on_action(rcg_id, "syncNow")
+
+    def restore(self, rcg_id):
+        """Restore PowerFlex RCG.
+
+        :param rcg_id: str
+        :return: dict
+        """
+
+        return self._perform_entity_operation_based_on_action(rcg_id, "restore")
+
+    def reverse(self, rcg_id):
+        """Reverse PowerFlex RCG.
+
+        :param rcg_id: str
+        :return: dict
+        """
+
+        return self._perform_entity_operation_based_on_action(rcg_id, "reverse")
+
+    def switchover(self, rcg_id, force=False):
+        """Switch over PowerFlex RCG.
+
+        :param rcg_id: str
+        :param force: bool
+        :return: dict
+        """
+        url_params = {
+            'force':force
+        }
+        return self._perform_entity_operation_based_on_action(rcg_id, "switchover", **url_params)
+
     def set_as_consistent(self, rcg_id):
         """Set PowerFlex RCG as consistent.
 

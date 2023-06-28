@@ -38,6 +38,9 @@ class TestSdcClient(tests.PyPowerFlexTestCase):
                 '/instances/Sdc::{}'
                 '/action/setSdcName'.format(self.fake_sdc_id):
                     {},
+                '/instances/Sdc::{}'
+                '/action/setSdcPerformanceParameters'.format(self.fake_sdc_id):
+                    {},
             }
         }
 
@@ -68,3 +71,13 @@ class TestSdcClient(tests.PyPowerFlexTestCase):
                               self.client.sdc.rename,
                               self.fake_sdc_id,
                               name='new_name')
+
+    def test_set_performance_profile(self):
+        self.client.sdc.set_performance_profile(self.fake_sdc_id, 'Compact')
+
+    def test_set_performance_profile_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexFailEntityOperation,
+                              self.client.sdc.set_performance_profile,
+                              self.fake_sdc_id,
+                              'Compact')

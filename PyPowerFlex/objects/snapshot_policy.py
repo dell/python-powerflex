@@ -66,7 +66,9 @@ class SnapshotPolicy(base_client.EntityRequest):
                auto_snap_creation_cadence_in_min,
                retained_snaps_per_level,
                name=None,
-               paused=None):
+               paused=None,
+               snapshotAccessMode=None,
+               secureSnapshots=None):
         """Create PowerFlex snapshot policy.
 
         :type auto_snap_creation_cadence_in_min: int
@@ -79,8 +81,8 @@ class SnapshotPolicy(base_client.EntityRequest):
         params = dict(
             autoSnapshotCreationCadenceInMin=auto_snap_creation_cadence_in_min,
             numOfRetainedSnapshotsPerLevel=retained_snaps_per_level,
-            name=name,
-            paused=paused
+            name=name, paused=paused, snapshotAccessMode=snapshotAccessMode,
+            secureSnapshots=secureSnapshots
         )
 
         return self._create_entity(params)
@@ -230,3 +232,15 @@ class SnapshotPolicy(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=snapshot_policy_id)
+
+    def get_statistics(self, snapshot_policy_id, fields=None):
+        """Get related PowerFlex Statistics for snapshot policy.
+
+        :type snapshot_policy_id: str
+        :type fields: list|tuple
+        :rtype: dict
+        """
+
+        return self.get_related(snapshot_policy_id,
+                                'Statistics',
+                                fields)

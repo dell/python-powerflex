@@ -325,7 +325,7 @@ class EntityRequest(Request):
         return response
 
     def _perform_entity_operation_based_on_action(self, entity_id, action,
-                                                  params=None, add_entity=True):
+                                                  params=None, add_entity=True, **url_params):
         if add_entity:
             action = action + self.entity
 
@@ -333,7 +333,8 @@ class EntityRequest(Request):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=entity_id,
-                                             params=params)
+                                             params=params,
+                                             **url_params)
         if r.status_code != requests.codes.ok:
             exc = exceptions.PowerFlexFailEntityOperation(self.entity, entity_id,
                                                           action, response)

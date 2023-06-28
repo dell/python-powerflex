@@ -17,12 +17,12 @@ from setuptools import setup
 
 setup(
     name='PyPowerFlex',
-    version='1.7.0',
+    version='1.8.0',
     description='Python library for Dell PowerFlex',
     author='Ansible Team at Dell',
     author_email='ansible.team@dell.com',
     install_requires=[
-        'packaging==20.4',
+        'packaging>=20.4',
         'requests>=2.23.0',
     ],
     packages=[

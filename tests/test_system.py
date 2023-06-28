@@ -67,6 +67,8 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
                 '/instances/System'
                 '/queryMdmCluster':
                     {},
+                '/Configuration':
+                    {},
             },
             self.RESPONSE_MODE.Invalid: {
                 '/version': 'invalid_version_format'
@@ -202,3 +204,11 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.system.switch_cluster_mode,
                               self.fake_mdm_id)
+
+    def test_get_gateway_configuration_details(self):
+        self.client.system.get_gateway_configuration_details()
+
+    def test_get_gateway_configuration_details_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.get_gateway_configuration_details)

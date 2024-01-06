@@ -522,3 +522,45 @@ class Volume(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=volume_id)
+
+    def migrate_vtree(self,
+                      volume_id,
+                      dest_sp_id,
+                      ignore_dest_capacity=None,
+                      queue_position=None,
+                      vol_type_conversion=None,
+                      allow_thick_non_zero=None,
+                      compression_method=None):
+
+        action = 'migrateVTree'
+
+        if not all([volume_id, dest_sp_id]):
+            msg = 'Both volume_id and dest_sp_id must be set.'
+            raise exceptions.InvalidInput(msg)
+
+        params = dict(
+            id=volume_id,
+            destSPId=dest_sp_id,
+            ignoreDestinationCapacity=ignore_dest_capacity,
+            queuePosition=queue_position,
+            volTypeConversion=vol_type_conversion,
+            allowThickNonZeroPaddedVTree=allow_thick_non_zero,
+            compressionMethod=compression_method
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=volume_id,
+                                             params=params)
+
+        if r.status_code != requests.codes.ok:
+            msg = ('Failed to migrate PowerFlex {entity} with id {_id} '
+                   'Error: {response}'.format(entity=self.entity,_id=volume_id, response=response))
+
+            LOG.error(msg)
+
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=volume_id)
+

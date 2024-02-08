@@ -20,7 +20,6 @@ import sys
 
 from PyPowerFlex import exceptions
 
-
 def init_logger(log_level):
     """Initialize logger for PowerFlex client.
 
@@ -130,14 +129,22 @@ def prepare_params(params, dump=True):
     return prepared
 
 
-def check_version(version):
+def is_version_3(version: str):
     """ Check the API version.
 
     :param version: Specifies the current API version
-    :return: True if API version is greater than or equal to 4.0
+    :return: True if API version is lesser than 4.0
     :rtype: bool
     """
     appliance_version = "4.0"
-    if version >= appliance_version:
+    if version < appliance_version:
         return True
     return False
+
+def build_uri(uri, **url_params):
+    for key, value in url_params.items():
+        if value is not None:
+            uri += '/{key}'.format(key=value)
+    return uri
+    # if url_params.get('filter'):
+    #     target_uri += '/{filter}'.format(filter=url_params.get('filter'))

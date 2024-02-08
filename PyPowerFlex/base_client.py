@@ -21,7 +21,6 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
 
-
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 LOG = logging.getLogger(__name__)
 
@@ -60,17 +59,21 @@ class Request:
             verify_certificate = self.configuration.certificate_path
         return verify_certificate
 
+    def get_auth_header(self):
+        return {'Authorization': 'Bearer {0}'.format(self.token.get())}
+
     def send_get_request(self, url, **url_params):
         request_url = self.base_url + url.format(**url_params)
+        LOG.error("Request URL: %s", request_url)
         version = self.login()
         r = requests.get(request_url,
                          auth=(
                              self.configuration.username,
                              self.token.get()
-                         ),
+                         ) if utils.is_version_3(version) else None,
+                         headers=None if utils.is_version_3(version) else self.get_auth_header(),
                          verify=self.verify_certificate,
                          timeout=self.configuration.timeout)
-
         self.logout(version)
         response = r.json()
         return r, response
@@ -117,18 +120,18 @@ class Request:
     # To perform login based on the API version
     def login(self):
         version = self.get_api_version()
-        if utils.check_version(version=version):
-            self._appliance_login()
-        else:
+        if utils.is_version_3(version=version):
             self._login()
+        else:
+            self._appliance_login()
         return version
 
     # To perform logout based on the API version
     def logout(self, version):
-        if utils.check_version(version=version):
-            self._appliance_logout()
-        else:
+        if utils.is_version_3(version=version):
             self._logout()
+        else:
+            self._appliance_logout()
 
     # Get the Current API version
     def get_api_version(self):
@@ -226,6 +229,9 @@ class EntityRequest(Request):
     base_object_url = '/instances/{entity}/action/{action}'
     query_mdm_cluster_url = '/instances/{entity}/queryMdmCluster'
     list_statistics_url = '/types/{entity}/instances/action/{action}'
+    service_template_url = '/V1/ServiceTemplate'
+    managed_device_url = '/V1/ManagedDevice'
+    deployment_url = '/V1/Deployment'
     entity_name = None
 
     @property

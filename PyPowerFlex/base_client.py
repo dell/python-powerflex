@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Dell Inc. or its subsidiaries.
+# Copyright (c) 2024 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -21,12 +21,13 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
 
-
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 LOG = logging.getLogger(__name__)
 
 
 class Request:
+    GET = "get"
+
     def __init__(self, token, configuration):
         self.token = token
         self.configuration = configuration
@@ -60,17 +61,24 @@ class Request:
             verify_certificate = self.configuration.certificate_path
         return verify_certificate
 
+    def get_auth_headers(self, request_type=None):
+        if request_type == self.GET:
+            return {'Authorization': 'Bearer {0}'.format(self.token.get())}
+        return {'Authorization': 'Bearer {0}'.format(self.token.get()),
+                'content-type': 'application/json'}
+
     def send_get_request(self, url, **url_params):
         request_url = self.base_url + url.format(**url_params)
         version = self.login()
-        r = requests.get(request_url,
-                         auth=(
-                             self.configuration.username,
-                             self.token.get()
-                         ),
-                         verify=self.verify_certificate,
-                         timeout=self.configuration.timeout)
-
+        request_params = {'url': request_url,
+                          'headers': self.get_auth_headers(request_type=self.GET),
+                          'verify': self.verify_certificate,
+                          'timeout': self.configuration.timeout}
+        if utils.is_version_3(version):
+            request_params['auth'] = (self.configuration.username,
+                                      self.token.get())
+            request_params['headers'] = None
+        r = requests.get(**request_params)
         self.logout(version)
         response = r.json()
         return r, response
@@ -117,18 +125,18 @@ class Request:
     # To perform login based on the API version
     def login(self):
         version = self.get_api_version()
-        if utils.check_version(version=version):
-            self._appliance_login()
-        else:
+        if utils.is_version_3(version=version):
             self._login()
+        else:
+            self._appliance_login()
         return version
 
     # To perform logout based on the API version
     def logout(self, version):
-        if utils.check_version(version=version):
-            self._appliance_logout()
-        else:
+        if utils.is_version_3(version=version):
             self._logout()
+        else:
+            self._appliance_logout()
 
     # Get the Current API version
     def get_api_version(self):
@@ -165,12 +173,8 @@ class Request:
     # API logout method for 4.0 and above.
     def _appliance_logout(self):
         request_url = self.auth_url + '/logout'
-        token = self.token.get()
-        headers = {'Authorization': 'Bearer {0}'.format(token),
-                   'content-type': 'application/json'
-                   }
         data = {'refresh_token': '{0}'.format(self.__refresh_token)}
-        r = requests.post(request_url, headers=headers, json=data,
+        r = requests.post(request_url, headers=self.get_auth_headers(), json=data,
                           verify=self.verify_certificate,
                           timeout=self.configuration.timeout
                           )
@@ -184,20 +188,21 @@ class Request:
 
     def _login(self):
         request_url = self.base_url + '/login'
-
-        r = requests.get(request_url,
-                         auth=(
-                             self.configuration.username,
-                             self.configuration.password
-                         ),
-                         verify=self.verify_certificate,
-                         timeout=self.configuration.timeout)
-        if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailQuerying('token')
-            LOG.error(exc.message)
-            raise exc
-        token = r.json()
-        self.token.set(token)
+        try:
+            r = requests.get(request_url,
+                            auth=(
+                                self.configuration.username,
+                                self.configuration.password
+                            ),
+                            verify=self.verify_certificate,
+                            timeout=self.configuration.timeout)
+            r.raise_for_status()
+            token = r.json()
+            self.token.set(token)
+        except requests.exceptions.RequestException as e:
+            error_msg = f'Login failed with error:{e.response.content}' if e.response else f'Login failed with error:{str(e)}'
+            LOG.error(error_msg)
+            raise Exception(error_msg)
 
     def _logout(self):
         token = self.token.get()
@@ -226,6 +231,9 @@ class EntityRequest(Request):
     base_object_url = '/instances/{entity}/action/{action}'
     query_mdm_cluster_url = '/instances/{entity}/queryMdmCluster'
     list_statistics_url = '/types/{entity}/instances/action/{action}'
+    service_template_url = '/V1/ServiceTemplate'
+    managed_device_url = '/V1/ManagedDevice'
+    deployment_url = '/V1/Deployment'
     entity_name = None
 
     @property

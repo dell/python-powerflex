@@ -1,5 +1,8 @@
 # PyPowerFlex Change Log
 
+## Version 1.9.0 - released on 29/02/24
+- Added support for retrieving managed devices, service templates and deployments from PowerFlex Manager.
+
 ## Version 1.8.0 - released on 30/06/23
 - Added block provisioning operations includes modifying performance profile in SDC, adding statistics data for snapshot policy, adding gateway configuration details for system, failover, restore, reverse, switchover, and sync operations in replication consistency group.
 

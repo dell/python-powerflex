@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Dell Inc. or its subsidiaries.
+# Copyright (c) 2024 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -19,7 +19,6 @@ import numbers
 import sys
 
 from PyPowerFlex import exceptions
-
 
 def init_logger(log_level):
     """Initialize logger for PowerFlex client.
@@ -130,14 +129,20 @@ def prepare_params(params, dump=True):
     return prepared
 
 
-def check_version(version):
+def is_version_3(version):
     """ Check the API version.
 
     :param version: Specifies the current API version
-    :return: True if API version is greater than or equal to 4.0
+    :return: True if API version is lesser than 4.0
     :rtype: bool
     """
     appliance_version = "4.0"
-    if version >= appliance_version:
+    if version < appliance_version:
         return True
     return False
+
+def build_uri_with_params(uri, **url_params):
+    query_params = [f"{key}={item}" if isinstance(value, list) else f"{key}={value}" for key, value in url_params.items() for item in (value if isinstance(value, list) else [value]) if item is not None]
+    if query_params:
+        uri += '?' + '&'.join(query_params)
+    return uri

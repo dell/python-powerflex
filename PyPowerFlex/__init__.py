@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Dell Inc. or its subsidiaries.
+# Copyright (c) 2024 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -44,7 +44,10 @@ class PowerFlexClient:
         'volume',
         'utility',
         'replication_consistency_group',
-        'replication_pair'
+        'replication_pair',
+        'service_template',
+        'managed_device',
+        'deployment'
     )
 
     def __init__(self,
@@ -92,6 +95,9 @@ class PowerFlexClient:
         self.__add_storage_entity('utility', objects.PowerFlexUtility)
         self.__add_storage_entity('replication_consistency_group', objects.ReplicationConsistencyGroup)
         self.__add_storage_entity('replication_pair', objects.ReplicationPair)
+        self.__add_storage_entity('service_template', objects.ServiceTemplate)
+        self.__add_storage_entity('managed_device', objects.ManagedDevice)
+        self.__add_storage_entity('deployment', objects.Deployment)
         utils.init_logger(self.configuration.log_level)
         if version.parse(self.system.api_version()) < version.Version('3.0'):
             raise exceptions.PowerFlexClientException(

@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Dell Inc. or its subsidiaries.
+# Copyright (c) 2024 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -109,7 +109,7 @@ class PyPowerFlexTestCase(TestCase):
         self.post_mock = self.mock_object(requests,
                                           'post',
                                           side_effect=self.get_mock_response)
-        utils.check_version = mock.MagicMock(return_value=False)
+        utils.is_version_3 = mock.MagicMock(return_value=True)
 
     def mock_object(self, obj, attr_name, *args, **kwargs):
         """Use python mock to mock an object attribute.

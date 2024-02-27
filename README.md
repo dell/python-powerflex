@@ -41,6 +41,9 @@ python setup.py install
 * Sdc
 * FaultSet
 * Volume
+* ManagedDevice
+* Deployment
+* ServiceTemplate
 
 #### Initialize PowerFlex client
 

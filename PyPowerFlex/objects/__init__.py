@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Dell Inc. or its subsidiaries.
+# Copyright (c) 2024 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -26,6 +26,9 @@ from PyPowerFlex.objects.volume import Volume
 from PyPowerFlex.objects.utility import PowerFlexUtility
 from PyPowerFlex.objects.replication_consistency_group import ReplicationConsistencyGroup
 from PyPowerFlex.objects.replication_pair import ReplicationPair
+from PyPowerFlex.objects.service_template import ServiceTemplate
+from PyPowerFlex.objects.managed_device import ManagedDevice
+from PyPowerFlex.objects.deployment import Deployment
 
 
 __all__ = [
@@ -41,5 +44,8 @@ __all__ = [
     'Volume',
     'PowerFlexUtility',
     'ReplicationConsistencyGroup',
-    'ReplicationPair'
+    'ReplicationPair',
+    'ServiceTemplate',
+    'ManagedDevice',
+    'Deployment',
 ]

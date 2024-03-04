@@ -101,3 +101,22 @@ class FaultSet(base_client.EntityRequest):
         )
 
         return self._rename_entity(action, fault_set_id, params)
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex fault set statistics.
+
+        :type properties: list
+        :type ids: list of fault set IDs or None for all fault sets
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

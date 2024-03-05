@@ -50,3 +50,34 @@ class Deployment(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
         return response
+
+    def deploy(self, rg_data):
+        r, response = self.send_post_request(self.deployment_url, rg_data)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to deploy resource group. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response 
+
+    def edit(self, deployment_id, rg_data):
+        request_url = f'{self.deployment_url}/{deployment_id}'
+        r, response = self.send_put_request(request_url, rg_data)
+        
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to edit resource group. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
+    def delete(self, deployment_id):
+        request_url = f'{self.deployment_url}/{deployment_id}'
+        response = self.send_delete_request(request_url)
+
+        if response.status_code != requests.codes.no_content:
+            msg = (f'Failed to delete resource group. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response

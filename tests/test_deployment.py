@@ -21,11 +21,13 @@ class TestDeploymentClient(tests.PyPowerFlexTestCase):
     def setUp(self):
         super(TestDeploymentClient, self).setUp()
         self.client.initialize()
-
+        self.deploymentId = '8aaa03a88de961fa018de9c882d20301'
+        self.rg_data = {}
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
                 '/V1/Deployment': {},
-                '/V1/Deployment?filter=co,name,Partial&includeDevices=False': {}
+                '/V1/Deployment?filter=co,name,Partial&includeDevices=False': {},
+                '/V1/Deployment/8aaa03a88de961fa018de9c882d20301': {}
             }
         }
 
@@ -39,3 +41,31 @@ class TestDeploymentClient(tests.PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.deployment.get)
+
+    def test_deployment_deploy(self):
+        self.client.deployment.deploy(self.rg_data)
+
+    def test_deployment_deploy_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.deployment.deploy,
+                              self.rg_data)
+
+    def test_deployment_edit(self):
+        self.client.deployment.edit(self.deploymentId, self.rg_data)
+
+    def test_deployment_edit_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.deployment.edit,
+                              self.deploymentId,
+                              self.rg_data)
+
+    def test_deployment_delete(self):
+        self.client.deployment.delete(self.deploymentId)
+
+    def test_deployment_delete_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.deployment.delete,
+                              self.deploymentId)

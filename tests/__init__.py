@@ -109,6 +109,12 @@ class PyPowerFlexTestCase(TestCase):
         self.post_mock = self.mock_object(requests,
                                           'post',
                                           side_effect=self.get_mock_response)
+        self.put_mock = self.mock_object(requests,
+                                         'put',
+                                         side_effect=self.get_mock_response)
+        self.delete_mock = self.mock_object(requests,
+                                            'delete',
+                                            side_effect=self.get_mock_response)
         utils.is_version_3 = mock.MagicMock(return_value=True)
 
     def mock_object(self, obj, attr_name, *args, **kwargs):

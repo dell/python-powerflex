@@ -86,20 +86,55 @@ class Request:
     def send_post_request(self, url, params=None, **url_params):
         if params is None:
             params = dict()
-        version = self.login()
         request_url = self.base_url + url.format(**url_params)
-        r = requests.post(request_url,
-                          auth=(
-                              self.configuration.username,
-                              self.token.get()
-                          ),
-                          headers=self.headers,
-                          data=utils.prepare_params(params),
-                          verify=self.verify_certificate,
-                          timeout=self.configuration.timeout)
-        response = r.json()
+        version = self.login()
+        request_params = {'url': request_url,
+                          'headers': self.get_auth_headers(),
+                          'data': utils.prepare_params(params),
+                          'verify': self.verify_certificate,
+                          'timeout': self.configuration.timeout}
+        if utils.is_version_3(version):
+            request_params['auth'] = (self.configuration.username,
+                                      self.token.get())
+            request_params['headers'] = None
+        r = requests.post(**request_params)
         self.logout(version)
+        response = r.json()
         return r, response
+
+    def send_put_request(self, url, params=None, **url_params):
+        if params is None:
+            params = dict()
+        request_url = self.base_url + url.format(**url_params)
+        version = self.login()
+        request_params = {'url': request_url,
+                          'headers': self.get_auth_headers(),
+                          'data': utils.prepare_params(params),
+                          'verify': self.verify_certificate,
+                          'timeout': self.configuration.timeout}
+        if utils.is_version_3(version):
+            request_params['auth'] = (self.configuration.username,
+                                      self.token.get())
+            request_params['headers'] = None
+        r = requests.put(**request_params)
+        self.logout(version)
+        response = r.json()
+        return r, response
+
+    def send_delete_request(self, url, **url_params):
+        request_url = self.base_url + url.format(**url_params)
+        version = self.login()
+        request_params = {'url': request_url,
+                          'headers': self.get_auth_headers(request_type=self.GET),
+                          'verify': self.verify_certificate,
+                          'timeout': self.configuration.timeout}
+        if utils.is_version_3(version):
+            request_params['auth'] = (self.configuration.username,
+                                      self.token.get())
+            request_params['headers'] = None
+        r = requests.delete(**request_params)
+        self.logout(version)
+        return r
 
     def send_mdm_cluster_post_request(self, url, params=None, **url_params):
         if params is None:

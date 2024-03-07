@@ -41,6 +41,10 @@ class TestReplicationPairClient(tests.PyPowerFlexTestCase):
                     {'id': self.fake_replication_pair_id},
                 '/types/ReplicationPair/instances/action/querySelectedStatistics':
                     {},
+                '/types/ReplicationPair'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_replication_pair_id: {'initialCopyProgress': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/ReplicationPair/instances':
@@ -82,3 +86,16 @@ class TestReplicationPairClient(tests.PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.replication_pair.get_all_statistics)
+
+    def test_replication_pair_query_selected_statistics(self):
+        self.client.replication_pair.query_selected_statistics(
+            properties=["initialCopyProgress"]
+        )
+
+    def test_replication_pair_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.replication_pair.query_selected_statistics,
+                properties=["initialCopyProgress"],
+            )

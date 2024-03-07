@@ -42,6 +42,10 @@ class TestDeviceClient(tests.PyPowerFlexTestCase):
                 '/instances/Device::{}'
                 '/action/setMediaType'.format(self.fake_device_id):
                     {},
+                '/types/Device'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_device_id: {'avgReadLatencyInMicrosec': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/Device/instances':
@@ -114,4 +118,17 @@ class TestDeviceClient(tests.PyPowerFlexTestCase):
                 self.client.device.set_media_type,
                 self.fake_device_id,
                 media_type=MediaType.hdd
+            )
+
+    def test_device_query_selected_statistics(self):
+        self.client.device.query_selected_statistics(
+            properties=["avgReadLatencyInMicrosec"]
+        )
+
+    def test_device_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.device.query_selected_statistics,
+                properties=["avgReadLatencyInMicrosec"],
             )

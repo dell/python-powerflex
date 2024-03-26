@@ -120,6 +120,9 @@ def prepare_params(params, dump=True):
     :return: prepared parameters
     """
 
+    if not isinstance(params, dict):
+        return params
+
     prepared = dict()
     for name, value in params.items():
         if value is not None:

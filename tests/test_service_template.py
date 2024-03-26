@@ -21,11 +21,12 @@ class TestServiceTemplateClient(tests.PyPowerFlexTestCase):
     def setUp(self):
         super(TestServiceTemplateClient, self).setUp()
         self.client.initialize()
-
+        self.template_id = 1234
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
                 '/V1/ServiceTemplate': {},
-                '/V1/ServiceTemplate?filter=eq,draft,False&limit=10&includeAttachments=False': {}
+                '/V1/ServiceTemplate?filter=eq,draft,False&limit=10&includeAttachments=False': {},
+                f'/V1/ServiceTemplate/{self.template_id}?forDeployment=true': {}
             }
         }
 
@@ -39,3 +40,12 @@ class TestServiceTemplateClient(tests.PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.service_template.get)
+
+    def test_service_template_get_by_id(self):
+        self.client.service_template.get_by_id(self.template_id, for_deployment=True)
+
+    def test_service_template_get_by_id_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.service_template.get_by_id,
+                              self.template_id, for_deployment=True)

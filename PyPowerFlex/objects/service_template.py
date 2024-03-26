@@ -46,3 +46,20 @@ class ServiceTemplate(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
         return response
+
+    def get_by_id(self, service_template_id, for_deployment=False):
+        """
+        Retrieve a Service Template by its ID.
+        :param service_template_id: The ID of the Service Template to retrieve.
+        :param for_deployment: (Optional) Whether to retrieve the Service Template for deployment.
+        :return: A dictionary containing the retrieved Service Template.
+        """
+        url = f'{self.service_template_url}/{service_template_id}'
+        if for_deployment:
+            url += '?forDeployment=true'
+        r, response = self.send_get_request(url)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to retrieve service template by id {service_template_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+        return response

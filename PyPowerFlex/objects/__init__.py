@@ -29,6 +29,7 @@ from PyPowerFlex.objects.replication_pair import ReplicationPair
 from PyPowerFlex.objects.service_template import ServiceTemplate
 from PyPowerFlex.objects.managed_device import ManagedDevice
 from PyPowerFlex.objects.deployment import Deployment
+from PyPowerFlex.objects.firmware_repository import FirmwareRepository
 
 
 __all__ = [
@@ -48,4 +49,5 @@ __all__ = [
     'ServiceTemplate',
     'ManagedDevice',
     'Deployment',
+    'FirmwareRepository',
 ]

@@ -50,3 +50,93 @@ class Deployment(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
         return response
+
+    def get_by_id(self, deployment_id):
+        """
+        Retrieve Deployment for specified ID.
+        :param deployment_id: Deployment ID.
+        :return: A dictionary containing the retrieved Deployment.
+        """
+        r, response = self.send_get_request(f'{self.deployment_url}/{deployment_id}')
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to retrieve deployment by id {deployment_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+        return response
+
+    def validate(self, rg_data):
+        """
+        Validates a new deployment.
+        Args:
+            rg_data (dict): The resource group data to be deployed.
+        Returns:
+            dict: The response from the deployment API.
+        Raises:
+            PowerFlexClientException: If the deployment fails.
+        """
+        r, response = self.send_post_request(f'{self.deployment_url}/validate', rg_data)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to validate the deployment. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
+    def create(self, rg_data):
+        """
+        Creates a new deployment.
+        Args:
+            rg_data (dict): The resource group data to be deployed.
+        Returns:
+            dict: The response from the deployment API.
+        Raises:
+            PowerFlexClientException: If the deployment fails.
+        """
+        r, response = self.send_post_request(self.deployment_url, rg_data)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to create a new deployment. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
+    def edit(self, deployment_id, rg_data):
+        """
+        Edit a deployment with the given ID using the provided data.
+        Args:
+            deployment_id (str): The ID of the deployment to edit.
+            rg_data (dict): The data to use for editing the deployment.
+        Returns:
+            dict: The response from the API.
+        Raises:
+            PowerFlexClientException: If the request fails.
+        """
+        request_url = f'{self.deployment_url}/{deployment_id}'
+        r, response = self.send_put_request(request_url, rg_data)
+        
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to edit the deployment. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
+    def delete(self, deployment_id):
+        """
+        Deletes a deployment with the given ID.
+        Args:
+            deployment_id (str): The ID of the deployment to delete.
+        Returns:
+            str: The response from the delete request.
+        Raises:
+            exceptions.PowerFlexClientException: If the delete request fails.
+        """
+        request_url = f'{self.deployment_url}/{deployment_id}'
+        response = self.send_delete_request(request_url)
+
+        if response.status_code != requests.codes.no_content:
+            msg = (f'Failed to delete deployment. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response

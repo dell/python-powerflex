@@ -77,7 +77,7 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
 
     def test_system_api_version(self):
         self.client.system.api_version()
-        self.assertEqual(5, self.get_mock.call_count)
+        self.assertEqual(4, self.get_mock.call_count)
 
     def test_system_api_version_bad_status(self):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
@@ -95,7 +95,7 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
         self.client.system.api_version()
         self.client.system.api_version()
         self.client.system.api_version()
-        self.assertEqual(5, self.get_mock.call_count)
+        self.assertEqual(4, self.get_mock.call_count)
 
     def test_system_remove_cg_snapshots(self):
         self.client.system.remove_cg_snapshots(self.fake_system_id,

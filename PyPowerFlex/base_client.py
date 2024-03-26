@@ -27,6 +27,9 @@ LOG = logging.getLogger(__name__)
 
 class Request:
     GET = "get"
+    POST = "post"
+    PUT = "put"
+    DELETE = "delete"
 
     def __init__(self, token, configuration):
         self.token = token
@@ -67,39 +70,39 @@ class Request:
         return {'Authorization': 'Bearer {0}'.format(self.token.get()),
                 'content-type': 'application/json'}
 
-    def send_get_request(self, url, **url_params):
-        request_url = self.base_url + url.format(**url_params)
+    def send_request(self, method, url, params=None, **url_params):
+        params = params or {}
+        request_url = f"{self.base_url}{url.format(**url_params)}"
         version = self.login()
-        request_params = {'url': request_url,
-                          'headers': self.get_auth_headers(request_type=self.GET),
-                          'verify': self.verify_certificate,
-                          'timeout': self.configuration.timeout}
+        request_params = {
+            'headers': self.get_auth_headers(method),
+            'verify': self.verify_certificate,
+            'timeout': self.configuration.timeout
+        }
         if utils.is_version_3(version):
-            request_params['auth'] = (self.configuration.username,
-                                      self.token.get())
+            request_params['auth'] = (self.configuration.username, self.token.get())
             request_params['headers'] = None
-        r = requests.get(**request_params)
+
+        if method in [self.PUT, self.POST]:
+            request_params['data'] = utils.prepare_params(params)
+        response = requests.request(method, request_url, **request_params)
         self.logout(version)
-        response = r.json()
-        return r, response
+        return response
+
+    def send_get_request(self, url, params=None, **url_params):
+        response = self.send_request(self.GET, url, params, **url_params)
+        return response, response.json()
 
     def send_post_request(self, url, params=None, **url_params):
-        if params is None:
-            params = dict()
-        version = self.login()
-        request_url = self.base_url + url.format(**url_params)
-        r = requests.post(request_url,
-                          auth=(
-                              self.configuration.username,
-                              self.token.get()
-                          ),
-                          headers=self.headers,
-                          data=utils.prepare_params(params),
-                          verify=self.verify_certificate,
-                          timeout=self.configuration.timeout)
-        response = r.json()
-        self.logout(version)
-        return r, response
+        response = self.send_request(self.POST, url, params, **url_params)
+        return response, response.json()
+
+    def send_put_request(self, url, params=None, **url_params):
+        response = self.send_request(self.PUT, url, params, **url_params)
+        return response, response.json()
+
+    def send_delete_request(self, url, params=None, **url_params):
+        return self.send_request(self.DELETE, url, params, **url_params)
 
     def send_mdm_cluster_post_request(self, url, params=None, **url_params):
         if params is None:
@@ -234,6 +237,7 @@ class EntityRequest(Request):
     service_template_url = '/V1/ServiceTemplate'
     managed_device_url = '/V1/ManagedDevice'
     deployment_url = '/V1/Deployment'
+    firmware_repository_url = '/V1/FirmwareRepository'
     entity_name = None
 
     @property

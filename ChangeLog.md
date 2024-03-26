@@ -1,5 +1,8 @@
 # PyPowerFlex Change Log
 
+## Version 1.10.0 - released on 29/03/24
+- Added support for retrieving all the firmware repository, validating, deploying, editing, adding nodes and deleting a resource group from PowerFlex Manager.
+
 ## Version 1.9.0 - released on 29/02/24
 - Added support for retrieving managed devices, service templates and deployments from PowerFlex Manager.
 

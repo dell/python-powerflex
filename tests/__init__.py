@@ -34,7 +34,6 @@ class MockResponse(requests.Response):
 
     def __init__(self, content, status_code=200):
         super(MockResponse, self).__init__()
-
         self._content = content
         self.request = mock.MagicMock()
         self.status_code = status_code
@@ -103,6 +102,7 @@ class PyPowerFlexTestCase(TestCase):
                                                   self.username,
                                                   self.password,
                                                   log_level=logging.DEBUG)
+        requests.request = self.get_mock_response
         self.get_mock = self.mock_object(requests,
                                          'get',
                                          side_effect=self.get_mock_response)
@@ -117,7 +117,6 @@ class PyPowerFlexTestCase(TestCase):
         Mocks the specified objects attribute with the given value.
         Automatically performs 'addCleanup' for the mock.
         """
-
         patcher = mock.patch.object(obj, attr_name, *args, **kwargs)
         result = patcher.start()
         self.addCleanup(patcher.stop)
@@ -131,10 +130,11 @@ class PyPowerFlexTestCase(TestCase):
         yield
         self.__http_response_mode = previous_response_mode
 
-    def get_mock_response(self, url, mode=None, *args, **kwargs):
+    def get_mock_response(self, url, request_url=None, mode=None, *args, **kwargs):
         if mode is None:
             mode = self.__http_response_mode
-        api_path = url.split('/api')[1]
+
+        api_path = url.split('/api')[1] if ('/api' in url) else request_url.split('/api')[1]
         try:
             if api_path == "/login":
                 response = self.RESPONSE_MODE.Valid[0]
@@ -155,7 +155,14 @@ class PyPowerFlexTestCase(TestCase):
                         )
                     )
         if not isinstance(response, MockResponse):
-            response = MockResponse(response, 200)
+            response = self._get_mock_response(response)
+
         response.request.url = url
         response.request.body = kwargs.get('data')
         return response
+
+    def _get_mock_response(self, response):
+        if "204" in str(response):
+            return MockResponse(response, 204)
+        else:
+            return MockResponse(response, 200)

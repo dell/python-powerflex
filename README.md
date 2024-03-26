@@ -44,6 +44,7 @@ python setup.py install
 * ManagedDevice
 * Deployment
 * ServiceTemplate
+* FirmwareRepository
 
 #### Initialize PowerFlex client
 

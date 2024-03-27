@@ -232,6 +232,7 @@ class EntityRequest(Request):
     base_entity_list_or_create_url = '/types/{entity}/instances'
     base_relationship_url = base_entity_url + '/relationships/{related}'
     base_object_url = '/instances/{entity}/action/{action}'
+    base_type_special_action_url = '/types/{entity}/instances/action/{action}'
     query_mdm_cluster_url = '/instances/{entity}/queryMdmCluster'
     list_statistics_url = '/types/{entity}/instances/action/{action}'
     service_template_url = '/V1/ServiceTemplate'
@@ -352,3 +353,20 @@ class EntityRequest(Request):
                                                           action, response)
             LOG.error(exc.message)
             raise exc
+
+    def _query_selected_statistics(self, action, params=None):
+        r, response = self.send_post_request(self.base_type_special_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            exc = exceptions.PowerFlexFailQuerying(self.entity,
+                                                   response=response,
+                                                   entity_id=params["ids"]
+                                                   if "ids" in params
+                                                   else "all IDs"
+                                                   if "allIds" in params
+                                                   else None)
+            LOG.error(exc.message)
+            raise exc
+        return response

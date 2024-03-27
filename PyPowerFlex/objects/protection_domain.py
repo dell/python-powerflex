@@ -262,3 +262,23 @@ class ProtectionDomain(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=protection_domain_id)
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex protection domain statistics.
+
+        :type properties: list
+        :type ids: list of protection domain IDs or None for all protection
+                   domains
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

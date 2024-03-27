@@ -244,3 +244,23 @@ class SnapshotPolicy(base_client.EntityRequest):
         return self.get_related(snapshot_policy_id,
                                 'Statistics',
                                 fields)
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex snapshot policy statistics.
+
+        :type properties: list
+        :type ids: list of snapshot policy IDs or None for all snapshot
+                   policies
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

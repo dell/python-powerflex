@@ -101,3 +101,23 @@ class ReplicationPair(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return response
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex replication pair statistics.
+
+        :type properties: list
+        :type ids: list of replication pair IDs or None for all replication
+                   pairs
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

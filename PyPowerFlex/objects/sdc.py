@@ -74,3 +74,22 @@ class Sdc(base_client.EntityRequest):
         )
         return self._perform_entity_operation_based_on_action\
             (sdc_id, action, params=params, add_entity=False)
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex SDC statistics.
+
+        :type properties: list
+        :type ids: list of SDC IDs or None for all SDC
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

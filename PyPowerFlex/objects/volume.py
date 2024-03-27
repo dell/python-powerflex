@@ -522,3 +522,22 @@ class Volume(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=volume_id)
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex volume statistics.
+
+        :type properties: list
+        :type ids: list of volume IDs or None for all volumes
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

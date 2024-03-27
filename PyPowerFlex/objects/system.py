@@ -431,3 +431,16 @@ class System(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return True
+
+    def query_selected_statistics(self, properties):
+        """Query PowerFlex system statistics.
+
+        :type properties: list
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        return self._query_selected_statistics(action, params)

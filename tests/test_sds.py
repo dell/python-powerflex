@@ -70,6 +70,10 @@ class TestSdsClient(tests.PyPowerFlexTestCase):
                 '/action/setSdsPerformanceParameters'
                     .format(self.fake_sds_id):
                     {},
+                '/types/Sds'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_sds_id: {'rfcacheFdReadTimeGreater5Sec': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/Sds/instances':
@@ -213,3 +217,17 @@ class TestSdsClient(tests.PyPowerFlexTestCase):
                 self.client.sds.set_performance_parameters,
                 self.fake_sds_id,
                 performance_profile=sds.PerformanceProfile.highperformance)
+
+    def test_sds_query_selected_statistics(self):
+        ret = self.client.sds.query_selected_statistics(
+            properties=["rfcacheFdReadTimeGreater5Sec"]
+        )
+        assert ret.get(self.fake_sds_id).get("rfcacheFdReadTimeGreater5Sec") == 0
+
+    def test_sds_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.sds.query_selected_statistics,
+                properties=["rfcacheFdReadTimeGreater5Sec"],
+            )

@@ -86,6 +86,10 @@ class TestStoragePoolClient(tests.PyPowerFlexTestCase):
                 '/instances/StoragePool::{}'
                 '/action/setZeroPaddingPolicy'.format(self.fake_sp_id):
                     {},
+                '/types/StoragePool'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_sp_id: {'rfcacheWritesSkippedCacheMiss': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/StoragePool/instances':
@@ -327,4 +331,18 @@ class TestStoragePoolClient(tests.PyPowerFlexTestCase):
                 self.client.storage_pool.set_zero_padding_policy,
                 self.fake_sp_id,
                 zero_padding_enabled=True
+            )
+
+    def test_storage_pool_query_selected_statistics(self):
+        ret = self.client.storage_pool.query_selected_statistics(
+            properties=["rfcacheWritesSkippedCacheMiss"]
+        )
+        assert ret.get(self.fake_sp_id).get("rfcacheWritesSkippedCacheMiss") == 0
+
+    def test_storage_pool_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.storage_pool.query_selected_statistics,
+                properties=["rfcacheWritesSkippedCacheMiss"],
             )

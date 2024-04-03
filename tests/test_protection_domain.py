@@ -60,6 +60,10 @@ class TestProtectionDomainClient(tests.PyPowerFlexTestCase):
                 '/instances/ProtectionDomain::{}'
                 '/action/setRfcacheParameters'.format(self.fake_pd_id):
                     {},
+                '/types/ProtectionDomain'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_pd_id: {'rplTransmitBwc': {'numSeconds': 0, 'totalWeightInKb': 0, 'numOccured': 0}}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/ProtectionDomain/instances':
@@ -175,3 +179,21 @@ class TestProtectionDomainClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.protection_domain.
                               rfcache_parameters, self.fake_pd_id)
+
+    def test_protection_domain_query_selected_statistics(self):
+        ret = self.client.protection_domain.query_selected_statistics(
+            properties=["rplTransmitBwc"]
+        )
+        assert ret.get(self.fake_pd_id).get("rplTransmitBwc") == {
+            "numSeconds": 0,
+            "totalWeightInKb": 0,
+            "numOccured": 0,
+        }
+
+    def test_protection_domain_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.protection_domain.query_selected_statistics,
+                properties=["rplTransmitBwc"],
+            )

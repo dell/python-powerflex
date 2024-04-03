@@ -42,6 +42,10 @@ class TestFaultSetClient(tests.PyPowerFlexTestCase):
                 '/instances/FaultSet::{}'
                 '/action/setFaultSetName'.format(self.fake_fault_set_id):
                     {},
+                '/types/FaultSet'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_fault_set_id: {'rfcacheFdReadTimeGreater5Sec': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/FaultSet/instances':
@@ -102,3 +106,17 @@ class TestFaultSetClient(tests.PyPowerFlexTestCase):
                               self.client.fault_set.rename,
                               self.fake_fault_set_id,
                               name='new_name')
+
+    def test_fault_set_query_selected_statistics(self):
+        ret = self.client.fault_set.query_selected_statistics(
+            properties=["rfcacheFdReadTimeGreater5Sec"]
+        )
+        assert ret.get(self.fake_fault_set_id).get("rfcacheFdReadTimeGreater5Sec") == 0
+
+    def test_fault_set_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.fault_set.query_selected_statistics,
+                properties=["rfcacheFdReadTimeGreater5Sec"],
+            )

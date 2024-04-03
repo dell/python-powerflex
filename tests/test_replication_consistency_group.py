@@ -89,11 +89,13 @@ class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
                 '/instances/ReplicationConsistencyGroup::{}'
                 '/action/syncNowReplicationConsistencyGroup'.format(self.fake_rcg_id):
                     {'id': self.fake_rcg_id},
-                '/types/ReplicationConsistencyGroup/instances/action/querySelectedStatistics':
-                    {},
                 '/instances/ReplicationConsistencyGroup::{}'
                 '/relationships/ReplicationPair'.format(self.fake_rcg_id):
                     {'id': self.fake_rcg_id},
+                '/types/ReplicationConsistencyGroup'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_rcg_id: {'thinCapacityInUseInKb': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/ReplicationConsistencyGroup/instances':
@@ -199,3 +201,17 @@ class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.replication_consistency_group.get_all_statistics,
                               False)
+
+    def test_replication_consistency_group_query_selected_statistics(self):
+        ret = self.client.replication_consistency_group.query_selected_statistics(
+            properties=["thinCapacityInUseInKb"]
+        )
+        assert ret.get(self.fake_rcg_id).get("thinCapacityInUseInKb") == 0
+
+    def test_replication_consistency_group_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.replication_consistency_group.query_selected_statistics,
+                properties=["thinCapacityInUseInKb"],
+            )

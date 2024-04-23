@@ -24,6 +24,7 @@ class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
         self.client.initialize()
         self.fake_pd_id = '1'
         self.fake_ap_id = '1'
+        self.fake_device_id = '1'
 
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
@@ -34,6 +35,10 @@ class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
                 '/instances/AccelerationPool::{}'
                 '/action/removeAccelerationPool'.format(self.fake_ap_id):
                     {},
+                '/types/AccelerationPool'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_ap_id: {'accelerationDeviceIds': [self.fake_device_id]}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/AccelerationPool/instances':
@@ -71,3 +76,19 @@ class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
                               self.client.acceleration_pool.delete,
                               self.fake_ap_id)
+
+    def test_acceleration_pool_query_selected_statistics(self):
+        ret = self.client.acceleration_pool.query_selected_statistics(
+            properties=["accelerationDeviceIds"]
+        )
+        assert ret.get(self.fake_ap_id).get("accelerationDeviceIds") == [
+            self.fake_device_id
+        ]
+
+    def test_acceleration_pool_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.acceleration_pool.query_selected_statistics,
+                properties=["accelerationDeviceIds"],
+            )

@@ -41,6 +41,10 @@ class TestSdcClient(tests.PyPowerFlexTestCase):
                 '/instances/Sdc::{}'
                 '/action/setSdcPerformanceParameters'.format(self.fake_sdc_id):
                     {},
+                '/types/Sdc'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_sdc_id: {'numOfMappedVolumes': 1}
+                },
             }
         }
 
@@ -81,3 +85,17 @@ class TestSdcClient(tests.PyPowerFlexTestCase):
                               self.client.sdc.set_performance_profile,
                               self.fake_sdc_id,
                               'Compact')
+
+    def test_sdc_query_selected_statistics(self):
+        ret = self.client.sdc.query_selected_statistics(
+            properties=["numOfMappedVolumes"]
+        )
+        assert ret.get(self.fake_sdc_id).get("numOfMappedVolumes") == 1
+
+    def test_sdc_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.sdc.query_selected_statistics,
+                properties=["numOfMappedVolumes"],
+            )

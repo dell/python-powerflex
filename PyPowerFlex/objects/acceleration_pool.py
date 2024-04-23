@@ -64,3 +64,23 @@ class AccelerationPool(base_client.EntityRequest):
         """
 
         return self._delete_entity(acceleration_pool_id)
+
+    def query_selected_statistics(self, properties, ids=None):
+        """Query PowerFlex acceleration pool statistics.
+
+        :type properties: list
+        :type ids: list of acceleration pool IDs or None for all acceleration
+                   pools
+        :rtype: dict
+        """
+
+        action = "querySelectedStatistics"
+
+        params = dict(properties=properties)
+
+        if ids:
+            params["ids"] = ids
+        else:
+            params["allIds"] = ""
+
+        return self._query_selected_statistics(action, params)

@@ -54,6 +54,10 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                 '/instances/SnapshotPolicy::{}'
                 '/action/resumeSnapshotPolicy'.format(self.fake_policy_id):
                     {},
+                '/types/SnapshotPolicy'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_policy_id: {'numOfSrcVols': 1}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/SnapshotPolicy/instances':
@@ -167,3 +171,17 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.resume,
                               self.fake_policy_id)
+
+    def test_snapshot_policy_query_selected_statistics(self):
+        ret = self.client.snapshot_policy.query_selected_statistics(
+            properties=["numOfSrcVols"]
+        )
+        assert ret.get(self.fake_policy_id).get("numOfSrcVols") == 1
+
+    def test_snapshot_policy_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.snapshot_policy.query_selected_statistics,
+                properties=["numOfSrcVols"],
+            )

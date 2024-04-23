@@ -69,6 +69,10 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
                     {},
                 '/Configuration':
                     {},
+                '/types/System'
+                '/instances/action/querySelectedStatistics': {
+                    'rplTransmitBwc': {'numSeconds': 0, 'totalWeightInKb': 0, 'numOccured': 0}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/version': 'invalid_version_format'
@@ -212,3 +216,21 @@ class TestSystemClient(tests.PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.system.get_gateway_configuration_details)
+
+    def test_system_query_selected_statistics(self):
+        ret = self.client.system.query_selected_statistics(
+            properties=["rplTransmitBwc"]
+        )
+        assert ret.get("rplTransmitBwc") == {
+            "numSeconds": 0,
+            "totalWeightInKb": 0,
+            "numOccured": 0,
+        }
+
+    def test_system_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.system.query_selected_statistics,
+                properties=["rplTransmitBwc"],
+            )

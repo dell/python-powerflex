@@ -55,6 +55,10 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
                 '/instances/Volume::{}'
                 '/action/unlockAutoSnapshot'.format(self.fake_volume_id):
                     {},
+                '/types/Volume'
+                '/instances/action/querySelectedStatistics': {
+                    self.fake_volume_id: {'userDataSdcReadLatency': {'numSeconds': 0, 'totalWeightInKb': 0, 'numOccured': 0}}
+                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/Volume/instances':
@@ -181,3 +185,21 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.volume.unlock_auto_snapshot,
                               self.fake_volume_id)
+
+    def test_volume_query_selected_statistics(self):
+        ret = self.client.volume.query_selected_statistics(
+            properties=["userDataSdcReadLatency"]
+        )
+        assert ret.get(self.fake_volume_id).get("userDataSdcReadLatency") == {
+            "numSeconds": 0,
+            "totalWeightInKb": 0,
+            "numOccured": 0,
+        }
+
+    def test_volume_query_selected_statistics_bad_status(self):
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.volume.query_selected_statistics,
+                properties=["userDataSdcReadLatency"],
+            )

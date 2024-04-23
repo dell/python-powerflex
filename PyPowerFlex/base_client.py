@@ -81,6 +81,7 @@ class Request:
         }
         if utils.is_version_3(version):
             request_params['auth'] = (self.configuration.username, self.token.get())
+            del request_params['headers']['Authorization']
 
         if method in [self.PUT, self.POST]:
             request_params['data'] = utils.prepare_params(params)

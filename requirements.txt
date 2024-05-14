@@ -1,0 +1,4 @@
+testtools
+requests
+pytest
+pytest-coverage

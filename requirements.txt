@@ -2,3 +2,4 @@ testtools
 requests
 pytest
 pytest-coverage
+packaging

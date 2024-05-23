@@ -25,5 +25,4 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest  
         run: |  
-          # python -m unittest -v tests/test_*.py
-          pytest tests/test_*.py
+          python -m unittest -v tests/test_*.py

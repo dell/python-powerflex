@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Dell Inc. or its subsidiaries.
+# Copyright (c) 2020-24 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -228,10 +228,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to enable/disable checksum for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
+            msg = (f'Failed to enable/disable checksum for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -257,10 +255,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set compression method for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
+            msg = (f'Failed to set compression method for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -302,10 +298,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set external acceleration type for PowerFlex '
-                   '{entity} with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
+            msg = (f'Failed to set external acceleration type for PowerFlex '
+                   f'{self.entity} with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -337,11 +331,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set media type for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
-
+            msg = (f'Failed to set media type for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -367,10 +358,9 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to enable/disable rebalance for PowerFlex {entity}'
-                   ' with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
+            msg = (f'Failed to enable/disable rebalance for PowerFlex {self.entity}'
+                   ' with id {storage_pool_id}. Error: {response}'
+                   )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -396,10 +386,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to enable/disable rebuild for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
+            msg = (f'Failed to enable/disable rebuild for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -425,11 +413,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set spare percentage for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
-
+            msg = (f'Failed to set spare percentage for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -452,11 +437,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set Rfcache usage for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
-
+            msg = (f'Failed to set Rfcache usage for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -482,11 +464,8 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set Rmcache usage for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
-
+            msg = (f'Failed to set Rmcache usage for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
 
             raise exceptions.PowerFlexClientException(msg)
@@ -513,10 +492,299 @@ class StoragePool(base_client.EntityRequest):
                                              entity_id=storage_pool_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set Zero Padding policy for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=storage_pool_id,
-                           response=response))
+            msg = (f'Failed to set Zero Padding policy for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def set_rep_cap_max_ratio(self, storage_pool_id, rep_cap_max_ratio):
+        """Set the replication journal capacity ratio on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type rep_cap_max_ratio: bool
+        :rtype: dict
+        """
+
+        action = 'setReplicationJournalCapacity'
+
+        params = dict(
+            replicationJournalCapacityMaxRatio=rep_cap_max_ratio
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set the replication journal capacity ratio for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+
+    def set_cap_alert_thresholds(self, storage_pool_id, cap_alert_high_threshold, cap_alert_critical_threshold):
+        """Set the capacity alert thresholds on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type cap_alert_high_threshold: str
+        :type cap_alert_critical_threshold: str
+        :rtype: dict
+        """
+
+        action = 'setCapacityAlertThresholds'
+
+        params = dict(
+            capacityAlertHighThresholdPercent=cap_alert_high_threshold,
+            capacityAlertCriticalThresholdPercent=cap_alert_critical_threshold
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set the capacity alert thresholds for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def set_protected_maintenance_mode_io_priority_policy(self, storage_pool_id, policy, concurrent_ios_per_device, bw_limit_per_device):
+        """Set protected maintenance mode I/O priority policy.
+
+        :type storage_pool_id: str
+        :type policy: str
+        :type concurrent_ios_per_device: str
+        :type bw_limit_per_device: str
+        :rtype: dict
+        """
+
+        action = 'setProtectedMaintenanceModeIoPriorityPolicy'
+
+        params = dict(
+            policy=policy,
+            numOfConcurrentIosPerDevice=concurrent_ios_per_device,
+            bwLimitPerDeviceInKbps=bw_limit_per_device
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set the protected maintenance mode IO priority policy for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+
+    def set_vtree_migration_io_priority_policy(self, storage_pool_id, policy, concurrent_ios_per_device, bw_limit_per_device):
+        """Set the vtree migration I/O priority policy on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type policy: str
+        :type concurrent_ios_per_device: str
+        :type bw_limit_per_device: str
+        :rtype: dict
+        """
+
+        action = 'setVTreeMigrationIoPriorityPolicy'
+
+        params = dict(
+            policy=policy,
+            numOfConcurrentIosPerDevice=concurrent_ios_per_device,
+            bwLimitPerDeviceInKbps=bw_limit_per_device
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set VTree migration I/O priority policy for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def rebalance_io_priority_policy(self, storage_pool_id, policy, concurrent_ios_per_device, bw_limit_per_device):
+        """Set the rebalance I/O priority policy on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type policy: str
+        :type concurrent_ios_per_device: str
+        :type bw_limit_per_device: str
+        :rtype: dict
+        """
+
+        action = 'setRebalanceIoPriorityPolicy'
+
+        params = dict(
+            policy=policy,
+            numOfConcurrentIosPerDevice=concurrent_ios_per_device,
+            bwLimitPerDeviceInKbps=bw_limit_per_device
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set the rebalance I/O priority policy for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def set_rmcache_write_handling_mode(self, storage_pool_id, rmcache_write_handling_mode):
+        """Set the RM cache write handling mode on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type rmcache_write_handling_mode: str
+        :rtype: dict
+        """
+
+        action = 'setRmcacheWriteHandlingMode'
+
+        params = dict(
+            rmcacheWriteHandlingMode=rmcache_write_handling_mode 
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set the RM cache write handling mode for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def set_rebuild_rebalance_parallelism_limit(self, storage_pool_id, no_of_parallel_rebuild_rebalance_jobs_per_device):
+        """Set the rebuild rebalance parallelism limit  on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type no_of_parallel_rebuild_rebalance_jobs_per_device: str
+        :rtype: dict
+        """
+
+        action = 'setRebuildRebalanceParallelism'
+
+        params = dict(
+            limit=no_of_parallel_rebuild_rebalance_jobs_per_device
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set rebuild rebalance parallelism limit for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def set_persistent_checksum(self, storage_pool_id, enable, validate, builder_limit):
+        """Set the persistent_checksum on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type enable: bool
+        :type validate: bool
+        :type builder_limit: str
+        :rtype: dict
+        """
+
+        action = 'disablePersistentChecksum'
+        params = None
+        if enable is True:
+            action='enablePersistentChecksum'
+            params = dict(
+                validateOnRead=validate,
+                builderLimitInKb=builder_limit
+            )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to set the persistent checksum for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+
+    def modify_persistent_checksum(self, storage_pool_id, validate, builder_limit):
+        """Modify the persistent_checksum on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type validate: bool
+        :type builder_limit: str
+        :rtype: dict
+        """
+
+        action = 'modifyPersistentChecksum'
+        params = dict(
+            validateOnRead=validate,
+            builderLimitInKb=builder_limit
+        )
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to modify the persistent checksum for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=storage_pool_id)
+
+    def set_fragmentation_enabled(self, storage_pool_id, enable_fragmentation):
+        """Enable/Disable the fragmentation on the specified Storage Pool.
+
+        :type storage_pool_id: str
+        :type enable_fragmentation: bool
+        :rtype: dict
+        """
+
+        action = 'disableFragmentation'
+        if enable_fragmentation:
+            action = 'enableFragmentation'
+
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=storage_pool_id)
+        if r.status_code != requests.codes.ok:
+            msg = (f'Failed to enable/disable fragmentation for PowerFlex {self.entity} '
+                   f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

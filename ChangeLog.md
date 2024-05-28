@@ -2,6 +2,7 @@
 
 ## Version 1.12.0 - released on 31/05/24
 - Enhanced the storage pool module by adding support for more functionalities.
+- Added support for PowerFlex Onyx(4.6.x).
 
 ## Version 1.11.0 - released on 30/04/24
 - Added support to query selected statistics to all relevant objects/entities from PowerFlex Manager.

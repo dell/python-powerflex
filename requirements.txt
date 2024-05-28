@@ -1,3 +1,2 @@
-testtools
 requests
 packaging

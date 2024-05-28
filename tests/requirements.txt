@@ -1,0 +1,4 @@
+testtools
+pytest
+pytest-coverage
+

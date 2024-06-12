@@ -531,7 +531,26 @@ class Volume(base_client.EntityRequest):
                       vol_type_conversion=None,
                       allow_thick_non_zero=None,
                       compression_method=None):
+"""
+        Migrates a volume from one storage pool (SP) to another.
 
+        Args:
+            volume_id (str): The ID of the volume to be migrated.
+            dest_sp_id (str): The ID of the destination storage pool.
+            ignore_dest_capacity (bool, optional): Whether to ignore the destination storage pool's capacity. Defaults to None.
+            queue_position (int, optional): The position in the migration queue. Defaults to None.
+            vol_type_conversion (bool, optional): Whether to allow volume type conversion. Defaults to None.
+            allow_thick_non_zero (bool, optional): Whether to allow thick non-zero volumes. Defaults to None.
+            compression_method (str, optional): The compression method to use. Defaults to None.
+
+        Raises:
+            InvalidInput: If either volume_id or dest_sp_id is not set.
+            PowerFlexClientException: If the migration fails.
+
+        Returns:
+            dict: The updated volume information.
+
+        """
         action = 'migrateVTree'
 
         if not all([volume_id, dest_sp_id]):

@@ -162,9 +162,14 @@ class StoragePool(base_client.EntityRequest):
                                     'SpSds',
                                     filter_fields,
                                     fields=('sdsId',))
+        sds_id_list = [sds['sdsId'] for sds in sdss_ids]
         if filter_fields:
-            filter_fields.update({'id': sdss_ids})
-        return Sds(self.token, self.configuration).get(filter_fields, fields)
+            filter_fields.update({'id': sds_id_list})
+            filter_fields.pop('sdsId', None)
+        else:
+            filter_fields = {'id': sds_id_list}
+        return Sds(self.token, self.configuration).get(
+            filter_fields=filter_fields, fields=fields)
 
     def get_volumes(self, storage_pool_id, filter_fields=None, fields=None):
         """Get related PowerFlex volumes for storage pool.

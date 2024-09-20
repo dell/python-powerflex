@@ -49,7 +49,8 @@ class PowerFlexClient:
         'service_template',
         'managed_device',
         'deployment',
-        'firmware_repository'
+        'firmware_repository',
+        'host'
     )
 
     def __init__(self,
@@ -102,6 +103,7 @@ class PowerFlexClient:
         self.__add_storage_entity('managed_device', objects.ManagedDevice)
         self.__add_storage_entity('deployment', objects.Deployment)
         self.__add_storage_entity('firmware_repository', objects.FirmwareRepository)
+        self.__add_storage_entity('host', objects.Host)
         utils.init_logger(self.configuration.log_level)
         if version.parse(self.system.api_version()) < version.Version('3.0'):
             raise exceptions.PowerFlexClientException(

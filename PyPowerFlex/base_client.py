@@ -370,17 +370,3 @@ class EntityRequest(Request):
             LOG.error(exc.message)
             raise exc
         return response
-
-    def _modify_entity(self, action, sdc_id, params):
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=sdc_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailRenaming(self.entity, sdc_id,
-                                                   response)
-            LOG.error(exc.message)
-            raise exc
-
-        return self.get(entity_id=sdc_id)

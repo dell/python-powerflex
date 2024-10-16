@@ -32,6 +32,7 @@ python setup.py install
 * Device
 * ProtectionDomain
 * Sds
+* Sdt
 * SnapshotPolicy
 * ReplicationConsistencyGroup
 * ReplicationPair

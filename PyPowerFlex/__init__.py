@@ -37,6 +37,7 @@ class PowerFlexClient:
         'protection_domain',
         'sdc',
         'sds',
+        'sdt',
         'snapshot_policy',
         'storage_pool',
         'acceleration_pool',
@@ -87,6 +88,7 @@ class PowerFlexClient:
                                   objects.ProtectionDomain)
         self.__add_storage_entity('sdc', objects.Sdc)
         self.__add_storage_entity('sds', objects.Sds)
+        self.__add_storage_entity('sdt', objects.Sdt)
         self.__add_storage_entity('snapshot_policy', objects.SnapshotPolicy)
         self.__add_storage_entity('storage_pool', objects.StoragePool)
         self.__add_storage_entity('acceleration_pool',

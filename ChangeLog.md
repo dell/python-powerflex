@@ -1,5 +1,8 @@
 # PyPowerFlex Change Log
 
+## Version 1.13.0 - released on 28/10/24
+- Fixed storage pool get_sdss function to return the correct data.
+
 ## Version 1.12.0 - released on 31/05/24
 - Enhanced the storage pool module by adding support for more functionalities.
 - Added support for PowerFlex Onyx(4.6.x).

@@ -18,6 +18,7 @@ from PyPowerFlex.objects.fault_set import FaultSet
 from PyPowerFlex.objects.protection_domain import ProtectionDomain
 from PyPowerFlex.objects.sdc import Sdc
 from PyPowerFlex.objects.sds import Sds
+from PyPowerFlex.objects.sdt import Sdt
 from PyPowerFlex.objects.snapshot_policy import SnapshotPolicy
 from PyPowerFlex.objects.storage_pool import StoragePool
 from PyPowerFlex.objects.acceleration_pool import AccelerationPool
@@ -38,6 +39,7 @@ __all__ = [
     'ProtectionDomain',
     'Sdc',
     'Sds',
+    'Sdt',
     'SnapshotPolicy',
     'StoragePool',
     'AccelerationPool',

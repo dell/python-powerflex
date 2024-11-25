@@ -40,6 +40,7 @@ python setup.py install
 * StoragePool
 * AccelerationPool
 * Sdc
+* NvmeHost
 * FaultSet
 * Volume
 * ManagedDevice

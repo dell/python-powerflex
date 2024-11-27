@@ -1,5 +1,8 @@
 # PyPowerFlex Change Log
 
+## Version 1.14.0 - released on 05/12/24
+- Added support for managing NVME over TCP entities including SDT and NVMe Host.
+
 ## Version 1.13.0 - released on 28/10/24
 - Fixed storage pool get_sdss function to return the correct data.
 

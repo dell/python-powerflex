@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -88,7 +88,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to map PowerFlex {entity} with id {_id} '
                    'to SDC. Error: {response}'.format(entity=self.entity,
                                                       _id=volume_id,
@@ -167,7 +167,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to extend PowerFlex {entity} with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
                                               _id=volume_id,
@@ -202,7 +202,7 @@ class Volume(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=volume_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to lock AutoSnapshot for PowerFlex {entity} '
                    'with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -253,7 +253,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to unmap PowerFlex {entity} with id {_id} from '
                    'SDC. Error: {response}'.format(entity=self.entity,
                                                    _id=volume_id,
@@ -300,7 +300,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to unlock AutoSnapshot for PowerFlex {entity} '
                    'with id {_id}. Error: '
                    '{response}'.format(entity=self.entity, _id=volume_id,
@@ -338,7 +338,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to update the SDC limits of PowerFlex'
                    ' {entity} with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -373,7 +373,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to update the compression method of PowerFlex'
                    ' {entity} with id'
                    ' {_id}. Error: {response}'.format(entity=self.entity,
@@ -409,7 +409,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to update the use_rmcache of PowerFlex'
                    ' {entity} with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -446,7 +446,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set the access mode for the SDC {sdc_id}'
                    ' mapped to PowerFlex {entity} with id {_id}. Error:'
                    ' {response}'.format(entity=self.entity, _id=volume_id,
@@ -479,7 +479,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snap_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set the retention period for PowerFlex'
                    ' {entity} with id {_id}.'
                    ' Error: {response}'.format(entity=self.entity,
@@ -513,7 +513,7 @@ class Volume(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=volume_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to update the Volume Access Mode Limit of '
                    'PowerFlex {entity} with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=volume_id,

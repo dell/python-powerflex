@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -232,7 +232,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to enable/disable checksum for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -259,7 +259,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set compression method for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -302,7 +302,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set external acceleration type for PowerFlex '
                    f'{self.entity} with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -335,7 +335,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set media type for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -362,7 +362,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to enable/disable rebalance for PowerFlex {self.entity}'
                    ' with id {storage_pool_id}. Error: {response}'
                    )
@@ -390,7 +390,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to enable/disable rebuild for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -417,7 +417,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set spare percentage for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -441,7 +441,7 @@ class StoragePool(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=storage_pool_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set Rfcache usage for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -468,7 +468,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set Rmcache usage for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -496,7 +496,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set Zero Padding policy for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -523,7 +523,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set the replication journal capacity ratio for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -553,7 +553,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set the capacity alert thresholds for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -584,7 +584,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set the protected maintenance mode IO priority policy for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -616,7 +616,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set VTree migration I/O priority policy for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -647,7 +647,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set the rebalance I/O priority policy for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -674,7 +674,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set the RM cache write handling mode for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -701,7 +701,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set rebuild rebalance parallelism limit for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -733,7 +733,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to set the persistent checksum for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -762,7 +762,7 @@ class StoragePool(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=storage_pool_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to modify the persistent checksum for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
@@ -787,7 +787,7 @@ class StoragePool(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=storage_pool_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to enable/disable fragmentation for PowerFlex {self.entity} '
                    f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)

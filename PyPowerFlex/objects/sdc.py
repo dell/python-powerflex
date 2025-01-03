@@ -14,7 +14,7 @@
 # under the License.
 
 import logging
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 

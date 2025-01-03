@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -153,7 +153,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=sds_ip)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to add IP for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -284,7 +284,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to remove IP from PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -318,7 +318,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set ip role for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -346,7 +346,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set port for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -371,7 +371,7 @@ class Sds(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=sds_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to enable/disable Rfcache for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -399,7 +399,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to enable/disable Rmcache for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -427,7 +427,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set Rmcache size for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))
@@ -455,7 +455,7 @@ class Sds(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=sds_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set performance parameters for PowerFlex '
                    '{entity} with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=sds_id, response=response))

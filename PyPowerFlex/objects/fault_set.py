@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -38,7 +38,7 @@ class FaultSet(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=fault_set_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to clear PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=fault_set_id,

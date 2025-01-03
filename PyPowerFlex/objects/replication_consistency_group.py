@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -40,7 +40,7 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=rcg_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to create a snapshot of PowerFlex {entity} '
                    'with id {_id} . Error: {response}'.format(entity=self.entity,
                                                       _id=rcg_id,
@@ -307,7 +307,7 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
                                              entity=self.entity,
                                              action="querySelectedStatistics",
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to list replication consistencty group statistics for PowerFlex. '
                    'Error: {response}'.format(response=response))
             LOG.error(msg)

@@ -14,7 +14,7 @@
 # under the License.
 
 import logging
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
@@ -118,7 +118,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=params,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to add IP for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -149,7 +149,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=params,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to remove IP from PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -185,7 +185,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=params,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to set ip role for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -216,7 +216,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=params,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to set storage port for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -247,7 +247,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=params,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to set nvme port for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -278,7 +278,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=params,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to set discovery port for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -306,7 +306,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=None,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to enter maintenance mode for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(
@@ -334,7 +334,7 @@ class Sdt(base_client.EntityRequest):
             entity_id=sdt_id,
             params=None,
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 "Failed to exit maintenance mode for PowerFlex {entity} "
                 "with id {_id}. Error: {response}".format(

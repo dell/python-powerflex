@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -141,7 +141,7 @@ class Device(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=device_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set media type for PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=device_id,

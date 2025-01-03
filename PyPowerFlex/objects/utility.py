@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -54,7 +54,7 @@ class PowerFlexUtility(base_client.EntityRequest):
                                              entity='StoragePool',
                                              action=action,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to list storage pool statistics for PowerFlex. '
                    'Error: {response}'.format(response=response))
             LOG.error(msg)
@@ -83,7 +83,7 @@ class PowerFlexUtility(base_client.EntityRequest):
                                              entity='Volume',
                                              action=action,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to list volume statistics for PowerFlex. '
                    'Error: {response}'.format(response=response))
             LOG.error(msg)
@@ -112,7 +112,7 @@ class PowerFlexUtility(base_client.EntityRequest):
                                              entity='SnapshotPolicy',
                                              action=action,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to list snapshot policy statistics for PowerFlex. '
                    'Error: {response}'.format(response=response))
             LOG.error(msg)

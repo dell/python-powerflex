@@ -14,10 +14,12 @@
 # under the License.
 
 import logging
-import requests
+
+from PyPowerFlex.constants import HTTPStatusConstants
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
+
 LOG = logging.getLogger(__name__)
 
 
@@ -45,7 +47,7 @@ class Deployment(base_client.EntityRequest):
             includeTemplate=include_template
         )
         r, response = self.send_get_request(utils.build_uri_with_params(self.deployment_url, **params))
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to retrieve deployments. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -58,7 +60,7 @@ class Deployment(base_client.EntityRequest):
         :return: A dictionary containing the retrieved Deployment.
         """
         r, response = self.send_get_request(f'{self.deployment_url}/{deployment_id}')
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to retrieve deployment by id {deployment_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -75,7 +77,7 @@ class Deployment(base_client.EntityRequest):
             PowerFlexClientException: If the deployment fails.
         """
         r, response = self.send_post_request(f'{self.deployment_url}/validate', rg_data)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to validate the deployment. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -93,7 +95,7 @@ class Deployment(base_client.EntityRequest):
             PowerFlexClientException: If the deployment fails.
         """
         r, response = self.send_post_request(self.deployment_url, rg_data)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to create a new deployment. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -114,7 +116,7 @@ class Deployment(base_client.EntityRequest):
         request_url = f'{self.deployment_url}/{deployment_id}'
         r, response = self.send_put_request(request_url, rg_data)
         
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to edit the deployment. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -134,7 +136,7 @@ class Deployment(base_client.EntityRequest):
         request_url = f'{self.deployment_url}/{deployment_id}'
         response = self.send_delete_request(request_url)
 
-        if response.status_code != requests.codes.no_content:
+        if response.status != HTTPStatusConstants.NO_CONTENT:
             msg = (f'Failed to delete deployment. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)

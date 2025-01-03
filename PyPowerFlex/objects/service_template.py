@@ -14,7 +14,7 @@
 # under the License.
 
 import logging
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
@@ -41,7 +41,7 @@ class ServiceTemplate(base_client.EntityRequest):
             includeAttachments=include_attachments
         )
         r, response = self.send_get_request(utils.build_uri_with_params(self.service_template_url, **params))
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to retrieve service templates. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -58,7 +58,7 @@ class ServiceTemplate(base_client.EntityRequest):
         if for_deployment:
             url += '?forDeployment=true'
         r, response = self.send_get_request(url)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to retrieve service template by id {service_template_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)

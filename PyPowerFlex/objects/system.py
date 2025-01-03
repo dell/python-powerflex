@@ -16,7 +16,7 @@
 import logging
 import re
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -67,7 +67,7 @@ class System(base_client.EntityRequest):
 
         if not self.__api_version or not cached:
             r, response = self.send_get_request(url)
-            if r.status_code != requests.codes.ok:
+            if r.status != HTTPStatusConstants.OK:
                 exc = exceptions.PowerFlexFailQuerying('API version')
                 LOG.error(exc.message)
                 raise exc
@@ -75,7 +75,7 @@ class System(base_client.EntityRequest):
             if not pattern.match(response):
                 msg = (
                     'Failed to query PowerFlex API version. Invalid version '
-                    'format: {response}.'.format(response=r.text)
+                    'format: {response}.'.format(response=r.data.decode())
                 )
                 LOG.error(msg)
                 raise exceptions.PowerFlexClientException(msg)
@@ -103,7 +103,7 @@ class System(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=system_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to remove consistency group snapshots from '
                    'PowerFlex {entity} with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -144,7 +144,7 @@ class System(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=system_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to snapshot volumes on PowerFlex {entity} '
                    'with id {_id}.'
                    ' Error: {response}'.format(entity=self.entity,
@@ -199,7 +199,7 @@ class System(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to add standBy MDM on PowerFlex {entity}. '
                    'Error: {response}'.format(entity=self.entity,
                                               response=response))
@@ -224,7 +224,7 @@ class System(base_client.EntityRequest):
                                                          action=action,
                                                          entity=self.entity,
                                                          params=params)
-        if r.status_code != requests.codes.ok and response is not None:
+        if r.status != HTTPStatusConstants.OK and response is not None:
             msg = ('Failed to remove standBy MDM from PowerFlex {entity}. '
                    'Error: {response}.'.format(entity=self.entity,
                                                response=response))
@@ -242,7 +242,7 @@ class System(base_client.EntityRequest):
 
         r, response = self.send_post_request(self.query_mdm_cluster_url,
                                              entity=self.entity)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to get MDM cluster details on PowerFlex {entity}. '
                    'Error: {response}'.format(entity=self.entity,
                                               response=response))
@@ -259,7 +259,7 @@ class System(base_client.EntityRequest):
         """
 
         r, response = self.send_get_request('/Configuration')
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to get gateway configuration details on PowerFlex {entity}. '
                    'Error: {response}'.format(entity=self.entity,
                                               response=response))
@@ -286,7 +286,7 @@ class System(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to change ownership on PowerFlex {entity}. '
                    'Error: {response}'.format(entity=self.entity,
                                               response=response))
@@ -311,7 +311,7 @@ class System(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set performance profile of MDMs on PowerFlex '
                    '{entity}. Error: {response}'.format(entity=self.entity,
                                                         response=response))
@@ -341,7 +341,7 @@ class System(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to rename the MDM on PowerFlex {entity}. Error: '
                    '{response}'.format(entity=self.entity, response=response))
             LOG.error(msg)
@@ -380,7 +380,7 @@ class System(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to modify virtual IP interface on PowerFlex '
                    '{entity}. Error: {response}'.format(entity=self.entity,
                                                         response=response))
@@ -423,7 +423,7 @@ class System(base_client.EntityRequest):
                                                          action=action,
                                                          entity=self.entity,
                                                          params=params)
-        if r.status_code != requests.codes.ok and response is not None:
+        if r.status != HTTPStatusConstants.OK and response is not None:
             msg = ('Failed to switch MDM cluster mode PowerFlex {entity}. '
                    'Error: {response}.'.format(entity=self.entity,
                                                response=response))

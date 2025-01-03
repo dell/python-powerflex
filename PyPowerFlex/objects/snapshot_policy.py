@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -51,7 +51,7 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to add source volume to PowerFlex {entity} '
                    'with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -120,7 +120,7 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to modify PowerFlex {entity} '
                    'with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -144,7 +144,7 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to pause PowerFlex {entity} with id {_id}.'
                    ' Error: {response}'.format(entity=self.entity,
                                                _id=snapshot_policy_id,
@@ -183,7 +183,7 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to remove source volume from PowerFlex {entity} '
                    'with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
@@ -223,7 +223,7 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to resume PowerFlex {entity} with id {_id}. '
                    'Error: {response}'.format(entity=self.entity,
                                               _id=snapshot_policy_id,

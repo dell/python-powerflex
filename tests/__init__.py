@@ -20,32 +20,39 @@ import logging
 from unittest import mock
 from unittest import TestCase
 
-import requests
+import urllib3
 
 import PyPowerFlex
 from PyPowerFlex import utils
 
 
-class MockResponse(requests.Response):
+class MockResponse(urllib3.BaseHTTPResponse):
     """Mock HTTP Response.
 
     Defines http replies from mocked calls to do_request().
     """
 
-    def __init__(self, content, status_code=200):
-        super(MockResponse, self).__init__()
+    def __init__(self, content, status=200):
+        super(MockResponse, self).__init__(
+            status=status,
+            version=None,
+            version_string=None,
+            decode_content=False,
+            reason=None,
+            request_url=None
+        )
         self._content = content
         self.request = mock.MagicMock()
-        self.status_code = status_code
+        self.status = status
 
     def json(self, **kwargs):
         return self._content
 
     @property
-    def text(self):
+    def data(self) -> bytes:        
         if not isinstance(self._content, bytes):
-            return json.dumps(self._content)
-        return super(MockResponse, self).text
+            return json.dumps(self._content).encode()
+        return self._content
 
 
 class PyPowerFlexTestCase(TestCase):
@@ -102,13 +109,10 @@ class PyPowerFlexTestCase(TestCase):
                                                   self.username,
                                                   self.password,
                                                   log_level=logging.DEBUG)
-        requests.request = self.get_mock_response
-        self.get_mock = self.mock_object(requests,
-                                         'get',
+        urllib3.PoolManager.request = self.get_mock_response
+        self.request_mock = self.mock_object(urllib3.PoolManager,
+                                         'request',
                                          side_effect=self.get_mock_response)
-        self.post_mock = self.mock_object(requests,
-                                          'post',
-                                          side_effect=self.get_mock_response)
         utils.is_version_3 = mock.MagicMock(return_value=True)
 
     def mock_object(self, obj, attr_name, *args, **kwargs):

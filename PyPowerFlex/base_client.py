@@ -14,14 +14,16 @@
 # under the License.
 
 import logging
+import json
 
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+import urllib3
+from urllib3.util import make_headers
 
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
+from PyPowerFlex.constants import HTTPStatusConstants
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 LOG = logging.getLogger(__name__)
 
 
@@ -85,7 +87,17 @@ class Request:
 
         if method in [self.PUT, self.POST]:
             request_params['data'] = utils.prepare_params(params)
-        response = requests.request(method, request_url, **request_params)
+        if self.verify_certificate:
+            http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+        else:
+            http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+        response = http.request(
+            method,
+            request_url,
+            body=request_params.get('data'),
+            headers=request_params['headers'],
+            timeout=request_params['timeout']
+        )
         self.logout(version)
         return response
 
@@ -110,17 +122,19 @@ class Request:
         response = None
         version = self.login()
         request_url = self.base_url + url.format(**url_params)
-        r = requests.post(request_url,
-                          auth=(
-                              self.configuration.username,
-                              self.token.get()
-                          ),
-                          headers=self.headers,
-                          data=utils.prepare_params(params),
-                          verify=self.verify_certificate,
-                          timeout=self.configuration.timeout)
-
-        if r.content != b'':
+        if self.verify_certificate:
+            http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+        else:
+            http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+        auth_header = make_headers(basic_auth=f'{self.configuration.username}:{self.token.get()}')
+        r = http.request(
+            "POST",
+            request_url,
+            body=utils.prepare_params(params),
+            headers={**auth_header, **self.headers},
+            timeout=self.configuration.timeout
+        )
+        if r.data != b'':
             response = r.json()
         self.logout(version)
         return r, response
@@ -145,13 +159,19 @@ class Request:
     def get_api_version(self):
         request_url = self.base_url + '/version'
         self._login()
-        r = requests.get(request_url,
-                         auth=(
-                             self.configuration.username,
-                             self.token.get()),
-                         verify=self.verify_certificate,
-                         timeout=self.configuration.timeout)
-        response = r.json()
+        auth_headers = make_headers(basic_auth= f'{self.configuration.username}:{self.token.get()}')
+        if self.verify_certificate:
+            http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+        else:
+            http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+        r = http.request(
+            "GET",
+            request_url,
+            headers={**self.headers, **auth_headers},
+            timeout=self.configuration.timeout
+        )
+        if r.data != b'':
+            response = r.json()
         return response
 
     # API Login method for 4.0 and above.
@@ -160,11 +180,19 @@ class Request:
         payload = {"username": "%s" % self.configuration.username,
                    "password": "%s" % self.configuration.password
                    }
-        r = requests.post(request_url, headers=self.headers, json=payload,
-                          verify=self.verify_certificate,
-                          timeout=self.configuration.timeout
-                          )
-        if r.status_code != requests.codes.ok:
+        if self.verify_certificate:
+            http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+        else:
+            http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+        payload_json = json.dumps(payload).encode('utf-8')
+        r = http.request(
+            'POST',
+            request_url,
+            headers=self.headers,
+            body=payload_json,
+            timeout=self.configuration.timeout
+        )
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailQuerying('token')
             LOG.error(exc.message)
             raise exc
@@ -177,12 +205,21 @@ class Request:
     def _appliance_logout(self):
         request_url = self.auth_url + '/logout'
         data = {'refresh_token': '{0}'.format(self.__refresh_token)}
-        r = requests.post(request_url, headers=self.get_auth_headers(), json=data,
-                          verify=self.verify_certificate,
-                          timeout=self.configuration.timeout
-                          )
+        
+        if self.verify_certificate:
+            http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+        else:
+            http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+        payload_json = json.dumps(data).encode('utf-8')
+        r = http.request(
+            'POST',
+            request_url,
+            headers=self.get_auth_headers(),
+            body=payload_json,
+            timeout=self.configuration.timeout
+        )
 
-        if r.status_code != requests.codes.no_content:
+        if r.status != HTTPStatusConstants.NO_CONTENT:
             exc = exceptions.PowerFlexFailQuerying('token')
             LOG.error(exc.message)
             raise exc
@@ -192,17 +229,24 @@ class Request:
     def _login(self):
         request_url = self.base_url + '/login'
         try:
-            r = requests.get(request_url,
-                            auth=(
-                                self.configuration.username,
-                                self.configuration.password
-                            ),
-                            verify=self.verify_certificate,
-                            timeout=self.configuration.timeout)
-            r.raise_for_status()
+            if self.verify_certificate:
+                http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+            else:
+                http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+            auth_header = make_headers(basic_auth=f'{self.configuration.username}:{self.configuration.password}')
+            r = http.request(
+                "GET",
+                request_url,
+                headers={**auth_header, **self.headers},
+                timeout=self.configuration.timeout
+            )
+            if r.status >= 400:
+                exc = exceptions.PowerFlexFailQuerying('token')
+                LOG.error(exc.message)
+                raise exc
             token = r.json()
             self.token.set(token)
-        except requests.exceptions.RequestException as e:
+        except urllib3.exceptions.RequestError as e:
             error_msg = f'Login failed with error:{e.response.content}' if e.response else f'Login failed with error:{str(e)}'
             LOG.error(error_msg)
             raise Exception(error_msg)
@@ -212,14 +256,18 @@ class Request:
 
         if token:
             request_url = self.base_url + '/logout'
-            r = requests.get(request_url,
-                             auth=(
-                                 self.configuration.username,
-                                 token
-                             ),
-                             verify=self.verify_certificate,
-                             timeout=self.configuration.timeout)
-            if r.status_code != requests.codes.ok:
+            if self.verify_certificate:
+                http = urllib3.PoolManager(cert_reqs = "CERT_REQUIRED")
+            else:
+                http = urllib3.PoolManager(cert_reqs = "CERT_NONE")
+            auth_header = make_headers(basic_auth=f'{self.configuration.username}:{token}')
+            r = http.request(
+                "GET",
+                request_url,
+                headers={**auth_header, **self.headers},
+                timeout=self.configuration.timeout
+            )
+            if r.status != HTTPStatusConstants.OK:
                 exc = exceptions.PowerFlexFailQuerying('token')
                 LOG.error(exc.message)
                 raise exc
@@ -251,7 +299,7 @@ class EntityRequest(Request):
             entity=self.entity,
             params=params
         )
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailCreating(self.entity, response)
             LOG.error(exc.message)
             raise exc
@@ -267,7 +315,7 @@ class EntityRequest(Request):
                                              entity=self.entity,
                                              entity_id=entity_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailDeleting(self.entity, entity_id,
                                                    response)
             LOG.error(exc.message)
@@ -279,7 +327,7 @@ class EntityRequest(Request):
                                              entity=self.entity,
                                              entity_id=entity_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailRenaming(self.entity, entity_id,
                                                    response)
             LOG.error(exc.message)
@@ -299,7 +347,7 @@ class EntityRequest(Request):
                 raise exceptions.InvalidInput(msg)
 
         r, response = self.send_get_request(url, **url_params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailQuerying(self.entity, entity_id,
                                                    response)
             LOG.error(exc.message)
@@ -320,7 +368,7 @@ class EntityRequest(Request):
 
         r, response = self.send_get_request(self.base_relationship_url,
                                             **url_params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (
                 'Failed to query related {related} entities for PowerFlex '
                 '{entity} with id {_id}.'
@@ -348,7 +396,7 @@ class EntityRequest(Request):
                                              entity_id=entity_id,
                                              params=params,
                                              **url_params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailEntityOperation(self.entity, entity_id,
                                                           action, response)
             LOG.error(exc.message)
@@ -359,7 +407,7 @@ class EntityRequest(Request):
                                              action=action,
                                              entity=self.entity,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             exc = exceptions.PowerFlexFailQuerying(self.entity,
                                                    response=response,
                                                    entity_id=params["ids"]

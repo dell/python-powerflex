@@ -106,3 +106,7 @@ class SnapshotPolicyConstants:
         "autoSnapshotVolIds","expiredButLockedSnapshotsIds","numOfAutoSnapshots",
         "numOfExpiredButLockedSnapshots","numOfSrcVols","srcVolIds"
     ]
+
+class HTTPStatusConstants:
+    OK = 200
+    NO_CONTENT = 204

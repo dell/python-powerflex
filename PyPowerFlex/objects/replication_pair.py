@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -94,7 +94,7 @@ class ReplicationPair(base_client.EntityRequest):
         r, response = self.send_post_request(self.list_statistics_url,
                                              entity=self.entity,
                                              action="querySelectedStatistics")
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to list statistics for all ReplicationPair objects. '
                    'Error: {response}'.format(response=response))
             LOG.error(msg)

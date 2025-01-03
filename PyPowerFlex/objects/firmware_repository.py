@@ -14,7 +14,7 @@
 # under the License.
 
 import logging
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
@@ -44,7 +44,7 @@ class FirmwareRepository(base_client.EntityRequest):
             components=components
         )
         r, response = self.send_get_request(utils.build_uri_with_params(self.firmware_repository_url, **params))
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = (f'Failed to retrieve firmware repository. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)

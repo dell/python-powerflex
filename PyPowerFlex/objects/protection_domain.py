@@ -15,7 +15,7 @@
 
 import logging
 
-import requests
+from PyPowerFlex.constants import HTTPStatusConstants
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -54,7 +54,7 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=protection_domain_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to activate PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=protection_domain_id,
@@ -136,7 +136,7 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=protection_domain_id,
                                              params=params)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to inactivate PowerFlex {entity} '
                    'with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=protection_domain_id,
@@ -190,7 +190,7 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity_id=protection_domain_id,
                                              params=params)
 
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to update the network limits of PowerFlex {entity}'
                    ' with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=protection_domain_id,
@@ -217,7 +217,7 @@ class ProtectionDomain(base_client.EntityRequest):
                                              action=action,
                                              entity=self.entity,
                                              entity_id=protection_domain_id)
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to enable/disable RFcache in PowerFlex {entity} '
                    ' with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=protection_domain_id,
@@ -253,7 +253,7 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity_id=protection_domain_id,
                                              params=params)
 
-        if r.status_code != requests.codes.ok:
+        if r.status != HTTPStatusConstants.OK:
             msg = ('Failed to set RFcache parameters in PowerFlex {entity} '
                    ' with id {_id}. Error: {response}'
                    .format(entity=self.entity, _id=protection_domain_id,

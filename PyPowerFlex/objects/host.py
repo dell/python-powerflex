@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with host APIs."""
+
 import logging
 from PyPowerFlex import base_client
 
@@ -20,6 +22,9 @@ from PyPowerFlex import base_client
 LOG = logging.getLogger(__name__)
 
 class Host(base_client.EntityRequest):
+    """
+    A class representing Host client.
+    """
     def create(self,
                nqn,
                name=None,
@@ -39,18 +44,18 @@ class Host(base_client.EntityRequest):
         :rtype: dict
         """
 
-        params = dict(
-            nqn=nqn,
-            name=name,
-            maxNumPaths=max_num_paths,
-            maxNumSysPorts=max_num_sys_ports
-        )
+        params = {
+            "nqn": nqn,
+            "name": name,
+            "maxNumPaths": max_num_paths,
+            "maxNumSysPorts": max_num_sys_ports
+        }
 
         return self._create_entity(params)
 
     def modify_max_num_paths(self, host_id, max_num_paths):
         """Modify Maximum Number of Paths Per Volume.
-        
+
         :param host_id: ID of the SDC
         :type host_id: str
         :param max_num_paths: Maximum Number of Paths Per Volume.
@@ -61,16 +66,14 @@ class Host(base_client.EntityRequest):
 
         action = 'modifyMaxNumPaths'
 
-        params = dict(
-            newMaxNumPaths=max_num_paths
-        )
+        params = {"newMaxNumPaths": max_num_paths}
 
-        return self._perform_entity_operation_based_on_action(action=action, 
-                                                              entity_id=host_id, params=params, add_entity=False)
+        return self._perform_entity_operation_based_on_action(
+            action=action, entity_id=host_id, params=params, add_entity=False)
 
     def modify_max_num_sys_ports(self, host_id, max_num_sys_ports):
         """Modify Maximum Number of Ports Per Protection Domain.
-        
+
         :param host_id: ID of the SDC
         :type host_id: str
         :param max_num_sys_ports: Maximum Number of Ports Per Protection Domain.
@@ -81,9 +84,7 @@ class Host(base_client.EntityRequest):
 
         action = 'modifyMaxNumSysPorts'
 
-        params = dict(
-            newMaxNumSysPorts=max_num_sys_ports
-        )
+        params = {"newMaxNumSysPorts": max_num_sys_ports}
 
-        return self._perform_entity_operation_based_on_action(action=action, 
-                                                              entity_id=host_id, params=params, add_entity=False)
+        return self._perform_entity_operation_based_on_action(
+            action=action, entity_id=host_id, params=params, add_entity=False)

@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module is the base client of the PowerFlex APIs."""
+
+# pylint: disable=no-member,import-error,broad-exception-raised
+
 import logging
 
 import requests
@@ -26,6 +30,9 @@ LOG = logging.getLogger(__name__)
 
 
 class Request:
+    """
+    This class contains the methods for making requests to the PowerFlex API.
+    """
     GET = "get"
     POST = "post"
     PUT = "put"
@@ -38,24 +45,46 @@ class Request:
 
     @property
     def base_url(self):
-        return 'https://{address}:{port}/api'.format(
-            address=self.configuration.gateway_address,
-            port=self.configuration.gateway_port
-        )
+        """
+        Get the base URL for the PowerFlex API.
+
+        Returns:
+            str: The base URL.
+        """
+        return f'https://{self.configuration.gateway_address}:{self.configuration.gateway_port}/api'
 
     @property
     def auth_url(self):
-        return 'https://{address}:{port}/rest/auth'.format(
-            address=self.configuration.gateway_address,
-            port=self.configuration.gateway_port
+        """
+        Get the authentication URL for the PowerFlex API.
+
+        Returns:
+            str: The authentication URL.
+        """
+        gateway_address = self.configuration.gateway_address
+        port = self.configuration.gateway_port
+        return (
+            f"https://{gateway_address}:{port}/rest/auth"
         )
 
     @property
     def headers(self):
+        """
+        Get the headers for the PowerFlex API.
+
+        Returns:
+            dict: The headers.
+        """
         return {'content-type': 'application/json'}
 
     @property
     def verify_certificate(self):
+        """
+        Get the verification status of the certificate for the PowerFlex API.
+
+        Returns:
+            bool: The verification status.
+        """
         verify_certificate = self.configuration.verify_certificate
         if (
                 self.configuration.verify_certificate
@@ -65,12 +94,35 @@ class Request:
         return verify_certificate
 
     def get_auth_headers(self, request_type=None):
+        """
+        Get the authentication headers for the PowerFlex API.
+
+        Args:
+            request_type (str): The type of the request.
+
+        Returns:
+            dict: The authentication headers.
+        """
         if request_type == self.GET:
-            return {'Authorization': 'Bearer {0}'.format(self.token.get())}
-        return {'Authorization': 'Bearer {0}'.format(self.token.get()),
-                'content-type': 'application/json'}
+            return {'Authorization': f'Bearer {self.token.get()}'}
+        return {
+            'Authorization': f'Bearer {self.token.get()}',
+            'content-type': 'application/json'
+        }
 
     def send_request(self, method, url, params=None, **url_params):
+        """
+        Send a request to the PowerFlex API.
+
+        Args:
+            method (str): The HTTP method.
+            url (str): The URL.
+            params (dict): The parameters.
+            url_params (dict): The URL parameters.
+
+        Returns:
+            Response: The response object.
+        """
         params = params or {}
         request_url = f"{self.base_url}{url.format(**url_params)}"
         version = self.login()
@@ -80,7 +132,8 @@ class Request:
             'timeout': self.configuration.timeout
         }
         if utils.is_version_3(version):
-            request_params['auth'] = (self.configuration.username, self.token.get())
+            request_params['auth'] = (
+                self.configuration.username, self.token.get())
             del request_params['headers']['Authorization']
 
         if method in [self.PUT, self.POST]:
@@ -90,23 +143,76 @@ class Request:
         return response
 
     def send_get_request(self, url, params=None, **url_params):
+        """
+        Send a GET request to the PowerFlex API.
+
+        Args:
+            url (str): The URL.
+            params (dict): The parameters.
+            url_params (dict): The URL parameters.
+
+        Returns:
+            tuple: The response object and the response content.
+        """
         response = self.send_request(self.GET, url, params, **url_params)
         return response, response.json()
 
     def send_post_request(self, url, params=None, **url_params):
+        """
+        Send a POST request to the PowerFlex API.
+
+        Args:
+            url (str): The URL.
+            params (dict): The parameters.
+            url_params (dict): The URL parameters.
+
+        Returns:
+            tuple: The response object and the response content.
+        """
         response = self.send_request(self.POST, url, params, **url_params)
         return response, response.json()
 
     def send_put_request(self, url, params=None, **url_params):
+        """
+        Send a PUT request to the PowerFlex API.
+
+        Args:
+            url (str): The URL.
+            params (dict): The parameters.
+            url_params (dict): The URL parameters.
+
+        Returns:
+            tuple: The response object and the response content.
+        """
         response = self.send_request(self.PUT, url, params, **url_params)
         return response, response.json()
 
     def send_delete_request(self, url, params=None, **url_params):
+        """
+        Send a DELETE request.
+
+        Args:
+            url (str): The URL for the request.
+            params (dict, optional): The parameters for the request. Defaults to None.
+
+        Returns:
+            The response from the request.
+        """
         return self.send_request(self.DELETE, url, params, **url_params)
 
     def send_mdm_cluster_post_request(self, url, params=None, **url_params):
+        """
+        Send a POST request for the MDM cluster.
+
+        Args:
+            url (str): The URL for the request.
+            params (dict, optional): The parameters for the request. Defaults to None.
+
+        Returns:
+            tuple: A tuple containing the response and the JSON content of the response.
+        """
         if params is None:
-            params = dict()
+            params = {}
         response = None
         version = self.login()
         request_url = self.base_url + url.format(**url_params)
@@ -125,8 +231,13 @@ class Request:
         self.logout(version)
         return r, response
 
-    # To perform login based on the API version
     def login(self):
+        """
+        Perform login based on the API version.
+
+        Returns:
+            str: The API version.
+        """
         version = self.get_api_version()
         if utils.is_version_3(version=version):
             self._login()
@@ -134,15 +245,22 @@ class Request:
             self._appliance_login()
         return version
 
-    # To perform logout based on the API version
     def logout(self, version):
+        """
+        Perform logout based on the API version.
+        """
         if utils.is_version_3(version=version):
             self._logout()
         else:
             self._appliance_logout()
 
-    # Get the Current API version
     def get_api_version(self):
+        """
+        Get the current API version.
+
+        Returns:
+            dict: The JSON response containing the API version.
+        """
         request_url = self.base_url + '/version'
         self._login()
         r = requests.get(request_url,
@@ -154,12 +272,15 @@ class Request:
         response = r.json()
         return response
 
-    # API Login method for 4.0 and above.
     def _appliance_login(self):
+        """
+        Perform login for API version 4.0 and above.
+        """
         request_url = self.auth_url + '/login'
-        payload = {"username": "%s" % self.configuration.username,
-                   "password": "%s" % self.configuration.password
-                   }
+        payload = {
+            "username": f"{self.configuration.username}",
+            "password": f"{self.configuration.password}"
+        }
         r = requests.post(request_url, headers=self.headers, json=payload,
                           verify=self.verify_certificate,
                           timeout=self.configuration.timeout
@@ -173,14 +294,18 @@ class Request:
         self.token.set(token)
         self.__refresh_token = response['refresh_token']
 
-    # API logout method for 4.0 and above.
     def _appliance_logout(self):
+        """
+        Perform logout for API version 4.0 and above.
+        """
         request_url = self.auth_url + '/logout'
-        data = {'refresh_token': '{0}'.format(self.__refresh_token)}
-        r = requests.post(request_url, headers=self.get_auth_headers(), json=data,
-                          verify=self.verify_certificate,
-                          timeout=self.configuration.timeout
-                          )
+        data = {'refresh_token': f'{self.__refresh_token}'}
+        r = requests.post(
+            request_url,
+            headers=self.get_auth_headers(),
+            json=data,
+            verify=self.verify_certificate,
+            timeout=self.configuration.timeout)
 
         if r.status_code != requests.codes.no_content:
             exc = exceptions.PowerFlexFailQuerying('token')
@@ -190,24 +315,34 @@ class Request:
         self.__refresh_token = None
 
     def _login(self):
+        """
+        Perform login for API version below 4.0.
+        """
         request_url = self.base_url + '/login'
         try:
             r = requests.get(request_url,
-                            auth=(
-                                self.configuration.username,
-                                self.configuration.password
-                            ),
-                            verify=self.verify_certificate,
-                            timeout=self.configuration.timeout)
+                             auth=(
+                                 self.configuration.username,
+                                 self.configuration.password
+                             ),
+                             verify=self.verify_certificate,
+                             timeout=self.configuration.timeout)
             r.raise_for_status()
             token = r.json()
             self.token.set(token)
         except requests.exceptions.RequestException as e:
-            error_msg = f'Login failed with error:{e.response.content}' if e.response else f'Login failed with error:{str(e)}'
+            error_msg = (
+                f'Login failed with error: {e.response.content}'
+                if e.response
+                else f'Login failed with error: {str(e)}'
+            )
             LOG.error(error_msg)
-            raise Exception(error_msg)
+            raise Exception(error_msg) from e
 
     def _logout(self):
+        """
+        Perform logout for API version below 4.0.
+        """
         token = self.token.get()
 
         if token:
@@ -227,6 +362,9 @@ class Request:
 
 
 class EntityRequest(Request):
+    """
+    Base class for entity requests.
+    """
     base_action_url = '/instances/{entity}::{entity_id}/action/{action}'
     base_entity_url = '/instances/{entity}::{entity_id}'
     base_entity_list_or_create_url = '/types/{entity}/instances'
@@ -243,9 +381,24 @@ class EntityRequest(Request):
 
     @property
     def entity(self):
+        """
+        Returns the entity name.
+        """
         return self.entity_name or self.__class__.__name__
 
     def _create_entity(self, params=None):
+        """
+        Creates an entity.
+
+        Args:
+            params (dict, optional): Parameters for the entity.
+
+        Returns:
+            dict: The created entity.
+
+        Raises:
+            PowerFlexFailCreating: If the entity fails to be created.
+        """
         r, response = self.send_post_request(
             self.base_entity_list_or_create_url,
             entity=self.entity,
@@ -260,6 +413,16 @@ class EntityRequest(Request):
         return self.get(entity_id=entity_id)
 
     def _delete_entity(self, entity_id, params=None):
+        """
+        Deletes an entity.
+
+        Args:
+            entity_id (str): The ID of the entity.
+            params (dict, optional): Parameters for the entity.
+
+        Raises:
+            PowerFlexFailDeleting: If the entity fails to be deleted.
+        """
         action = 'remove' + self.entity
 
         r, response = self.send_post_request(self.base_action_url,
@@ -274,6 +437,20 @@ class EntityRequest(Request):
             raise exc
 
     def _rename_entity(self, action, entity_id, params=None):
+        """
+        Renames an entity.
+
+        Args:
+            action (str): The action to perform.
+            entity_id (str): The ID of the entity.
+            params (dict, optional): Parameters for the entity.
+
+        Returns:
+            dict: The renamed entity.
+
+        Raises:
+            PowerFlexFailRenaming: If the entity fails to be renamed.
+        """
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
@@ -288,8 +465,22 @@ class EntityRequest(Request):
         return self.get(entity_id=entity_id)
 
     def get(self, entity_id=None, filter_fields=None, fields=None):
+        """
+        Gets an entity.
+
+        Args:
+            entity_id (str, optional): The ID of the entity.
+            filter_fields (dict, optional): Fields to filter.
+            fields (dict, optional): Fields to query.
+
+        Returns:
+            dict: The entity.
+
+        Raises:
+            PowerFlexFailQuerying: If the entity fails to be queried.
+        """
         url = self.base_entity_list_or_create_url
-        url_params = dict(entity=self.entity)
+        url_params = {'entity': self.entity}
 
         if entity_id:
             url = self.base_entity_url
@@ -312,22 +503,33 @@ class EntityRequest(Request):
 
     def get_related(self, entity_id, related, filter_fields=None,
                     fields=None):
-        url_params = dict(
-            entity=self.entity,
-            entity_id=entity_id,
-            related=related
-        )
+        """
+        Gets related entities.
+
+        Args:
+            entity_id (str): The ID of the entity.
+            related (str): The related entity.
+            filter_fields (dict, optional): Fields to filter.
+            fields (dict, optional): Fields to query.
+
+        Returns:
+            dict: The related entities.
+
+        Raises:
+            PowerFlexClientException: If the related entities fail to be queried.
+        """
+        url_params = {
+            "entity": self.entity,
+            "entity_id": entity_id,
+            "related": related
+        }
 
         r, response = self.send_get_request(self.base_relationship_url,
                                             **url_params)
         if r.status_code != requests.codes.ok:
             msg = (
-                'Failed to query related {related} entities for PowerFlex '
-                '{entity} with id {_id}.'
-                ' Error: {response}'.format(related=related,
-                                            entity=self.entity,
-                                            _id=entity_id,
-                                            response=response)
+                f"Failed to query related {related} entities for PowerFlex "
+                f"{self.entity} with id {entity_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -337,8 +539,29 @@ class EntityRequest(Request):
             response = utils.query_response_fields(response, fields)
         return response
 
-    def _perform_entity_operation_based_on_action(self, entity_id, action,
-                                                  params=None, add_entity=True, **url_params):
+    def _perform_entity_operation_based_on_action(
+            self,
+            entity_id,
+            action,
+            params=None,
+            add_entity=True,
+            **url_params):
+        """
+        Perform a specific action on an entity.
+
+        Args:
+            entity_id (str): The ID of the entity.
+            action (str): The action to perform.
+            params (dict, optional): Additional parameters.
+            add_entity (bool, optional): Whether to add the entity to the action.
+            **url_params: Additional URL parameters.
+
+        Raises:
+            exceptions.PowerFlexFailEntityOperation: If the entity operation fails.
+
+        Returns:
+            dict: The response from the API.
+        """
         if add_entity:
             action = action + self.entity
 
@@ -349,12 +572,25 @@ class EntityRequest(Request):
                                              params=params,
                                              **url_params)
         if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailEntityOperation(self.entity, entity_id,
-                                                          action, response)
+            exc = exceptions.PowerFlexFailEntityOperation(
+                self.entity, entity_id, action, response)
             LOG.error(exc.message)
             raise exc
 
     def _query_selected_statistics(self, action, params=None):
+        """
+        Query the selected statistics.
+
+        Args:
+            action (str): The action to perform.
+            params (dict, optional): Additional parameters.
+
+        Raises:
+            exceptions.PowerFlexFailQuerying: If the query fails.
+
+        Returns:
+            dict: The response from the API.
+        """
         r, response = self.send_post_request(self.base_type_special_action_url,
                                              action=action,
                                              entity=self.entity,

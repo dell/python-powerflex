@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with replication pair APIs."""
+
+# pylint: disable=redefined-builtin,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
+
 import logging
 
 import requests
@@ -25,6 +29,9 @@ LOG = logging.getLogger(__name__)
 
 
 class ReplicationPair(base_client.EntityRequest):
+    """
+    A class representing Replication Pair client.
+    """
     def get_statistics(self, id):
         """Retrieve statistics for the specified ReplicationPair object.
 
@@ -51,13 +58,13 @@ class ReplicationPair(base_client.EntityRequest):
         :return: dict
         """
 
-        params = dict(
-            sourceVolumeId=source_vol_id,
-            destinationVolumeId=dest_vol_id,
-            replicationConsistencyGroupId=rcg_id,
-            copyType=copy_type,
-            name=name
-        )
+        params = {
+            "sourceVolumeId": source_vol_id,
+            "destinationVolumeId": dest_vol_id,
+            "replicationConsistencyGroupId": rcg_id,
+            "copyType": copy_type,
+            "name": name
+        }
 
         return self._create_entity(params)
 
@@ -75,8 +82,8 @@ class ReplicationPair(base_client.EntityRequest):
         :param id: str
         :return: dict
         """
-        return self._perform_entity_operation_based_on_action\
-            (id, "pausePairInitialCopy", add_entity=False)
+        return self._perform_entity_operation_based_on_action(
+            id, "pausePairInitialCopy", add_entity=False)
 
     def resume(self, id):
         """Resume initial copy of the ReplicationPair.
@@ -84,8 +91,8 @@ class ReplicationPair(base_client.EntityRequest):
         :param id: str
         :return: dict
         """
-        return self._perform_entity_operation_based_on_action\
-            (id, "resumePairInitialCopy", add_entity=False)
+        return self._perform_entity_operation_based_on_action(
+            id, "resumePairInitialCopy", add_entity=False)
 
     def get_all_statistics(self):
         """Retrieve statistics for all ReplicationPair objects.
@@ -95,8 +102,10 @@ class ReplicationPair(base_client.EntityRequest):
                                              entity=self.entity,
                                              action="querySelectedStatistics")
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to list statistics for all ReplicationPair objects. '
-                   'Error: {response}'.format(response=response))
+            msg = (
+                'Failed to list statistics for all ReplicationPair objects. '
+                f'Error: {response}'
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -113,7 +122,7 @@ class ReplicationPair(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

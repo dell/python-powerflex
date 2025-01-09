@@ -13,13 +13,23 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for testing managed device client."""
+
+# pylint: disable=invalid-name
+
 from PyPowerFlex import exceptions
 import tests
 
 
 class TestManagedDeviceClient(tests.PyPowerFlexTestCase):
+    """
+    Test class for the ManagedDeviceClient.
+    """
     def setUp(self):
-        super(TestManagedDeviceClient, self).setUp()
+        """
+        Set up the test environment.
+        """
+        super().setUp()
         self.client.initialize()
 
         self.MOCK_RESPONSES = {
@@ -30,12 +40,21 @@ class TestManagedDeviceClient(tests.PyPowerFlexTestCase):
         }
 
     def test_managed_device_get(self):
+        """
+        Test the managed_device.get() method.
+        """
         self.client.managed_device.get()
 
     def test_managed_device_get_with_query_params(self):
+        """
+        Test the managed_device.get() method with query parameters.
+        """
         self.client.managed_device.get(filters=['eq,deviceType,scaleio'], sort="state")
 
     def test_managed_device_get_bad_status(self):
+        """
+        Test the managed_device.get() method with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.managed_device.get)

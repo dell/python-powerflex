@@ -13,13 +13,23 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for testing host client."""
+
+# pylint: disable=invalid-name
+
 from PyPowerFlex import exceptions
 import tests
 
 
 class TestHostClient(tests.PyPowerFlexTestCase):
+    """
+    Tests for the HostClient class.
+    """
     def setUp(self):
-        super(TestHostClient, self).setUp()
+        """
+        Set up the test environment.
+        """
+        super().setUp()
         self.client.initialize()
         self.fake_host_id="1"
         self.fake_nqn = "nqn::"
@@ -28,37 +38,53 @@ class TestHostClient(tests.PyPowerFlexTestCase):
             self.RESPONSE_MODE.Valid: {
                 # create
                 '/types/Host/instances': {'id': self.fake_host_id},
-                '/instances/Host::{}'.format(self.fake_host_id):
+                f'/instances/Host::{self.fake_host_id}':
                     {'id': self.fake_host_id},
-                 '/instances/Host::{}'
-                '/action/modifyMaxNumPaths'.format(self.fake_host_id): {},
-                 '/instances/Host::{}'
-                '/action/modifyMaxNumSysPorts'.format(self.fake_host_id): {},
+                f'/instances/Host::{self.fake_host_id}/action/modifyMaxNumPaths': {},
+                f'/instances/Host::{self.fake_host_id}/action/modifyMaxNumSysPorts': {},
             }
         }
-        
+
     def test_sdc_host_create(self):
+        """
+        Test the creation of a new host.
+        """
         self.client.host.create(self.fake_nqn, max_num_paths='8', max_num_sys_ports='8')
 
     def test_sdc_host_create_bad_status(self):
+        """
+        Test the creation of a new host with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailCreating,
                               self.client.host.create, self.fake_nqn)
     def test_sdc_modify_max_num_paths(self):
+        """
+        Test the modification of the maximum number of paths.
+        """
         self.client.host.modify_max_num_paths(self.fake_host_id, max_num_paths='8')
-        
+
     def test_sdc_modify_max_num_paths_bad_status(self):
-         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+        """
+        Test the modification of the maximum number of paths with a bad status.
+        """
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailEntityOperation,
                               self.client.host.modify_max_num_paths,
                               self.fake_host_id,
                               max_num_paths='8')
 
     def test_sdc_modify_max_num_sys_ports(self):
+        """
+        Test the modification of the maximum number of system ports.
+        """
         self.client.host.modify_max_num_sys_ports(self.fake_host_id, max_num_sys_ports='8')
 
     def test_sdc_modify_max_num_sys_ports_bad_status(self):
-         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+        """
+        Test the modification of the maximum number of system ports with a bad status.
+        """
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailEntityOperation,
                               self.client.host.modify_max_num_sys_ports,
                               self.fake_host_id,

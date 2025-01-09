@@ -13,14 +13,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for testing accelaration pool client."""
+
+# pylint: disable=invalid-name
+
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects import acceleration_pool
 import tests
 
 
 class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
+    """
+    Test class for the AccelerationPoolClient.
+    """
     def setUp(self):
-        super(TestAccelerationPoolClient, self).setUp()
+        """
+        Set up the test environment.
+        """
+        super().setUp()
         self.client.initialize()
         self.fake_pd_id = '1'
         self.fake_ap_id = '1'
@@ -30,10 +40,9 @@ class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
             self.RESPONSE_MODE.Valid: {
                 '/types/AccelerationPool/instances':
                     {'id': self.fake_ap_id},
-                '/instances/AccelerationPool::{}'.format(self.fake_ap_id):
+                f'/instances/AccelerationPool::{self.fake_ap_id}':
                     {'id': self.fake_ap_id},
-                '/instances/AccelerationPool::{}'
-                '/action/removeAccelerationPool'.format(self.fake_ap_id):
+                f'/instances/AccelerationPool::{self.fake_ap_id}/action/removeAccelerationPool':
                     {},
                 '/types/AccelerationPool'
                 '/instances/action/querySelectedStatistics': {
@@ -47,37 +56,55 @@ class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
         }
 
     def test_acceleration_pool_create(self):
+        """
+        Test the create method of the AccelerationPoolClient.
+        """
         self.client.acceleration_pool.create(
             media_type=acceleration_pool.MediaType.ssd,
             protection_domain_id=self.fake_pd_id,
-            isRfcache=True)
+            is_rfcache=True)
 
     def test_acceleration_pool_create_bad_status(self):
+        """
+        Test the create method of the AccelerationPoolClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailCreating,
                               self.client.acceleration_pool.create,
                               media_type=acceleration_pool.MediaType.ssd,
                               protection_domain_id=self.fake_pd_id,
-                              isRfcache=True)
+                              is_rfcache=True)
 
     def test_acceleration_pool_create_no_id_in_response(self):
+        """
+        Test the create method of the AccelerationPoolClient with no id in the response.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.Invalid):
             self.assertRaises(KeyError,
                               self.client.acceleration_pool.create,
                               media_type=acceleration_pool.MediaType.ssd,
                               protection_domain_id=self.fake_pd_id,
-                              isRfcache=True)
+                              is_rfcache=True)
 
     def test_acceleration_pool_delete(self):
+        """
+        Test the delete method of the AccelerationPoolClient.
+        """
         self.client.acceleration_pool.delete(self.fake_ap_id)
 
     def test_acceleration_pool_delete_bad_status(self):
+        """
+        Test the delete method of the AccelerationPoolClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
                               self.client.acceleration_pool.delete,
                               self.fake_ap_id)
 
     def test_acceleration_pool_query_selected_statistics(self):
+        """
+        Test the query_selected_statistics method of the AccelerationPoolClient.
+        """
         ret = self.client.acceleration_pool.query_selected_statistics(
             properties=["accelerationDeviceIds"]
         )
@@ -86,6 +113,9 @@ class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
         ]
 
     def test_acceleration_pool_query_selected_statistics_bad_status(self):
+        """
+        Test the query_selected_statistics method of the AccelerationPoolClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexFailQuerying,

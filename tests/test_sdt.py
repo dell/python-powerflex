@@ -13,14 +13,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for testing SDT client."""
+
+# pylint: disable=invalid-name,too-many-public-methods
+
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects import sdt
 import tests
 
 
 class TestSdtClient(tests.PyPowerFlexTestCase):
+    """
+    Tests for the SdtClient class.
+    """
     def setUp(self):
-        super(TestSdtClient, self).setUp()
+        """
+        Set up the test environment.
+        """
+        super().setUp()
         self.client.initialize()
         self.fake_sdt_id = "1"
         self.fake_sdt_name = "1"
@@ -30,23 +40,17 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
                 "/types/Sdt/instances": {"id": self.fake_sdt_id},
-                "/instances/Sdt::{}".format(self.fake_sdt_id): {"id": self.fake_sdt_id},
-                "/instances/Sdt::{}" "/action/addIp".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}" "/action/removeIp".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}" "/action/renameSdt".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}"
-                "/action/modifyIpRole".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}"
-                "/action/modifyStoragePort".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}"
-                "/action/modifyNvmePort".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}"
-                "/action/modifyDiscoveryPort".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}"
-                "/action/enterMaintenanceMode".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}"
-                "/action/exitMaintenanceMode".format(self.fake_sdt_id): {},
-                "/instances/Sdt::{}" "/action/removeSdt".format(self.fake_sdt_id): {},
+                f"/instances/Sdt::{self.fake_sdt_id}": {"id": self.fake_sdt_id},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/addIp": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/removeIp": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/renameSdt": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/modifyIpRole": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/modifyStoragePort": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/modifyNvmePort": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/modifyDiscoveryPort": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/enterMaintenanceMode": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/exitMaintenanceMode": {},
+                f"/instances/Sdt::{self.fake_sdt_id}/action/removeSdt": {},
             },
             self.RESPONSE_MODE.Invalid: {
                 "/types/Sdt/instances": {},
@@ -54,6 +58,9 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
         }
 
     def test_sdt_create(self):
+        """
+        Test the create method of the SdtClient.
+        """
         self.client.sdt.create(
             protection_domain_id=self.fake_pd_id,
             sdt_ips=self.fake_sdt_ips,
@@ -61,6 +68,9 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
         )
 
     def test_sdt_create_bad_status(self):
+        """
+        Test the create method of the SdtClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexFailCreating,
@@ -71,6 +81,9 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_create_no_id_in_response(self):
+        """
+        Test the create method of the SdtClient with no id in the response.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.Invalid):
             self.assertRaises(
                 KeyError,
@@ -81,9 +94,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_rename(self):
+        """
+        Test the rename method of the SdtClient.
+        """
         self.client.sdt.rename(self.fake_sdt_id, name="new_name")
 
     def test_sdt_rename_bad_status(self):
+        """
+        Test the rename method of the SdtClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexFailRenaming,
@@ -93,11 +112,17 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_add_ip(self):
+        """
+        Test the add_ip method of the SdtClient.
+        """
         self.client.sdt.add_ip(
             self.fake_sdt_id, ip="1.2.3.4", role=sdt.SdtIpRoles.storage_and_host
         )
 
     def test_sdt_add_ip_bad_status(self):
+        """
+        Test the add_ip method of the SdtClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -108,9 +133,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_remove_ip(self):
+        """
+        Test the remove_ip method of the SdtClient.
+        """
         self.client.sdt.remove_ip(self.fake_sdt_id, ip="1.2.3.4")
 
     def test_sdt_remove_ip_bad_status(self):
+        """
+        Test the remove_ip method of the SdtClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -120,11 +151,17 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_set_ip_role(self):
+        """
+        Test the set_ip_role method of the SdtClient.
+        """
         self.client.sdt.set_ip_role(
             self.fake_sdt_id, ip="1.2.3.4", role=sdt.SdtIpRoles.storage_and_host
         )
 
     def test_sdt_set_ip_role_bad_status(self):
+        """
+        Test the set_ip_role method of the SdtClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -135,9 +172,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_set_storage_port(self):
+        """
+        Test the set_storage_port method of the SdtClient.
+        """
         self.client.sdt.set_storage_port(self.fake_sdt_id, storage_port=12200)
 
     def test_sdt_set_storage_port_bad_status(self):
+        """
+        Test the set_storage_port method of the SdtClient with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -147,9 +190,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_set_nvme_port(self):
+        """
+        Test case for setting NVMe port of a Storage Device Target.
+        """
         self.client.sdt.set_nvme_port(self.fake_sdt_id, nvme_port=4420)
 
     def test_sdt_set_nvme_port_bad_status(self):
+        """
+        Test case for setting NVMe port of a Storage Device Target with bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -159,9 +208,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_set_discovery_port(self):
+        """
+        Test case for setting discovery port of a Storage Device Target.
+        """
         self.client.sdt.set_discovery_port(self.fake_sdt_id, discovery_port=8009)
 
     def test_sdt_set_discovery_port_bad_status(self):
+        """
+        Test case for setting discovery port of a Storage Device Target with bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -171,9 +226,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_enter_maintenance_mode(self):
+        """
+        Test case for entering maintenance mode of a Storage Device Target.
+        """
         self.client.sdt.enter_maintenance_mode(self.fake_sdt_id)
 
     def test_sdt_enter_maintenance_mode_bad_status(self):
+        """
+        Test case for entering maintenance mode of a Storage Device Target with bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -182,9 +243,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_exit_maintenance_mode(self):
+        """
+        Test case for exiting maintenance mode of a Storage Device Target.
+        """
         self.client.sdt.exit_maintenance_mode(self.fake_sdt_id)
 
     def test_sdt_exit_maintenance_mode_bad_status(self):
+        """
+        Test case for exiting maintenance mode of a Storage Device Target with bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
@@ -193,9 +260,15 @@ class TestSdtClient(tests.PyPowerFlexTestCase):
             )
 
     def test_sdt_delete(self):
+        """
+        Test case for deleting a Storage Device Target.
+        """
         self.client.sdt.delete(self.fake_sdt_id)
 
     def test_sdt_delete_bad_status(self):
+        """
+        Test case for deleting a Storage Device Target with bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexFailDeleting,

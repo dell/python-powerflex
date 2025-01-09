@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with protection domain APIs."""
+
+# pylint: disable=too-few-public-methods,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
+
 import logging
 
 import requests
@@ -35,6 +39,9 @@ class RFCacheOperationMode:
 
 
 class ProtectionDomain(base_client.EntityRequest):
+    """
+    A class representing Protection Domain client.
+    """
     def activate(self, protection_domain_id, force=False):
         """Activate PowerFlex protection domain.
 
@@ -45,9 +52,9 @@ class ProtectionDomain(base_client.EntityRequest):
 
         action = 'activateProtectionDomain'
 
-        params = dict(
-            forceActivate=force
-        )
+        params = {
+            "forceActivate": force
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -55,10 +62,10 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity_id=protection_domain_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to activate PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=protection_domain_id,
-                           response=response))
+            msg = (
+                f"Failed to activate PowerFlex {self.entity} "
+                f"with id {protection_domain_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -71,9 +78,7 @@ class ProtectionDomain(base_client.EntityRequest):
         :rtype: dict
         """
 
-        params = dict(
-            name=name
-        )
+        params = {"name": name}
 
         return self._create_entity(params)
 
@@ -127,9 +132,9 @@ class ProtectionDomain(base_client.EntityRequest):
 
         action = 'inactivateProtectionDomain'
 
-        params = dict(
-            forceShutdown=force
-        )
+        params = {
+            "forceShutdown": force
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -137,10 +142,10 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity_id=protection_domain_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to inactivate PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=protection_domain_id,
-                           response=response))
+            msg = (
+                f"Failed to inactivate PowerFlex {self.entity} "
+                f"with id {protection_domain_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -156,9 +161,7 @@ class ProtectionDomain(base_client.EntityRequest):
 
         action = 'setProtectionDomainName'
 
-        params = dict(
-            name=name
-        )
+        params = {"name": name}
 
         return self._rename_entity(action, protection_domain_id, params)
 
@@ -178,12 +181,12 @@ class ProtectionDomain(base_client.EntityRequest):
 
         action = "setSdsNetworkLimits"
 
-        params = dict(
-            rebuildLimitInKbps=rebuild_limit,
-            rebalanceLimitInKbps=rebalance_limit,
-            vtreeMigrationLimitInKbps=vtree_migration_limit,
-            overallLimitInKbps=overall_limit
-        )
+        params = {
+            "rebuildLimitInKbps": rebuild_limit,
+            "rebalanceLimitInKbps": rebalance_limit,
+            "vtreeMigrationLimitInKbps": vtree_migration_limit,
+            "overallLimitInKbps": overall_limit
+        }
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
@@ -191,10 +194,10 @@ class ProtectionDomain(base_client.EntityRequest):
                                              params=params)
 
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to update the network limits of PowerFlex {entity}'
-                   ' with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=protection_domain_id,
-                           response=response))
+            msg = (
+                f"Failed to update the network limits of PowerFlex {self.entity} "
+                f"with id {protection_domain_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -218,10 +221,10 @@ class ProtectionDomain(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=protection_domain_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to enable/disable RFcache in PowerFlex {entity} '
-                   ' with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=protection_domain_id,
-                           response=response))
+            msg = (
+                f"Failed to enable/disable RFcache in PowerFlex {self.entity} "
+                f"with id {protection_domain_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -241,11 +244,11 @@ class ProtectionDomain(base_client.EntityRequest):
 
         action = "setRfcacheParameters"
 
-        params = dict(
-            pageSizeKb=page_size,
-            maxIOSizeKb=max_io_limit,
-            rfcacheOperationMode=pass_through_mode
-        )
+        params = {
+            "pageSizeKb": page_size,
+            "maxIOSizeKb": max_io_limit,
+            "rfcacheOperationMode": pass_through_mode
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -254,10 +257,10 @@ class ProtectionDomain(base_client.EntityRequest):
                                              params=params)
 
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set RFcache parameters in PowerFlex {entity} '
-                   ' with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=protection_domain_id,
-                           response=response))
+            msg = (
+                f"Failed to set RFcache parameters in PowerFlex {self.entity} "
+                f"with id {protection_domain_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -274,7 +277,7 @@ class ProtectionDomain(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

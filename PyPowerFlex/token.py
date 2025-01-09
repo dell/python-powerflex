@@ -13,13 +13,37 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module is used for the management of token."""
 
 class Token:
+    """
+    A class to manage a token.
+    """
     def __init__(self):
+        """
+        Initialize the Token object.
+
+        The initial value of the token is None.
+        """
         self.__token = None
 
     def get(self):
+        """
+        Get the current token.
+
+        Returns:
+            The current token.
+        """
         return self.__token
 
     def set(self, token):
+        """
+        Set the token.
+
+        Args:
+            token (Any): The new token.
+
+        Returns:
+            None
+        """
         self.__token = token

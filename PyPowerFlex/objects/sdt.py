@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with SDT APIs."""
+
+# pylint: disable=too-few-public-methods,no-member,too-many-arguments,too-many-positional-arguments
+
 import logging
 import requests
 from PyPowerFlex import base_client
@@ -37,7 +41,7 @@ class SdtIp(dict):
             },
             dump=False,
         )
-        super(SdtIp, self).__init__(**params)
+        super().__init__(**params)
 
 
 class SdtIpRoles:
@@ -49,7 +53,9 @@ class SdtIpRoles:
 
 
 class Sdt(base_client.EntityRequest):
-
+    """
+    A class representing SDT client.
+    """
     def create(
         self,
         sdt_ips,
@@ -70,14 +76,14 @@ class Sdt(base_client.EntityRequest):
         :rtype: dict
         """
 
-        params = dict(
-            ips=sdt_ips,
-            storagePort=storage_port,
-            nvmePort=nvme_port,
-            discoveryPort=discovery_port,
-            name=sdt_name,
-            protectionDomainId=protection_domain_id,
-        )
+        params = {
+            "ips": sdt_ips,
+            "storagePort": storage_port,
+            "nvmePort": nvme_port,
+            "discoveryPort": discovery_port,
+            "name": sdt_name,
+            "protectionDomainId": protection_domain_id,
+        }
 
         return self._create_entity(params)
 
@@ -91,7 +97,7 @@ class Sdt(base_client.EntityRequest):
 
         action = "renameSdt"
 
-        params = dict(newName=name)
+        params = {'newName': name}
 
         return self._rename_entity(action, sdt_id, params)
 
@@ -106,10 +112,10 @@ class Sdt(base_client.EntityRequest):
 
         action = "addIp"
 
-        params = dict(
-            ip=ip,
-            role=role,
-        )
+        params = {
+            "ip": ip,
+            "role": role,
+        }
 
         r, response = self.send_post_request(
             self.base_action_url,
@@ -120,10 +126,8 @@ class Sdt(base_client.EntityRequest):
         )
         if r.status_code != requests.codes.ok:
             msg = (
-                "Failed to add IP for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
+                f"Failed to add IP for PowerFlex {self.entity} "
+                f"with id {sdt_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -140,7 +144,7 @@ class Sdt(base_client.EntityRequest):
 
         action = "removeIp"
 
-        params = dict(ip=ip)
+        params = {"ip": ip}
 
         r, response = self.send_post_request(
             self.base_action_url,
@@ -150,12 +154,8 @@ class Sdt(base_client.EntityRequest):
             params=params,
         )
         if r.status_code != requests.codes.ok:
-            msg = (
-                "Failed to remove IP from PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
-            )
+            msg = f"Failed to remove IP from PowerFlex {self.entity} " \
+                  f"with id {sdt_id}. Error: {response}"
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -173,10 +173,10 @@ class Sdt(base_client.EntityRequest):
 
         action = "modifyIpRole"
 
-        params = dict(
-            ip=ip,
-            newRole=role,
-        )
+        params = {
+            "ip": ip,
+            "newRole": role
+        }
 
         r, response = self.send_post_request(
             self.base_action_url,
@@ -186,12 +186,8 @@ class Sdt(base_client.EntityRequest):
             params=params,
         )
         if r.status_code != requests.codes.ok:
-            msg = (
-                "Failed to set ip role for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
-            )
+            msg = f"Failed to set ip role for PowerFlex {self.entity} " \
+                  f"with id {sdt_id}. Error: {response}"
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -207,7 +203,7 @@ class Sdt(base_client.EntityRequest):
 
         action = "modifyStoragePort"
 
-        params = dict(newStoragePort=storage_port)
+        params = {"newStoragePort": storage_port}
 
         r, response = self.send_post_request(
             self.base_action_url,
@@ -218,10 +214,8 @@ class Sdt(base_client.EntityRequest):
         )
         if r.status_code != requests.codes.ok:
             msg = (
-                "Failed to set storage port for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
+                f"Failed to set storage port for PowerFlex {self.entity} "
+                f"with id {sdt_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -238,7 +232,7 @@ class Sdt(base_client.EntityRequest):
 
         action = "modifyNvmePort"
 
-        params = dict(newNvmePort=nvme_port)
+        params = {"newNvmePort": nvme_port}
 
         r, response = self.send_post_request(
             self.base_action_url,
@@ -249,10 +243,8 @@ class Sdt(base_client.EntityRequest):
         )
         if r.status_code != requests.codes.ok:
             msg = (
-                "Failed to set nvme port for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
+                f"Failed to set nvme port for PowerFlex {self.entity} "
+                f"with id {sdt_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -269,7 +261,7 @@ class Sdt(base_client.EntityRequest):
 
         action = "modifyDiscoveryPort"
 
-        params = dict(newDiscoveryPort=discovery_port)
+        params = {"newDiscoveryPort": discovery_port}
 
         r, response = self.send_post_request(
             self.base_action_url,
@@ -280,10 +272,8 @@ class Sdt(base_client.EntityRequest):
         )
         if r.status_code != requests.codes.ok:
             msg = (
-                "Failed to set discovery port for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
+                f"Failed to set discovery port for PowerFlex {self.entity} "
+                f"with id {sdt_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -308,10 +298,8 @@ class Sdt(base_client.EntityRequest):
         )
         if r.status_code != requests.codes.ok:
             msg = (
-                "Failed to enter maintenance mode for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
+                f"Failed to enter maintenance mode for PowerFlex {self.entity} "
+                f"with id {sdt_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -336,10 +324,8 @@ class Sdt(base_client.EntityRequest):
         )
         if r.status_code != requests.codes.ok:
             msg = (
-                "Failed to exit maintenance mode for PowerFlex {entity} "
-                "with id {_id}. Error: {response}".format(
-                    entity=self.entity, _id=sdt_id, response=response
-                )
+                f"Failed to exit maintenance mode for PowerFlex {self.entity} "
+                f"with id {sdt_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -354,6 +340,6 @@ class Sdt(base_client.EntityRequest):
         :rtype: None
         """
 
-        params = dict(force=force)
+        params = {"force": force}
 
         return self._delete_entity(sdt_id, params)

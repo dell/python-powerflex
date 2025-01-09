@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module is used for the initialization of PowerFlex Client."""
+
+# pylint: disable=invalid-name,too-many-arguments,too-many-positional-arguments
+
 from packaging import version
 
 from PyPowerFlex import configuration
@@ -28,6 +32,12 @@ __all__ = [
 
 
 class PowerFlexClient:
+    """
+    Client class for interacting with PowerFlex API.
+
+    This class initializes the client with the provided configuration and provides
+    access to the various storage entities available in the PowerFlex system.
+    """
     __slots__ = (
         '__is_initialized',
         'configuration',
@@ -76,12 +86,18 @@ class PowerFlexClient:
     def __getattr__(self, item):
         if not self.__is_initialized and item in self.__slots__:
             raise exceptions.ClientNotInitialized
-        return super(PowerFlexClient, self).__getattribute__(item)
+        return super().__getattribute__(item)
 
     def __add_storage_entity(self, attr_name, entity_class):
         setattr(self, attr_name, entity_class(self.token, self.configuration))
 
     def initialize(self):
+        """
+        Initializes the client.
+
+        Raises:
+            PowerFlexClientException: If the PowerFlex API version is lower than 3.0.
+        """
         self.configuration.validate()
         self.__add_storage_entity('device', objects.Device)
         self.__add_storage_entity('fault_set', objects.FaultSet)
@@ -97,12 +113,16 @@ class PowerFlexClient:
         self.__add_storage_entity('system', objects.System)
         self.__add_storage_entity('volume', objects.Volume)
         self.__add_storage_entity('utility', objects.PowerFlexUtility)
-        self.__add_storage_entity('replication_consistency_group', objects.ReplicationConsistencyGroup)
+        self.__add_storage_entity(
+            'replication_consistency_group',
+            objects.ReplicationConsistencyGroup)
         self.__add_storage_entity('replication_pair', objects.ReplicationPair)
         self.__add_storage_entity('service_template', objects.ServiceTemplate)
         self.__add_storage_entity('managed_device', objects.ManagedDevice)
         self.__add_storage_entity('deployment', objects.Deployment)
-        self.__add_storage_entity('firmware_repository', objects.FirmwareRepository)
+        self.__add_storage_entity(
+            'firmware_repository',
+            objects.FirmwareRepository)
         self.__add_storage_entity('host', objects.Host)
         utils.init_logger(self.configuration.log_level)
         if version.parse(self.system.api_version()) < version.Version('3.0'):

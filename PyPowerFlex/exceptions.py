@@ -13,8 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module contains the definitions of the exceptions used in the code."""
+
+# pylint: disable=super-init-not-called
 
 class PowerFlexClientException(Exception):
+    """
+    Base class for all exceptions raised by the PowerFlexClient.
+    """
     def __init__(self, message, response=None):
         self.message = message
         self.response = response
@@ -24,6 +30,9 @@ class PowerFlexClientException(Exception):
 
 
 class ClientNotInitialized(PowerFlexClientException):
+    """
+    Exception raised when the PowerFlexClient is not initialized.
+    """
     def __init__(self):
         self.message = (
             'PowerFlex Client is not initialized. '
@@ -32,76 +41,87 @@ class ClientNotInitialized(PowerFlexClientException):
 
 
 class InvalidConfiguration(PowerFlexClientException):
-    pass
+    """
+    Exception raised when the configuration is invalid.
+    """
 
 
 class FieldsNotFound(PowerFlexClientException):
-    pass
+    """
+    Exception raised when the required fields are not found.
+    """
 
 
 class InvalidInput(PowerFlexClientException):
-    pass
+    """
+    Exception raised when the input is invalid.
+    """
 
 
 class PowerFlexFailCreating(PowerFlexClientException):
+    """
+    Exception raised when creating a PowerFlex entity fails.
+    """
     base = 'Failed to create PowerFlex {entity}.'
 
     def __init__(self, entity, response=None):
         self.message = self.base.format(entity=entity)
         self.response = response
         if response:
-            self.message = '{msg} Error: ' \
-                           '{response}'.format(msg=self.message,
-                                               response=response)
+            self.message = (
+                f"{self.message} Error: "
+                f"{response}"
+            )
 
 
 class PowerFlexFailDeleting(PowerFlexClientException):
+    """
+    Exception raised when deleting a PowerFlex entity fails.
+    """
     base = 'Failed to delete PowerFlex {entity} with id {_id}.'
 
     def __init__(self, entity, entity_id, response=None):
         self.message = self.base.format(entity=entity, _id=entity_id)
         self.response = response
         if response:
-            self.message = '{msg} Error: ' \
-                           '{response}'.format(msg=self.message,
-                                               response=response)
+            self.message = f"{self.message} Error: {response}"
 
 
 class PowerFlexFailQuerying(PowerFlexClientException):
+    """
+    Exception raised when querying a PowerFlex entity fails.
+    """
     base = 'Failed to query PowerFlex {entity}'
 
     def __init__(self, entity, entity_id=None, response=None):
         base = self.base.format(entity=entity)
         self.response = response
         if entity_id and response is None:
-            self.message = '{base} with id {_id}.'.format(base=base,
-                                                          _id=entity_id)
+            self.message = f"{base} with id {entity_id}."
         elif entity is None and response:
-            self.message = '{base} Error: ' \
-                           '{response}'.format(base=base,
-                                               response=response)
+            self.message = f"{base} Error: {response}."
         elif entity and response:
-            self.message = '{base} with id {_id}.' \
-                           ' Error: {response}'.format(base=base,
-                                                       _id=entity_id,
-                                                       response=response)
+            self.message = f"{base} with id {entity_id}. Error: {response}."
         else:
-            self.message = '{base}.'.format(base=base)
+            self.message = f"{base}."
 
 
 class PowerFlexFailRenaming(PowerFlexClientException):
+    """
+    Exception raised when renaming a PowerFlex entity fails.
+    """
     base = 'Failed to rename PowerFlex {entity} with id {_id}.'
 
     def __init__(self, entity, entity_id, response=None):
         self.message = self.base.format(entity=entity, _id=entity_id)
         self.response = response
         if response:
-            self.message = '{msg} Error: ' \
-                           '{response}'.format(msg=self.message,
-                                               response=response)
-
+            self.message = f"{self.message} Error: {response}"
 
 class PowerFlexFailEntityOperation(PowerFlexClientException):
+    """
+    Exception raised when performing an operation on a PowerFlex entity fails.
+    """
     base = 'Failed to perform {action} on PowerFlex {entity} with id {_id}.'
 
     def __init__(self, entity, entity_id, action, response=None):
@@ -109,6 +129,4 @@ class PowerFlexFailEntityOperation(PowerFlexClientException):
             self.base.format(action=action, entity=entity, _id=entity_id)
         self.response = response
         if response:
-            self.message = '{msg} Error: ' \
-                           '{response}'.format(msg=self.message,
-                                               response=response)
+            self.message = f"{self.message} Error: {response}"

@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with device APIs."""
+
+# pylint: disable=too-few-public-methods,too-many-arguments,too-many-positional-arguments,no-member,duplicate-code
+
 import logging
 
 import requests
@@ -43,6 +47,9 @@ class ExternalAccelerationType:
 
 
 class Device(base_client.EntityRequest):
+    """
+    A class representing Device client.
+    """
     def create(self,
                current_pathname,
                sds_id,
@@ -76,16 +83,16 @@ class Device(base_client.EntityRequest):
                   'set.'
             raise exceptions.InvalidInput(msg)
 
-        params = dict(
-            deviceCurrentPathname=current_pathname,
-            sdsId=sds_id,
-            accelerationPoolId=acceleration_pool_id,
-            externalAccelerationType=external_acceleration_type,
-            forceDeviceTakeover=force,
-            mediaType=media_type,
-            name=name,
-            storagePoolId=storage_pool_id
-        )
+        params = {
+            "deviceCurrentPathname": current_pathname,
+            "sdsId": sds_id,
+            "accelerationPoolId": acceleration_pool_id,
+            "externalAccelerationType": external_acceleration_type,
+            "forceDeviceTakeover": force,
+            "mediaType": media_type,
+            "name": name,
+            "storagePoolId": storage_pool_id
+        }
 
         return self._create_entity(params)
 
@@ -97,9 +104,9 @@ class Device(base_client.EntityRequest):
         :rtype: None
         """
 
-        params = dict(
-            forceRemove=force
-        )
+        params = {
+            "forceRemove": force
+        }
 
         return self._delete_entity(device_id, params)
 
@@ -113,9 +120,9 @@ class Device(base_client.EntityRequest):
 
         action = 'setDeviceName'
 
-        params = dict(
-            newName=name
-        )
+        params = {
+            "newName": name
+        }
 
         return self._rename_entity(action, device_id, params)
 
@@ -132,9 +139,7 @@ class Device(base_client.EntityRequest):
 
         action = 'setMediaType'
 
-        params = dict(
-            mediaType=media_type
-        )
+        params = {"mediaType": media_type}
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -142,10 +147,10 @@ class Device(base_client.EntityRequest):
                                              entity_id=device_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set media type for PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=device_id,
-                           response=response))
+            msg = (
+                f"Failed to set media type for PowerFlex {self.entity} "
+                f"with id {device_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -161,7 +166,7 @@ class Device(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

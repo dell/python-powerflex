@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with accelaration pool APIs."""
+
+# pylint: disable=too-few-public-methods,duplicate-code
+
 import logging
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
@@ -29,30 +33,35 @@ class MediaType:
 
 
 class AccelerationPool(base_client.EntityRequest):
+    """
+    A class representing a PowerFlex acceleration pool.
+
+    This class provides methods to create, delete, and query acceleration pools.
+    """
     def create(self,
                media_type,
                protection_domain_id,
                name=None,
-               isRfcache=None):
+               is_rfcache=None):
         """Create PowerFlex acceleration pool.
 
         :param media_type: one of predefined attributes of MediaType
         :type media_type: str
         :type protection_domain_id: str
         :type name: str
-        :type isRfcache: bool
+        :type is_rfcache: bool
         :rtype: dict
         """
 
-        if media_type == MediaType.ssd and not isRfcache:
-            msg = 'isRfcache must be set for media_type SSD.'
+        if media_type == MediaType.ssd and not is_rfcache:
+            msg = 'is_rfcache must be set for media_type SSD.'
             raise exceptions.InvalidInput(msg)
-        params = dict(
-            mediaType=media_type,
-            protectionDomainId=protection_domain_id,
-            name=name,
-            isRfcache=isRfcache
-        )
+        params = {
+            'mediaType': media_type,
+            'protectionDomainId': protection_domain_id,
+            'name': name,
+            'isRfcache': is_rfcache
+        }
 
         return self._create_entity(params)
 
@@ -76,7 +85,7 @@ class AccelerationPool(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

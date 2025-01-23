@@ -36,7 +36,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Run Unit Test and Generate report  
         run: |
-          coverage run -m pytest -v PyPowerFlex/tests/test_*.py
+          coverage run -m pytest -v tests/test_*.py
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v5
         if: ${{ matrix.python-version == '3.12' }}

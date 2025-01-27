@@ -13,14 +13,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for testing snapshot policy client."""
+
+# pylint: disable=invalid-name
+
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects import snapshot_policy as sp
 import tests
 
 
 class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
+    """
+    Test class for snapshot policy client.
+    """
     def setUp(self):
-        super(TestSnapshotPolicyClient, self).setUp()
+        """
+        Set up the test case.
+        """
+        super().setUp()
         self.client.initialize()
         self.fake_policy_id = '1'
         self.fake_volume_id = '1'
@@ -29,30 +39,23 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
             self.RESPONSE_MODE.Valid: {
                 '/types/SnapshotPolicy/instances':
                     {'id': self.fake_policy_id},
-                '/instances/SnapshotPolicy::{}'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}':
                     {'id': self.fake_policy_id},
-                '/instances/SnapshotPolicy::{}'
-                '/action/removeSnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/removeSnapshotPolicy':
                     {},
-                '/instances/SnapshotPolicy::{}'
-                '/action'
-                '/addSourceVolumeToSnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}'
+                '/action/addSourceVolumeToSnapshotPolicy':
                     {},
-                '/instances/SnapshotPolicy::{}'
-                '/action/modifySnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/modifySnapshotPolicy':
                     {},
-                '/instances/SnapshotPolicy::{}'
-                '/action/pauseSnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/pauseSnapshotPolicy':
                     {},
-                '/instances/SnapshotPolicy::{}'
-                '/action/removeSourceVolume'
-                'FromSnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}'
+                '/action/removeSourceVolumeFromSnapshotPolicy':
                     {},
-                '/instances/SnapshotPolicy::{}'
-                '/action/renameSnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/renameSnapshotPolicy':
                     {},
-                '/instances/SnapshotPolicy::{}'
-                '/action/resumeSnapshotPolicy'.format(self.fake_policy_id):
+                f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/resumeSnapshotPolicy':
                     {},
                 '/types/SnapshotPolicy'
                 '/instances/action/querySelectedStatistics': {
@@ -66,10 +69,16 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
         }
 
     def test_snapshot_policy_add_source_volume(self):
+        """
+        Test adding a source volume to a snapshot policy.
+        """
         self.client.snapshot_policy.add_source_volume(self.fake_policy_id,
                                                       self.fake_volume_id)
 
     def test_snapshot_policy_add_source_volume_bad_status(self):
+        """
+        Test adding a source volume to a snapshot policy with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.add_source_volume,
@@ -77,6 +86,9 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                               self.fake_volume_id)
 
     def test_snapshot_policy_create(self):
+        """
+        Test creating a snapshot policy.
+        """
         self.client.snapshot_policy.create(
             auto_snap_creation_cadence_in_min=15,
             retained_snaps_per_level=[1, 2, 3],
@@ -85,6 +97,9 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
         )
 
     def test_snapshot_policy_create_bad_status(self):
+        """
+        Test creating a snapshot policy with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailCreating,
                               self.client.snapshot_policy.create,
@@ -94,6 +109,9 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                               paused=False)
 
     def test_snapshot_policy_create_no_id_in_response(self):
+        """
+        Test creating a snapshot policy with no id in the response.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.Invalid):
             self.assertRaises(KeyError,
                               self.client.snapshot_policy.create,
@@ -103,15 +121,24 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                               paused=False)
 
     def test_snapshot_policy_delete(self):
+        """
+        Test deleting a snapshot policy.
+        """
         self.client.snapshot_policy.delete(self.fake_policy_id)
 
     def test_snapshot_policy_delete_bad_status(self):
+        """
+        Test deleting a snapshot policy with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
                               self.client.snapshot_policy.delete,
                               self.fake_policy_id)
 
     def test_snapshot_policy_modify(self):
+        """
+        Test modifying a snapshot policy.
+        """
         self.client.snapshot_policy.modify(
             self.fake_policy_id,
             auto_snap_creation_cadence_in_min=25,
@@ -119,6 +146,9 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
         )
 
     def test_snapshot_policy_modify_bad_status(self):
+        """
+        Test modifying a snapshot policy with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.modify,
@@ -127,15 +157,24 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                               retained_snaps_per_level=[1, 2, 4])
 
     def test_snapshot_policy_pause(self):
+        """
+        Test pausing a snapshot policy.
+        """
         self.client.snapshot_policy.pause(self.fake_policy_id)
 
     def test_snapshot_policy_pause_bad_status(self):
+        """
+        Test pausing a snapshot policy with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.pause,
                               self.fake_policy_id)
 
     def test_snapshot_policy_remove_source_volume(self):
+        """
+        Test removing a source volume from a snapshot policy.
+        """
         self.client.snapshot_policy.remove_source_volume(
             self.fake_policy_id,
             self.fake_volume_id,
@@ -144,6 +183,9 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
         )
 
     def test_snapshot_policy_remove_source_volume_bad_status(self):
+        """
+        Test removing a source volume from a snapshot policy with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.remove_source_volume,
@@ -153,10 +195,16 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                               False)
 
     def test_snapshot_policy_rename(self):
+        """
+        Test renaming a snapshot policy.
+        """
         self.client.snapshot_policy.rename(self.fake_policy_id,
                                            name='new_name')
 
     def test_snapshot_policy_rename_bad_status(self):
+        """
+        Tests the behavior of the rename method when the HTTP response has a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailRenaming,
                               self.client.snapshot_policy.rename,
@@ -164,21 +212,34 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                               name='new_name')
 
     def test_snapshot_policy_resume(self):
+        """
+        Tests the behavior of the resume method.
+        """
         self.client.snapshot_policy.resume(self.fake_policy_id)
 
     def test_snapshot_policy_resume_bad_status(self):
+        """
+        Tests the behavior of the resume method when the HTTP response has a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.resume,
                               self.fake_policy_id)
 
     def test_snapshot_policy_query_selected_statistics(self):
+        """
+        Tests the behavior of the query_selected_statistics method.
+        """
         ret = self.client.snapshot_policy.query_selected_statistics(
             properties=["numOfSrcVols"]
         )
         assert ret.get(self.fake_policy_id).get("numOfSrcVols") == 1
 
     def test_snapshot_policy_query_selected_statistics_bad_status(self):
+        """
+        Tests the behavior of the query_selected_statistics method
+        when the HTTP response has a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexFailQuerying,

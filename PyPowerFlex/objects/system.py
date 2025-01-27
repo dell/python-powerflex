@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for doing system-related operations."""
+
+# pylint: disable=no-member,too-many-arguments,too-many-positional-arguments
+
 import logging
 import re
 
@@ -47,13 +51,14 @@ class SnapshotDef(dict):
             },
             dump=False
         )
-        super(SnapshotDef, self).__init__(**params)
+        super().__init__(**params)
 
 
 class System(base_client.EntityRequest):
+    """Client for system operations"""
     def __init__(self, token, configuration):
         self.__api_version = None
-        super(System, self).__init__(token, configuration)
+        super().__init__(token, configuration)
 
     def api_version(self, cached=True):
         """Get PowerFlex API version.
@@ -74,8 +79,8 @@ class System(base_client.EntityRequest):
             pattern = re.compile(r'^\d+(\.\d+)*$')
             if not pattern.match(response):
                 msg = (
-                    'Failed to query PowerFlex API version. Invalid version '
-                    'format: {response}.'.format(response=r.text)
+                    f"Failed to query PowerFlex API version. Invalid version "
+                    f"format: {response}."
                 )
                 LOG.error(msg)
                 raise exceptions.PowerFlexClientException(msg)
@@ -93,10 +98,10 @@ class System(base_client.EntityRequest):
 
         action = 'removeConsistencyGroupSnapshots'
 
-        params = dict(
-            snapGroupId=cg_id,
-            allowOnExtManagedVol=allow_ext_managed
-        )
+        params = {
+            "snapGroupId": cg_id,
+            "allowOnExtManagedVol": allow_ext_managed
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -104,11 +109,11 @@ class System(base_client.EntityRequest):
                                              entity_id=system_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to remove consistency group snapshots from '
-                   'PowerFlex {entity} with id {_id}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              _id=system_id,
-                                              response=response))
+            msg = (
+                f"Failed to remove consistency group snapshots from "
+                f"PowerFlex {self.entity} with id {system_id}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -132,12 +137,12 @@ class System(base_client.EntityRequest):
 
         action = 'snapshotVolumes'
 
-        params = dict(
-            snapshotDefs=snapshot_defs,
-            allowOnExtManagedVol=allow_ext_managed,
-            accessModeLimit=access_mode,
-            retentionPeriodInMin=retention_period
-        )
+        params = {
+            'snapshotDefs': snapshot_defs,
+            'allowOnExtManagedVol': allow_ext_managed,
+            'accessModeLimit': access_mode,
+            'retentionPeriodInMin': retention_period
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -145,11 +150,10 @@ class System(base_client.EntityRequest):
                                              entity_id=system_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to snapshot volumes on PowerFlex {entity} '
-                   'with id {_id}.'
-                   ' Error: {response}'.format(entity=self.entity,
-                                               _id=system_id,
-                                               response=response))
+            msg = (
+                f"Failed to snapshot volumes on PowerFlex {self.entity} "
+                f"with id {system_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -184,25 +188,24 @@ class System(base_client.EntityRequest):
         :rtype: dict
         """
         action = 'addStandbyMdm'
-        params = dict(
-            ips=mdm_ips,
-            role=role,
-            managementIps=management_ips,
-            name=mdm_name,
-            port=port,
-            allowAsymmetricIps=allow_multiple_ips,
-            forceClean=clean,
-            virtIpIntfs=virtual_interface
-        )
+        params = {
+            "ips": mdm_ips,
+            "role": role,
+            "managementIps": management_ips,
+            "name": mdm_name,
+            "port": port,
+            "allowAsymmetricIps": allow_multiple_ips,
+            "forceClean": clean,
+            "virtIpIntfs": virtual_interface
+        }
 
         r, response = self.send_post_request(self.base_object_url,
                                              action=action,
                                              entity=self.entity,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to add standBy MDM on PowerFlex {entity}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              response=response))
+            msg = f"Failed to add standBy MDM on PowerFlex {self.entity}. " \
+                  f"Error: {response}"
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -216,18 +219,19 @@ class System(base_client.EntityRequest):
         :return: None
         """
         action = 'removeStandbyMdm'
-        params = dict(
-            id=mdm_id
-        )
+        params = {
+            "id": mdm_id
+        }
 
         r, response = self.send_mdm_cluster_post_request(self.base_object_url,
                                                          action=action,
                                                          entity=self.entity,
                                                          params=params)
         if r.status_code != requests.codes.ok and response is not None:
-            msg = ('Failed to remove standBy MDM from PowerFlex {entity}. '
-                   'Error: {response}.'.format(entity=self.entity,
-                                               response=response))
+            msg = (
+                f"Failed to remove standBy MDM from PowerFlex {self.entity}. "
+                f"Error: {response}."
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -243,9 +247,10 @@ class System(base_client.EntityRequest):
         r, response = self.send_post_request(self.query_mdm_cluster_url,
                                              entity=self.entity)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to get MDM cluster details on PowerFlex {entity}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              response=response))
+            msg = (
+                f"Failed to get MDM cluster details on PowerFlex {self.entity}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -260,9 +265,10 @@ class System(base_client.EntityRequest):
 
         r, response = self.send_get_request('/Configuration')
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to get gateway configuration details on PowerFlex {entity}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              response=response))
+            msg = (
+                f"Failed to get gateway configuration details on PowerFlex {self.entity}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -278,18 +284,19 @@ class System(base_client.EntityRequest):
         :rtype: dict
         """
         action = 'changeMdmOwnership'
-        params = dict(
-            id=mdm_id
-        )
+        params = {
+            "id": mdm_id
+        }
 
         r, response = self.send_post_request(self.base_object_url,
                                              action=action,
                                              entity=self.entity,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to change ownership on PowerFlex {entity}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              response=response))
+            msg = (
+                f"Failed to change ownership on PowerFlex {self.entity}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -303,18 +310,17 @@ class System(base_client.EntityRequest):
         :rtype: dict
         """
         action = 'setMdmPerformanceParameters'
-        params = dict(
-            perfProfile=performance_profile
-        )
+        params = {"perfProfile": performance_profile}
 
         r, response = self.send_post_request(self.base_object_url,
                                              action=action,
                                              entity=self.entity,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to set performance profile of MDMs on PowerFlex '
-                   '{entity}. Error: {response}'.format(entity=self.entity,
-                                                        response=response))
+            msg = (
+                f"Failed to set performance profile of MDMs on PowerFlex "
+                f"{self.entity}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -332,18 +338,20 @@ class System(base_client.EntityRequest):
         :rtype: dict
         """
         action = 'renameMdm'
-        params = dict(
-            id=mdm_id,
-            newName=mdm_new_name
-        )
+        params = {
+            "id": mdm_id,
+            "newName": mdm_new_name
+        }
 
         r, response = self.send_post_request(self.base_object_url,
                                              action=action,
                                              entity=self.entity,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to rename the MDM on PowerFlex {entity}. Error: '
-                   '{response}'.format(entity=self.entity, response=response))
+            msg = (
+                f"Failed to rename the MDM on PowerFlex {self.entity}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -366,31 +374,37 @@ class System(base_client.EntityRequest):
         """
         action = 'modifyVirtualIpInterfaces'
         if virtual_ip_interfaces is not None:
-            params = dict(
-                id=mdm_id,
-                virtIpIntfs=virtual_ip_interfaces
-            )
+            params = {
+                "id": mdm_id,
+                "virtIpIntfs": virtual_ip_interfaces
+            }
         else:
-            params = dict(
-                id=mdm_id,
-                clear=clear_interfaces
-            )
+            params = {
+                "id": mdm_id,
+                "clear": clear_interfaces
+            }
 
         r, response = self.send_post_request(self.base_object_url,
                                              action=action,
                                              entity=self.entity,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to modify virtual IP interface on PowerFlex '
-                   '{entity}. Error: {response}'.format(entity=self.entity,
-                                                        response=response))
+            msg = (
+                f"Failed to modify virtual IP interface on PowerFlex "
+                f"{self.entity}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
         return response
 
-    def switch_cluster_mode(self, cluster_mode, add_secondary=None,
-                            remove_secondary=None, add_tb=None, remove_tb=None):
+    def switch_cluster_mode(
+            self,
+            cluster_mode,
+            add_secondary=None,
+            remove_secondary=None,
+            add_tb=None,
+            remove_tb=None):
         """
         Switch cluster mode.
 
@@ -411,22 +425,21 @@ class System(base_client.EntityRequest):
         :return: None
         """
         action = 'switchClusterMode'
-        params = dict(
-            mode=cluster_mode,
-            addSlaveMdmIdList=add_secondary,
-            addTBIdList=add_tb,
-            removeSlaveMdmIdList=remove_secondary,
-            removeTBIdList=remove_tb
-        )
+        params = {
+            "mode": cluster_mode,
+            "addSlaveMdmIdList": add_secondary,
+            "addTBIdList": add_tb,
+            "removeSlaveMdmIdList": remove_secondary,
+            "removeTBIdList": remove_tb
+        }
 
         r, response = self.send_mdm_cluster_post_request(self.base_object_url,
                                                          action=action,
                                                          entity=self.entity,
                                                          params=params)
         if r.status_code != requests.codes.ok and response is not None:
-            msg = ('Failed to switch MDM cluster mode PowerFlex {entity}. '
-                   'Error: {response}.'.format(entity=self.entity,
-                                               response=response))
+            msg = f"Failed to switch MDM cluster mode PowerFlex {self.entity}. " \
+                  f"Error: {response}."
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -441,6 +454,6 @@ class System(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         return self._query_selected_statistics(action, params)

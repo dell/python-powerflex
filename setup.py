@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for general setup."""
+
+# pylint: disable=import-error
+
 from setuptools import setup
 
 setup(

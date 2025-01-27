@@ -13,14 +13,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for testing PowerFlex utility."""
+
+# pylint: disable=invalid-name
+
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects import utility
 import tests
 
 
 class TestPowerFlexUtility(tests.PyPowerFlexTestCase):
+    """
+    Test class for the PowerFlex utility.
+    """
+
     def setUp(self):
-        super(TestPowerFlexUtility, self).setUp()
+        """
+        Set up the test case.
+        """
+        super().setUp()
         self.client.initialize()
 
         self.MOCK_RESPONSES = {
@@ -33,17 +43,29 @@ class TestPowerFlexUtility(tests.PyPowerFlexTestCase):
         }
 
     def test_get_statistics_for_all_storagepools(self):
+        """
+        Test the get_statistics_for_all_storagepools method.
+        """
         self.client.utility.get_statistics_for_all_storagepools()
 
     def test_get_statistics_for_all_storagepools_bad_status(self):
+        """
+        Test the get_statistics_for_all_storagepools method with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.utility.get_statistics_for_all_storagepools)
 
     def test_get_statistics_for_all_volumes(self):
+        """
+        Test the get_statistics_for_all_volumes method.
+        """
         self.client.utility.get_statistics_for_all_volumes()
 
     def test_get_statistics_for_all_volumes_bad_status(self):
+        """
+        Test the get_statistics_for_all_volumes method with a bad status.
+        """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.utility.get_statistics_for_all_volumes)

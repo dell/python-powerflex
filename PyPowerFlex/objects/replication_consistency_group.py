@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with replication consistency group APIs."""
+
+# pylint: disable=too-many-public-methods,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
+
 import logging
 
 import requests
@@ -26,8 +30,11 @@ LOG = logging.getLogger(__name__)
 
 
 class ReplicationConsistencyGroup(base_client.EntityRequest):
+    """
+    A class representing Replication Consistency Group client.
+    """
     def create_snapshot(self,
-                       rcg_id):
+                        rcg_id):
         """Create a snapshot of PowerFlex replication consistency group.
 
         :param rcg_id: str
@@ -41,10 +48,10 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=rcg_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to create a snapshot of PowerFlex {entity} '
-                   'with id {_id} . Error: {response}'.format(entity=self.entity,
-                                                      _id=rcg_id,
-                                                      response=response))
+            msg = (
+                f"Failed to create a snapshot of PowerFlex {self.entity} "
+                f"with id {rcg_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -82,16 +89,16 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        params = dict(
-            rpoInSeconds=rpo,
-            protectionDomainId=protection_domain_id,
-            remoteProtectionDomainId=remote_protection_domain_id,
-            peerMdmId=peer_mdm_id,
-            destinationSystemId=destination_system_id,
-            name=name,
-            forceIgnoreConsistency=force_ignore_consistency,
-            activityMode=activity_mode
-        )
+        params = {
+            "rpoInSeconds": rpo,
+            "protectionDomainId": protection_domain_id,
+            "remoteProtectionDomainId": remote_protection_domain_id,
+            "peerMdmId": peer_mdm_id,
+            "destinationSystemId": destination_system_id,
+            "name": name,
+            "forceIgnoreConsistency": force_ignore_consistency,
+            "activityMode": activity_mode
+        }
 
         return self._create_entity(params)
 
@@ -105,9 +112,7 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: None
         """
 
-        params = dict(
-            forceIgnoreConsistency=force_ignore_consistency
-        )
+        params = {"forceIgnoreConsistency": force_ignore_consistency}
 
         return self._delete_entity(rcg_id, params)
 
@@ -117,9 +122,9 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :param rcg_id: str
         :return: dict
         """
-        action = "activate%s" % self.entity
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, action, add_entity=False)
+        action = f"activate{self.entity}"
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, action, add_entity=False)
 
     def inactivate(self, rcg_id):
         """Inactivate PowerFlex RCG.
@@ -127,9 +132,9 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :param rcg_id: str
         :return: dict
         """
-        action = "terminate%s" % self.entity
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, action, add_entity=False)
+        action = f"terminate{self.entity}"
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, action, add_entity=False)
 
     def freeze(self, rcg_id):
         """Freeze PowerFlex RCG.
@@ -138,7 +143,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        return self._perform_entity_operation_based_on_action(rcg_id, "freezeApply")
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "freezeApply")
 
     def unfreeze(self, rcg_id):
         """Freeze PowerFlex RCG.
@@ -147,7 +153,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        return self._perform_entity_operation_based_on_action(rcg_id, "unfreezeApply")
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "unfreezeApply")
 
     def pause(self, rcg_id, pause_mode):
         """Pause PowerFlex RCG.
@@ -157,10 +164,9 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        params = dict(
-            pauseMode=pause_mode
-        )
-        return self._perform_entity_operation_based_on_action(rcg_id, "pause", params)
+        params = {"pauseMode": pause_mode}
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "pause", params)
 
     def resume(self, rcg_id):
         """Resume PowerFlex RCG.
@@ -178,7 +184,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        return self._perform_entity_operation_based_on_action(rcg_id, "failover")
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "failover")
 
     def sync(self, rcg_id):
         """Synchronize PowerFlex RCG.
@@ -187,7 +194,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        return self._perform_entity_operation_based_on_action(rcg_id, "syncNow")
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "syncNow")
 
     def restore(self, rcg_id):
         """Restore PowerFlex RCG.
@@ -196,7 +204,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        return self._perform_entity_operation_based_on_action(rcg_id, "restore")
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "restore")
 
     def reverse(self, rcg_id):
         """Reverse PowerFlex RCG.
@@ -205,7 +214,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        return self._perform_entity_operation_based_on_action(rcg_id, "reverse")
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "reverse")
 
     def switchover(self, rcg_id, force=False):
         """Switch over PowerFlex RCG.
@@ -215,9 +225,10 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
         url_params = {
-            'force':force
+            'force': force
         }
-        return self._perform_entity_operation_based_on_action(rcg_id, "switchover", **url_params)
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "switchover", **url_params)
 
     def set_as_consistent(self, rcg_id):
         """Set PowerFlex RCG as consistent.
@@ -225,9 +236,9 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :param rcg_id: str
         :return: dict
         """
-        action = "set%sConsistent" % self.entity
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, action, add_entity=False)
+        action = f"set{self.entity}Consistent"
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, action, add_entity=False)
 
     def set_as_inconsistent(self, rcg_id):
         """Set PowerFlex RCG as in-consistent.
@@ -235,9 +246,9 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :param rcg_id: str
         :return: dict
         """
-        action = "set%sInconsistent" % self.entity
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, action, add_entity=False)
+        action = f"set{self.entity}Inconsistent"
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, action, add_entity=False)
 
     def modify_rpo(self, rcg_id, rpo_in_seconds):
         """Modify rpo of PowerFlex RCG.
@@ -247,14 +258,15 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        params = dict(
-            rpoInSeconds=rpo_in_seconds
-        )
-        action = "Modify%sRpo" % self.entity
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, action, params=params, add_entity=False)
+        params = {
+            'rpoInSeconds': rpo_in_seconds
+        }
+        action = f"Modify{self.entity}Rpo"
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, action, params=params, add_entity=False)
 
-    def modify_target_volume_access_mode(self, rcg_id, target_volume_access_mode):
+    def modify_target_volume_access_mode(
+            self, rcg_id, target_volume_access_mode):
         """Modify TargetVolumeAccessMode of PowerFlex RCG.
 
         :param rcg_id: str
@@ -262,12 +274,10 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        params = dict(
-            targetVolumeAccessMode=target_volume_access_mode
-        )
-        action = "modify%sTargetVolumeAccessMode" % self.entity
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, action, params=params, add_entity=False)
+        params = {"targetVolumeAccessMode": target_volume_access_mode}
+        action = f"modify{self.entity}TargetVolumeAccessMode"
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, action, params=params, add_entity=False)
 
     def rename_rcg(self, rcg_id, new_name):
         """Rename PowerFlex RCG.
@@ -277,11 +287,9 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :return: dict
         """
 
-        params = dict(
-            newName=new_name
-        )
-        return self._perform_entity_operation_based_on_action\
-            (rcg_id, "rename", params=params)
+        params = {"newName": new_name}
+        return self._perform_entity_operation_based_on_action(
+            rcg_id, "rename", params=params)
 
     def get_replication_pairs(self, rcg_id):
         """Get replication pairs of PowerFlex RCG.
@@ -300,7 +308,8 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         """
         params = {'properties': RCGConstants.DEFAULT_STATISTICS_PROPERTIES}
         if not api_version_less_than_3_6:
-            params = {'properties': RCGConstants.DEFAULT_STATISTICS_PROPERTIES_ABOVE_3_5}
+            params = {
+                'properties': RCGConstants.DEFAULT_STATISTICS_PROPERTIES_ABOVE_3_5}
         params['allIds'] = ""
 
         r, response = self.send_post_request(self.list_statistics_url,
@@ -308,8 +317,10 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
                                              action="querySelectedStatistics",
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to list replication consistencty group statistics for PowerFlex. '
-                   'Error: {response}'.format(response=response))
+            msg = (
+                f'Failed to list replication consistency group statistics for PowerFlex. '
+                f'Error: {response}'
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -326,7 +337,7 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

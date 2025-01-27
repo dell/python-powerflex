@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module contains the objects for interacting with the PowerFlex APIs."""
+
 from PyPowerFlex.objects.device import Device
 from PyPowerFlex.objects.fault_set import FaultSet
 from PyPowerFlex.objects.protection_domain import ProtectionDomain

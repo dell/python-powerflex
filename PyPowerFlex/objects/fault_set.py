@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with fault set APIs."""
+
+# pylint: disable=no-member,duplicate-code
+
 import logging
 
 import requests
@@ -25,6 +29,9 @@ LOG = logging.getLogger(__name__)
 
 
 class FaultSet(base_client.EntityRequest):
+    """
+    A class representing Fault Set client.
+    """
     def clear(self, fault_set_id):
         """Clear PowerFlex fault set.
 
@@ -39,10 +46,10 @@ class FaultSet(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=fault_set_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to clear PowerFlex {entity} '
-                   'with id {_id}. Error: {response}'
-                   .format(entity=self.entity, _id=fault_set_id,
-                           response=response))
+            msg = (
+                f"Failed to clear PowerFlex {self.entity} "
+                f"with id {fault_set_id}. Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -56,10 +63,10 @@ class FaultSet(base_client.EntityRequest):
         :rtype: dict
         """
 
-        params = dict(
-            protectionDomainId=protection_domain_id,
-            name=name
-        )
+        params = {
+            "protectionDomainId": protection_domain_id,
+            "name": name
+        }
 
         return self._create_entity(params)
 
@@ -96,9 +103,9 @@ class FaultSet(base_client.EntityRequest):
 
         action = 'setFaultSetName'
 
-        params = dict(
-            newName=name
-        )
+        params = {
+            "newName": name
+        }
 
         return self._rename_entity(action, fault_set_id, params)
 
@@ -112,7 +119,7 @@ class FaultSet(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

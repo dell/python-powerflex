@@ -177,7 +177,7 @@ from PyPowerFlex.objects.acceleration_pool import MediaType
 client.acceleration_pool.create(media_type=MediaType.ssd,
                                 protection_domain_id='1caf743100000000',
                                 name='ACP_SSD',
-                                isRfcache=True)
+                                is_rfcache=True)
 client.acceleration_pool.get(filter_fields={'id': '9c8c5c7800000001'}, 
                              fields=['name', 'id'])
 [{'name': 'ACP_SSD', 'id': '9c8c5c7800000001'}]

@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with firmware repository APIs."""
+
+# pylint: disable=arguments-renamed,no-member,too-many-arguments,too-many-positional-arguments
+
 import logging
 import requests
 from PyPowerFlex import base_client
@@ -22,7 +26,11 @@ LOG = logging.getLogger(__name__)
 
 
 class FirmwareRepository(base_client.EntityRequest):
-    def get(self, filters=None, limit=None, offset=None, sort=None, related=False, bundles=False, components=False):
+    """
+    A class representing Firmware Repository client.
+    """
+    def get(self, filters=None, limit=None, offset=None, sort=None,
+            related=False, bundles=False, components=False):
         """
         Retrieve all firmware repository with filter, sort, pagination
         :param filters: (Optional) The filters to apply to the results.
@@ -34,18 +42,21 @@ class FirmwareRepository(base_client.EntityRequest):
         :param components: Whether to include components in the response.
         :return: A list of dictionary containing the retrieved firmware repository.
         """
-        params = dict(
-            filter=filters,
-            sort=sort,
-            offset=offset,
-            limit=limit,
-            related=related,
-            bundles=bundles,
-            components=components
-        )
-        r, response = self.send_get_request(utils.build_uri_with_params(self.firmware_repository_url, **params))
+        params = {
+            'filter': filters,
+            'sort': sort,
+            'offset': offset,
+            'limit': limit,
+            'related': related,
+            'bundles': bundles,
+            'components': components
+        }
+        r, response = self.send_get_request(
+            utils.build_uri_with_params(
+                self.firmware_repository_url, **params))
         if r.status_code != requests.codes.ok:
-            msg = (f'Failed to retrieve firmware repository. Error: {response}')
+            msg = (
+                f'Failed to retrieve firmware repository. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
         return response

@@ -13,10 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module is used for the configuration of the client."""
+
+# pylint: disable=too-many-instance-attributes,too-many-arguments,too-many-positional-arguments,too-few-public-methods
+
 from PyPowerFlex import exceptions
 
-
 class Configuration:
+    """
+    Configuration class for the PyPowerFlex library.
+    """
     def __init__(self,
                  gateway_address=None,
                  gateway_port=443,
@@ -26,6 +32,9 @@ class Configuration:
                  certificate_path=None,
                  timeout=120,
                  log_level=None):
+        """
+        Initializes the Configuration class.
+        """
         self.gateway_address = gateway_address
         self.gateway_port = gateway_port
         self.username = username
@@ -36,6 +45,11 @@ class Configuration:
         self.log_level = log_level
 
     def validate(self):
+        """
+        Validates the configuration.
+
+        :raises exceptions.InvalidConfiguration: If any of the required parameters are not set.
+        """
         if not all(
                 [
                     self.gateway_address,

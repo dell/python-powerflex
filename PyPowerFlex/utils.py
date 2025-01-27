@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""This module contains the utils used in the code."""
+
 import json
 import logging
 import numbers
@@ -77,8 +79,8 @@ def query_response_fields(response, fields):
     """
 
     def query_entity_fields(entity):
-        entity_fields = dict()
-        fields_not_found = list()
+        entity_fields = {}
+        fields_not_found = []
         for field in fields:
             try:
                 entity_fields[field] = entity[field]
@@ -87,28 +89,32 @@ def query_response_fields(response, fields):
         if fields_not_found:
             msg = (
                 'The following fields are not found in response: '
-                '{fields_not_found}.'.format(
-                    fields_not_found=', '.join(fields_not_found)
-                )
+                f'{", ".join(fields_not_found)}.'
             )
             raise exceptions.FieldsNotFound(msg)
         return entity_fields
 
     if isinstance(response, list):
         return list(map(query_entity_fields, response))
-    elif isinstance(response, dict):
+    if isinstance(response, dict):
         return query_entity_fields(response)
+    return None
 
 
 def convert(param):
+    """
+    Convert parameters to appropriate types.
+
+    :param param: request parameters
+    :return: converted parameters
+    """
     if isinstance(param, list):
         return [convert(item) for item in param]
-    elif isinstance(param, (numbers.Number, bool)):
+    if isinstance(param, (numbers.Number, bool)):
         # Convert numbers and boolean to string.
         return str(param)
-    else:
-        # Other types are not converted.
-        return param
+    # Other types are not converted.
+    return param
 
 
 def prepare_params(params, dump=True):
@@ -123,7 +129,7 @@ def prepare_params(params, dump=True):
     if not isinstance(params, dict):
         return params
 
-    prepared = dict()
+    prepared = {}
     for name, value in params.items():
         if value is not None:
             prepared[name] = convert(value)
@@ -144,8 +150,23 @@ def is_version_3(version):
         return True
     return False
 
+
 def build_uri_with_params(uri, **url_params):
-    query_params = [f"{key}={item}" if isinstance(value, list) else f"{key}={value}" for key, value in url_params.items() for item in (value if isinstance(value, list) else [value]) if item is not None]
+    """
+    Build the URI with query parameters.
+
+    :param uri: base URI
+    :param url_params: query parameters
+    :return: URI with query parameters
+    """
+    query_params = [
+        f"{key}={item}" if isinstance(
+            value,
+            list) else f"{key}={value}" for key,
+        value in url_params.items() for item in (
+            value if isinstance(
+                value,
+                list) else [value]) if item is not None]
     if query_params:
         uri += '?' + '&'.join(query_params)
     return uri

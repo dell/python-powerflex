@@ -13,16 +13,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with SDC APIs."""
+
 import logging
-import requests
 from PyPowerFlex import base_client
-from PyPowerFlex import exceptions
 
 
 LOG = logging.getLogger(__name__)
 
 
 class Sdc(base_client.EntityRequest):
+    """
+    A class representing SDC client.
+    """
     def delete(self, sdc_id):
         """Remove PowerFlex SDC.
 
@@ -53,9 +56,7 @@ class Sdc(base_client.EntityRequest):
 
         action = 'setSdcName'
 
-        params = dict(
-            sdcName=name
-        )
+        params = {"sdcName": name}
 
         return self._rename_entity(action, sdc_id, params)
 
@@ -69,11 +70,9 @@ class Sdc(base_client.EntityRequest):
 
         action = 'setSdcPerformanceParameters'
 
-        params = dict(
-            perfProfile=perf_profile
-        )
-        return self._perform_entity_operation_based_on_action\
-            (sdc_id, action, params=params, add_entity=False)
+        params = {"perfProfile": perf_profile}
+        return self._perform_entity_operation_based_on_action(
+            sdc_id, action, params=params, add_entity=False)
 
     def query_selected_statistics(self, properties, ids=None):
         """Query PowerFlex SDC statistics.
@@ -85,7 +84,7 @@ class Sdc(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

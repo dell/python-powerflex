@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for doing the deployment."""
+
+# pylint: disable=arguments-renamed,too-many-arguments,too-many-positional-arguments,no-member
+
 import logging
 import requests
 from PyPowerFlex import base_client
@@ -22,8 +26,18 @@ LOG = logging.getLogger(__name__)
 
 
 class Deployment(base_client.EntityRequest):
-    def get(self, filters=None, full=None, include_devices=None, include_template=None,
-            limit=None, offset=None, sort=None):
+    """
+    A class representing Deployment client.
+    """
+    def get(
+            self,
+            filters=None,
+            full=None,
+            include_devices=None,
+            include_template=None,
+            limit=None,
+            offset=None,
+            sort=None):
         """
         Retrieve all Deployments with filter, sort, pagination
         :param filters: (Optional) The filters to apply to the results.
@@ -35,18 +49,20 @@ class Deployment(base_client.EntityRequest):
         :param sort: (Optional) The field to sort the results by.
         :return: A list of dictionary containing the retrieved Deployments.
         """
-        params = dict(
-            filter=filters,
-            full=full,
-            sort=sort,
-            offset=offset,
-            limit=limit,
-            includeDevices=include_devices,
-            includeTemplate=include_template
-        )
-        r, response = self.send_get_request(utils.build_uri_with_params(self.deployment_url, **params))
+        params = {
+            'filter': filters,
+            'full': full,
+            'sort': sort,
+            'offset': offset,
+            'limit': limit,
+            'includeDevices': include_devices,
+            'includeTemplate': include_template
+        }
+        r, response = self.send_get_request(
+            utils.build_uri_with_params(
+                self.deployment_url, **params))
         if r.status_code != requests.codes.ok:
-            msg = (f'Failed to retrieve deployments. Error: {response}')
+            msg = f'Failed to retrieve deployments. Error: {response}'
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
         return response
@@ -57,9 +73,11 @@ class Deployment(base_client.EntityRequest):
         :param deployment_id: Deployment ID.
         :return: A dictionary containing the retrieved Deployment.
         """
-        r, response = self.send_get_request(f'{self.deployment_url}/{deployment_id}')
+        r, response = self.send_get_request(
+            f'{self.deployment_url}/{deployment_id}')
         if r.status_code != requests.codes.ok:
-            msg = (f'Failed to retrieve deployment by id {deployment_id}. Error: {response}')
+            msg = (
+                f'Failed to retrieve deployment by id {deployment_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
         return response
@@ -74,9 +92,10 @@ class Deployment(base_client.EntityRequest):
         Raises:
             PowerFlexClientException: If the deployment fails.
         """
-        r, response = self.send_post_request(f'{self.deployment_url}/validate', rg_data)
+        r, response = self.send_post_request(
+            f'{self.deployment_url}/validate', rg_data)
         if r.status_code != requests.codes.ok:
-            msg = (f'Failed to validate the deployment. Error: {response}')
+            msg = f'Failed to validate the deployment. Error: {response}'
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -94,7 +113,7 @@ class Deployment(base_client.EntityRequest):
         """
         r, response = self.send_post_request(self.deployment_url, rg_data)
         if r.status_code != requests.codes.ok:
-            msg = (f'Failed to create a new deployment. Error: {response}')
+            msg = f'Failed to create a new deployment. Error: {response}'
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -113,9 +132,9 @@ class Deployment(base_client.EntityRequest):
         """
         request_url = f'{self.deployment_url}/{deployment_id}'
         r, response = self.send_put_request(request_url, rg_data)
-        
+
         if r.status_code != requests.codes.ok:
-            msg = (f'Failed to edit the deployment. Error: {response}')
+            msg = f'Failed to edit the deployment. Error: {response}'
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -135,7 +154,7 @@ class Deployment(base_client.EntityRequest):
         response = self.send_delete_request(request_url)
 
         if response.status_code != requests.codes.no_content:
-            msg = (f'Failed to delete deployment. Error: {response}')
+            msg = f'Failed to delete deployment. Error: {response}'
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 

@@ -13,6 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""Module for interacting with snapshot policy APIs."""
+
+# pylint: disable=too-few-public-methods,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
+
 import logging
 
 import requests
@@ -32,6 +36,9 @@ class AutoSnapshotRemovalAction:
 
 
 class SnapshotPolicy(base_client.EntityRequest):
+    """
+    A class representing Snapshot Policy client.
+    """
     def add_source_volume(self, snapshot_policy_id, volume_id):
         """Add source volume to PowerFlex snapshot policy.
 
@@ -42,9 +49,7 @@ class SnapshotPolicy(base_client.EntityRequest):
 
         action = 'addSourceVolumeToSnapshotPolicy'
 
-        params = dict(
-            sourceVolumeId=volume_id
-        )
+        params = {"sourceVolumeId": volume_id}
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -52,11 +57,11 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity_id=snapshot_policy_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to add source volume to PowerFlex {entity} '
-                   'with id {_id}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              _id=snapshot_policy_id,
-                                              response=response))
+            msg = (
+                f"Failed to add source volume to PowerFlex {self.entity} "
+                f"with id {snapshot_policy_id}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -67,8 +72,8 @@ class SnapshotPolicy(base_client.EntityRequest):
                retained_snaps_per_level,
                name=None,
                paused=None,
-               snapshotAccessMode=None,
-               secureSnapshots=None):
+               snapshot_access_mode=None,
+               secure_snapshots=None):
         """Create PowerFlex snapshot policy.
 
         :type auto_snap_creation_cadence_in_min: int
@@ -78,12 +83,14 @@ class SnapshotPolicy(base_client.EntityRequest):
         :rtype: dict
         """
 
-        params = dict(
-            autoSnapshotCreationCadenceInMin=auto_snap_creation_cadence_in_min,
-            numOfRetainedSnapshotsPerLevel=retained_snaps_per_level,
-            name=name, paused=paused, snapshotAccessMode=snapshotAccessMode,
-            secureSnapshots=secureSnapshots
-        )
+        params = {
+            "autoSnapshotCreationCadenceInMin": auto_snap_creation_cadence_in_min,
+            "numOfRetainedSnapshotsPerLevel": retained_snaps_per_level,
+            "name": name,
+            "paused": paused,
+            "snapshotAccessMode": snapshot_access_mode,
+            "secureSnapshots": secure_snapshots
+        }
 
         return self._create_entity(params)
 
@@ -110,10 +117,10 @@ class SnapshotPolicy(base_client.EntityRequest):
 
         action = 'modifySnapshotPolicy'
 
-        params = dict(
-            autoSnapshotCreationCadenceInMin=auto_snap_creation_cadence_in_min,
-            numOfRetainedSnapshotsPerLevel=retained_snaps_per_level
-        )
+        params = {
+            "autoSnapshotCreationCadenceInMin": auto_snap_creation_cadence_in_min,
+            "numOfRetainedSnapshotsPerLevel": retained_snaps_per_level
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -121,11 +128,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity_id=snapshot_policy_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to modify PowerFlex {entity} '
-                   'with id {_id}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              _id=snapshot_policy_id,
-                                              response=response))
+            msg = (
+                f"Failed to modify PowerFlex {self.entity} with id {snapshot_policy_id}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -145,10 +151,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to pause PowerFlex {entity} with id {_id}.'
-                   ' Error: {response}'.format(entity=self.entity,
-                                               _id=snapshot_policy_id,
-                                               response=response))
+            msg = (
+                f"Failed to pause PowerFlex {self.entity} with id {snapshot_policy_id}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -172,11 +178,11 @@ class SnapshotPolicy(base_client.EntityRequest):
 
         action = 'removeSourceVolumeFromSnapshotPolicy'
 
-        params = dict(
-            sourceVolumeId=volume_id,
-            autoSnapshotRemovalAction=auto_snap_removal_action,
-            detachLockedAutoSnapshots=detach_locked_auto_snaps
-        )
+        params = {
+            "sourceVolumeId": volume_id,
+            "autoSnapshotRemovalAction": auto_snap_removal_action,
+            "detachLockedAutoSnapshots": detach_locked_auto_snaps
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -184,11 +190,11 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity_id=snapshot_policy_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to remove source volume from PowerFlex {entity} '
-                   'with id {_id}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              _id=snapshot_policy_id,
-                                              response=response))
+            msg = (
+                f"Failed to remove source volume from PowerFlex {self.entity} "
+                f"with id {snapshot_policy_id}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -204,9 +210,9 @@ class SnapshotPolicy(base_client.EntityRequest):
 
         action = 'renameSnapshotPolicy'
 
-        params = dict(
-            newName=name
-        )
+        params = {
+            "newName": name
+        }
 
         return self._rename_entity(action, snapshot_policy_id, params)
 
@@ -224,10 +230,10 @@ class SnapshotPolicy(base_client.EntityRequest):
                                              entity=self.entity,
                                              entity_id=snapshot_policy_id)
         if r.status_code != requests.codes.ok:
-            msg = ('Failed to resume PowerFlex {entity} with id {_id}. '
-                   'Error: {response}'.format(entity=self.entity,
-                                              _id=snapshot_policy_id,
-                                              response=response))
+            msg = (
+                f"Failed to resume PowerFlex {self.entity} with id {snapshot_policy_id}. "
+                f"Error: {response}"
+            )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -256,7 +262,7 @@ class SnapshotPolicy(base_client.EntityRequest):
 
         action = "querySelectedStatistics"
 
-        params = dict(properties=properties)
+        params = {'properties': properties}
 
         if ids:
             params["ids"] = ids

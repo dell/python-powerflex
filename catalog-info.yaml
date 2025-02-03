@@ -1,0 +1,29 @@
+# nonk8s
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: python-powerflex
+  description: "Python SDK for Dell PowerFlex"
+  tags:
+    - ansible
+    - devops
+    - automation
+    - storage
+    - dell
+    - infrastructure-as-code
+    - powerflex
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: dell/python-powerflex
+  links:
+    - url: 'https://pypi.org/project/PyPowerFlex/'
+      title: 'PyPI'
+      icon: 'web'
+    - url: 'https://github.com/dell/python-powerflex/issues'
+      title: 'Contact Technical Support'
+      icon: 'help'
+spec:
+  type: service
+  lifecycle: production
+  owner: user:default/sachin.apagundi
+  visibility: all

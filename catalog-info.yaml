@@ -14,13 +14,10 @@ metadata:
     - powerflex
   annotations:
     backstage.io/techdocs-ref: dir:.
-    github.com/project-slug: dell/powerflex
+    github.com/project-slug: dell/python-powerflex
   links:
-    - url: 'https://galaxy.ansible.com/dellemc/powerflex'
-      title: 'Ansible Galaxy'
-      icon: 'web'
-    - url: 'https://console.redhat.com/ansible/automation-hub/repo/published/dellemc/powerflex'
-      title: 'Automation Hub'
+    - url: 'https://pypi.org/project/PyPowerFlex/'
+      title: 'PyPI'
       icon: 'web'
     - url: 'https://github.com/dell/python-powerflex/issues'
       title: 'Contact Technical Support'

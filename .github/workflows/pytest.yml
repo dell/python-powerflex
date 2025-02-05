@@ -1,6 +1,19 @@
 name: Run Unit Test via Pytest  
   
-on: [push]  
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+on:
+  # Run CI against all pushes (direct commits, also merged PRs), Pull Requests
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+  # Runs CI on every day (at 06:00 UTC)
+  schedule:
+    - cron: '0 6 * * *'
   
 jobs:  
   build:  
@@ -10,7 +23,8 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12']  
   
     steps:  
-      - uses: actions/checkout@v3  
+      - name: Check out the code
+        uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}  
         uses: actions/setup-python@v4  
         with:  
@@ -18,11 +32,13 @@ jobs:
       - name: Install dependencies  
         run: |  
           python -m pip install --upgrade pip
-          pip install testtools
-          pip install requests
-          pip install pytest
-          pip install pytest-coverage
+          pip install testtools requests pytest pytest-coverage coverage
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Test with pytest  
-        run: |  
-          python -m unittest -v tests/test_*.py
+      - name: Run Unit Test and Generate report  
+        run: |
+          coverage run -m pytest -v tests/test_*.py
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v5
+        if: ${{ matrix.python-version == '3.12' }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

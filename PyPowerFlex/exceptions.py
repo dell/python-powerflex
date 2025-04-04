@@ -130,3 +130,19 @@ class PowerFlexFailEntityOperation(PowerFlexClientException):
         self.response = response
         if response:
             self.message = f"{self.message} Error: {response}"
+
+class PowerFlexFailMigration(PowerFlexClientException):
+    """
+    Exception raised when migrating a PowerFlex entity fails.
+    """
+    base = 'Failed to migrate PowerFlex {entity} with id {_id} to storage pool {dest_sp_id}.'
+
+    def __init__(self, entity, entity_id, dest_sp_id, response=None):
+        self.message = self.base.format(
+            entity=entity,
+            _id=entity_id,
+            dest_sp_id=dest_sp_id
+        )
+        self.response = response
+        if response:
+            self.message = f"{self.message} Error: {response}"

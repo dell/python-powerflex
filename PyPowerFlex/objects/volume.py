@@ -542,3 +542,98 @@ class Volume(base_client.EntityRequest):
             params["allIds"] = ""
 
         return self._query_selected_statistics(action, params)
+
+    def migrate_vtree(self,
+                      volume_id,
+                      dest_sp_id,
+                      ignore_dest_capacity=None,
+                      queue_position=None,
+                      vol_type_conversion=None,
+                      allow_thick_non_zero=None,
+                      compression_method=None):
+        """Migrate a volume tree from one storage pool to another.
+
+        This method migrates an entire VTree from one Storage Pool to another Storage Pool,
+        within the same Protection Domain or between different Protection Domains. It can also
+        be used for rollback volume migration when using the source storage pool ID as the
+        dest_sp_id.
+
+        Args:
+            volume_id (str): The ID of the volume to be migrated.
+            dest_sp_id (str): The ID of the destination storage pool.
+            ignore_dest_capacity (bool, optional): Whether to ignore destination capacity
+                checks. Defaults to None.
+            queue_position (str, optional): Position in the migration queue ('head' or 'tail').
+                Defaults to None.
+            vol_type_conversion (str, optional): Volume type conversion strategy.
+                Defaults to None.
+            allow_thick_non_zero (bool, optional): Whether to allow thick non-zero volumes.
+                Defaults to None.
+            compression_method (str, optional): The compression method to use. Must be one of
+                CompressionMethod values. Defaults to None.
+
+        Raises:
+            InvalidInput: If required parameters are missing or invalid.
+            PowerFlexFailMigration: If the migration operation fails.
+
+        Returns:
+            dict: The updated volume information after migration.
+
+        Examples:
+            >>> # Basic migration
+            >>> volume.migrate_vtree('volume_id', 'dest_sp_id')
+            >>> # Migration with compression
+            >>> volume.migrate_vtree('volume_id', 'dest_sp_id',
+            ...                     compression_method=CompressionMethod.normal)
+            >>> # Migration ignoring destination capacity
+            >>> volume.migrate_vtree('volume_id', 'dest_sp_id',
+            ...                     ignore_dest_capacity=True)
+        """
+        action = 'migrateVTree'
+
+        if not all([volume_id, dest_sp_id]):
+            msg = 'Both volume_id and dest_sp_id must be set.'
+            raise exceptions.InvalidInput(msg)
+
+        if compression_method and compression_method not in [
+            CompressionMethod.none,
+            CompressionMethod.normal
+        ]:
+            msg = 'Invalid compression method. Must be one of: none, normal'
+            raise exceptions.InvalidInput(msg)
+
+        if queue_position and queue_position not in ['head', 'tail']:
+            msg = 'Invalid queue_position. Must be either "head" or "tail"'
+            raise exceptions.InvalidInput(msg)
+
+        params = {
+            'destSPId': dest_sp_id,
+            'ignoreDestinationCapacity': ignore_dest_capacity,
+            'queuePosition': queue_position,
+            'volTypeConversion': vol_type_conversion,
+            'allowThickNonZeroPaddedVTree': allow_thick_non_zero,
+            'compressionMethod': compression_method
+        }
+
+        r, response = self.send_post_request(
+            self.base_action_url,
+            action=action,
+            entity=self.entity,
+            entity_id=volume_id,
+            params=params
+        )
+
+        if r.status_code != requests.codes.ok:
+            msg = (
+                f'Failed to migrate PowerFlex {self.entity} with id {volume_id} '
+                f'to storage pool {dest_sp_id}. Error: {response}'
+            )
+            LOG.error(msg)
+            raise exceptions.PowerFlexFailMigration(
+                entity=self.entity,
+                entity_id=volume_id,
+                dest_sp_id=dest_sp_id,
+                response=response
+            )
+
+        return self.get(entity_id=volume_id)

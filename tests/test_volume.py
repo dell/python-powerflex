@@ -283,3 +283,187 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
                 self.client.volume.query_selected_statistics,
                 properties=["userDataSdcReadLatency"],
             )
+
+    def test_migrate_vtree_success(self):
+        """
+        Test successful volume tree migration with minimal parameters.
+        """
+        result = self.client.volume.migrate_vtree(
+            volume_id=self.fake_volume_id,
+            dest_sp_id=self.fake_sp_id
+        )
+        self.assertEqual(result['id'], self.fake_volume_id)
+
+    def test_migrate_vtree_missing_params(self):
+        """
+        Test migration with missing required parameters.
+        """
+        test_cases = [
+            (None, None, 'Both volume_id and dest_sp_id must be set'),
+            (self.fake_volume_id, None, 'Both volume_id and dest_sp_id must be set'),
+            (None, self.fake_sp_id, 'Both volume_id and dest_sp_id must be set')
+        ]
+
+        for volume_id, dest_sp_id, expected_error in test_cases:
+            with self.assertRaises(exceptions.InvalidInput) as context:
+                self.client.volume.migrate_vtree(
+                    volume_id=volume_id,
+                    dest_sp_id=dest_sp_id
+                )
+            self.assertIn(expected_error, str(context.exception))
+
+    def test_migrate_vtree_invalid_compression(self):
+        """
+        Test migration with invalid compression method.
+        """
+        with self.assertRaises(exceptions.InvalidInput) as context:
+            self.client.volume.migrate_vtree(
+                volume_id=self.fake_volume_id,
+                dest_sp_id=self.fake_sp_id,
+                compression_method='invalid_method'
+            )
+        self.assertIn('Invalid compression method', str(context.exception))
+
+    def test_migrate_vtree_invalid_queue_position(self):
+        """
+        Test migration with invalid queue position.
+        """
+        with self.assertRaises(exceptions.InvalidInput) as context:
+            self.client.volume.migrate_vtree(
+                volume_id=self.fake_volume_id,
+                dest_sp_id=self.fake_sp_id,
+                queue_position='invalid'
+            )
+        self.assertIn('Invalid queue_position', str(context.exception))
+
+    def test_migrate_vtree_server_error(self):
+        """
+        Test migration when server returns an error.
+        """
+        error_response = MockResponse(
+            {'error': 'Insufficient capacity'},
+            status_code=500
+        )
+        
+        self.MOCK_RESPONSES[self.RESPONSE_MODE.BadStatus][
+            f'/instances/Volume::{self.fake_volume_id}/action/migrateVTree'
+        ] = error_response
+        
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            with self.assertRaises(exceptions.PowerFlexFailMigration) as context:
+                self.client.volume.migrate_vtree(
+                    volume_id=self.fake_volume_id,
+                    dest_sp_id=self.fake_sp_id
+                )
+            self.assertIn('Failed to migrate PowerFlex', str(context.exception))
+            self.assertIn(self.fake_volume_id, str(context.exception))
+            self.assertIn(self.fake_sp_id, str(context.exception))
+            self.assertIn('Insufficient capacity', str(context.exception))
+
+    def test_migrate_vtree_with_all_params(self):
+        """
+        Test migration with all optional parameters.
+        """
+        result = self.client.volume.migrate_vtree(
+            volume_id=self.fake_volume_id,
+            dest_sp_id=self.fake_sp_id,
+            ignore_dest_capacity=True,
+            queue_position='head',
+            vol_type_conversion='ThickToThin',
+            allow_thick_non_zero=True,
+            compression_method=volume.CompressionMethod.normal
+        )
+        self.assertEqual(result['id'], self.fake_volume_id)
+
+    def test_migrate_vtree_compression_methods(self):
+        """
+        Test migrate_vtree with different compression methods.
+        """
+        for method in [volume.CompressionMethod.none, 
+                      volume.CompressionMethod.normal]:
+            result = self.client.volume.migrate_vtree(
+                volume_id=self.fake_volume_id,
+                dest_sp_id=self.fake_sp_id,
+                compression_method=method
+            )
+            self.assertEqual(result['id'], self.fake_volume_id)
+
+    def test_migrate_vtree_queue_positions(self):
+        """
+        Test migrate_vtree with different queue positions.
+        """
+        for position in ['head', 'tail']:
+            result = self.client.volume.migrate_vtree(
+                volume_id=self.fake_volume_id,
+                dest_sp_id=self.fake_sp_id,
+                queue_position=position
+            )
+            self.assertEqual(result['id'], self.fake_volume_id)
+
+    def test_migrate_vtree_concurrent_access(self):
+        """
+        Test migrate_vtree handling of concurrent access errors.
+        """
+        error_response = MockResponse(
+            {
+                'errorCode': 409,
+                'message': 'Operation cannot be performed - another operation is in progress'
+            },
+            status_code=409
+        )
+        
+        self.MOCK_RESPONSES[self.RESPONSE_MODE.BadStatus][
+            f'/instances/Volume::{self.fake_volume_id}/action/migrateVTree'
+        ] = error_response
+        
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            with self.assertRaises(exceptions.PowerFlexFailMigration) as context:
+                self.client.volume.migrate_vtree(
+                    volume_id=self.fake_volume_id,
+                    dest_sp_id=self.fake_sp_id
+                )
+            self.assertIn('another operation is in progress', str(context.exception))
+
+    def test_migrate_vtree_insufficient_space(self):
+        """
+        Test migrate_vtree handling of insufficient space errors.
+        """
+        error_response = MockResponse(
+            {
+                'errorCode': 500,
+                'message': 'Insufficient space in destination storage pool'
+            },
+            status_code=500
+        )
+        
+        self.MOCK_RESPONSES[self.RESPONSE_MODE.BadStatus][
+            f'/instances/Volume::{self.fake_volume_id}/action/migrateVTree'
+        ] = error_response
+        
+        # Test without ignore_dest_capacity
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            with self.assertRaises(exceptions.PowerFlexFailMigration) as context:
+                self.client.volume.migrate_vtree(
+                    volume_id=self.fake_volume_id,
+                    dest_sp_id=self.fake_sp_id
+                )
+            self.assertIn('Insufficient space', str(context.exception))
+        
+        # Test with ignore_dest_capacity=True
+        result = self.client.volume.migrate_vtree(
+            volume_id=self.fake_volume_id,
+            dest_sp_id=self.fake_sp_id,
+            ignore_dest_capacity=True
+        )
+        self.assertEqual(result['id'], self.fake_volume_id)
+
+    def test_migrate_vtree_rollback(self):
+        """
+        Test migrate_vtree for rollback scenario using source SP as destination.
+        """
+        result = self.client.volume.migrate_vtree(
+            volume_id=self.fake_volume_id,
+            dest_sp_id=self.fake_sp_id,  # Using same SP ID for rollback
+            ignore_dest_capacity=True
+        )
+        self.assertEqual(result['id'], self.fake_volume_id)

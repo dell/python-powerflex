@@ -55,6 +55,10 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
                 '/instances/Volume::{}'
                 '/action/unlockAutoSnapshot'.format(self.fake_volume_id):
                     {},
+                '/instances/Volume::{}'
+                '/action/migrateVTree'.format(self.fake_volume_id):
+                    {},
+
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/Volume/instances':
@@ -181,3 +185,43 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.volume.unlock_auto_snapshot,
                               self.fake_volume_id)
+
+
+    def test_volume_migrate_vtree_success_defaults(self):
+        # Test successful migration with only required arguments
+        self.client.volume.migrate_vtree(volume_id=self.fake_volume_id,
+                                          dest_sp_id='sp2')
+
+    def test_volume_migrate_vtree_success_all_options(self):
+        # Test successful migration with all optional arguments
+        self.client.volume.migrate_vtree(volume_id=self.fake_volume_id,
+                                          dest_sp_id='sp2',
+                                          ignore_dest_capacity=True,
+                                          queue_position=1,
+                                          vol_type_conversion=True,
+                                          allow_thick_non_zero=True,
+                                          compression_method='Normal')
+
+    def test_volume_migrate_vtree_missing_volume_id(self):
+        # Test validation failure when volume_id is missing
+        with self.assertRaises(exceptions.InvalidInput) as error:
+            self.client.volume.migrate_vtree(volume_id=None,
+                                              dest_sp_id='sp2')
+        self.assertEqual('Both volume_id and dest_sp_id must be set.',
+                         error.exception.message)
+
+    def test_volume_migrate_vtree_missing_dest_sp_id(self):
+        # Test validation failure when dest_sp_id is missing
+        with self.assertRaises(exceptions.InvalidInput) as error:
+            self.client.volume.migrate_vtree(volume_id=self.fake_volume_id,
+                                              dest_sp_id=None)
+        self.assertEqual('Both volume_id and dest_sp_id must be set.',
+                         error.exception.message)
+
+    def test_volume_migrate_vtree_api_failure(self):
+        # Test exception handling when the API call fails
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.volume.migrate_vtree,
+                              volume_id=self.fake_volume_id,
+                              dest_sp_id='sp2')

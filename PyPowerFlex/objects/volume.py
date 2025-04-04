@@ -531,7 +531,7 @@ class Volume(base_client.EntityRequest):
                       vol_type_conversion=None,
                       allow_thick_non_zero=None,
                       compression_method=None):
-"""
+        """
         Migrates a volume from one storage pool (SP) to another.
 
         Args:
@@ -558,7 +558,6 @@ class Volume(base_client.EntityRequest):
             raise exceptions.InvalidInput(msg)
 
         params = dict(
-            id=volume_id,
             destSPId=dest_sp_id,
             ignoreDestinationCapacity=ignore_dest_capacity,
             queuePosition=queue_position,

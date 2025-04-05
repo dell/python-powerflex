@@ -1,0 +1,3 @@
+[MASTER]
+[FORMAT]
+disable=trailing-whitespace,undefined-variable

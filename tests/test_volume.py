@@ -344,18 +344,20 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
             {'error': 'Insufficient capacity'},
             status_code=500
         )
-        
+
         self.MOCK_RESPONSES[self.RESPONSE_MODE.BadStatus][
             f'/instances/Volume::{self.fake_volume_id}/action/migrateVTree'
         ] = error_response
-        
+
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             with self.assertRaises(exceptions.PowerFlexFailMigration) as context:
                 self.client.volume.migrate_vtree(
                     volume_id=self.fake_volume_id,
                     dest_sp_id=self.fake_sp_id
                 )
-            self.assertIn('Failed to migrate PowerFlex', str(context.exception))
+            self.assertIn(
+                'Failed to migrate PowerFlex', str(
+                    context.exception))
             self.assertIn(self.fake_volume_id, str(context.exception))
             self.assertIn(self.fake_sp_id, str(context.exception))
             self.assertIn('Insufficient capacity', str(context.exception))
@@ -379,8 +381,8 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
         """
         Test migrate_vtree with different compression methods.
         """
-        for method in [volume.CompressionMethod.none, 
-                      volume.CompressionMethod.normal]:
+        for method in [volume.CompressionMethod.none,
+                       volume.CompressionMethod.normal]:
             result = self.client.volume.migrate_vtree(
                 volume_id=self.fake_volume_id,
                 dest_sp_id=self.fake_sp_id,
@@ -411,18 +413,20 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
             },
             status_code=409
         )
-        
+
         self.MOCK_RESPONSES[self.RESPONSE_MODE.BadStatus][
             f'/instances/Volume::{self.fake_volume_id}/action/migrateVTree'
         ] = error_response
-        
+
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             with self.assertRaises(exceptions.PowerFlexFailMigration) as context:
                 self.client.volume.migrate_vtree(
                     volume_id=self.fake_volume_id,
                     dest_sp_id=self.fake_sp_id
                 )
-            self.assertIn('another operation is in progress', str(context.exception))
+            self.assertIn(
+                'another operation is in progress', str(
+                    context.exception))
 
     def test_migrate_vtree_insufficient_space(self):
         """
@@ -435,11 +439,11 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
             },
             status_code=500
         )
-        
+
         self.MOCK_RESPONSES[self.RESPONSE_MODE.BadStatus][
             f'/instances/Volume::{self.fake_volume_id}/action/migrateVTree'
         ] = error_response
-        
+
         # Test without ignore_dest_capacity
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             with self.assertRaises(exceptions.PowerFlexFailMigration) as context:
@@ -448,7 +452,7 @@ class TestVolumeClient(tests.PyPowerFlexTestCase):
                     dest_sp_id=self.fake_sp_id
                 )
             self.assertIn('Insufficient space', str(context.exception))
-        
+
         # Test with ignore_dest_capacity=True
         result = self.client.volume.migrate_vtree(
             volume_id=self.fake_volume_id,

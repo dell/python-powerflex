@@ -47,6 +47,7 @@ python setup.py install
 * Deployment
 * ServiceTemplate
 * FirmwareRepository
+* Credential (requires PowerFlex Gateway 4.0+)
 
 #### Initialize PowerFlex client
 
@@ -223,3 +224,56 @@ client.volume.get(filter_fields={'id': '4a3a153e00000000'},
                   fields=['name', 'id'])
 [{'name': 'sio-new_thin_vol', 'id': '4a3a153e00000000'}]
 ```
+
+#### Credential Management (4.0+ Gateway)
+
+PowerFlex 4.0 and later provides credential management capabilities through the PyPowerFlex SDK. This feature allows you to manage credentials for various components in your PowerFlex environment.
+
+```python
+# Create a server credential
+from PyPowerFlex.objects.credential import ServerCredential
+
+# Create credential object
+server_cred = ServerCredential(
+    label="Web Server Admin",
+    username="admin",
+    password="secure_password"
+)
+
+# Add the credential to PowerFlex
+result = client.credential.create(server_cred)
+print(f"Created credential with ID: {result['id']}")
+
+# Create a vCenter credential with domain
+from PyPowerFlex.objects.credential import VCenterCredential
+
+vcenter_cred = VCenterCredential(
+    label="vCenter Admin",
+    username="administrator",
+    password="secure_password",
+    domain="vsphere.local"  # Domain parameter for supported credential types
+)
+
+# Add the credential to PowerFlex
+result = client.credential.create(vcenter_cred)
+
+# Retrieve all credentials
+all_credentials = client.credential.get()
+
+# Get a specific credential by ID
+credential_id = "1234567890"
+credential = client.credential.get(entity_id=credential_id)
+
+# Update a credential
+updated_cred = ServerCredential(
+    label="Updated Server Credential",
+    username="admin",
+    password="new_secure_password"
+)
+result = client.credential.update(credential_id, updated_cred)
+
+# Delete a credential
+client.credential.delete(credential_id)
+```
+
+For detailed documentation on credential management, see [Credential Management](docs/credential_management.md)

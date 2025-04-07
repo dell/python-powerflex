@@ -146,3 +146,51 @@ class PowerFlexFailMigration(PowerFlexClientException):
         self.response = response
         if response:
             self.message = f"{self.message} Error: {response}"
+
+
+class PowerFlexCredentialNotSupported(PowerFlexClientException):
+    """Raised when credential operations are attempted on unsupported Gateway versions."""
+
+    def __init__(self, gateway_version):
+        """Initialize the exception.
+
+        :param gateway_version: The PowerFlex Gateway version that doesn't support
+                               credential management
+        :type gateway_version: str
+        """
+        self.gateway_version = gateway_version
+        message = (f"Credential operations are not supported for PowerFlex "
+                   f"Gateway version {gateway_version}. PowerFlex Gateway "
+                   f"versions below 4.0 do not support credential management "
+                   f"operations.")
+        super().__init__(message)
+
+
+class PowerFlexCredentialTypeError(PowerFlexClientException):
+    """
+    Exception raised when an invalid credential type is specified.
+    """
+    def __init__(self, credential_type=None):
+        valid_types = [
+            'serverCredential', 'iomCredential', 'vCenterCredential', 
+            'emCredential', 'scaleIOCredential', 'PSCredential', 
+            'OSCredential', 'OSUserCredential'
+        ]
+        
+        self.message = (
+            f'Invalid credential type: {credential_type}. '
+            f'Valid credential types are: {", ".join(valid_types)}'
+        )
+
+
+class PowerFlexFailCredentialOperation(PowerFlexClientException):
+    """
+    Exception raised when performing an operation on a PowerFlex credential fails.
+    """
+    base = 'Failed to perform {action} on credential with id {_id}.'
+
+    def __init__(self, credential_id, action, response=None):
+        self.message = self.base.format(action=action, _id=credential_id)
+        self.response = response
+        if response:
+            self.message = f"{self.message} Error: {response}"

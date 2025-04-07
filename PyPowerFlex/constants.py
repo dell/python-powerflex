@@ -365,3 +365,59 @@ class SnapshotPolicyConstants:
         "numOfExpiredButLockedSnapshots",
         "numOfSrcVols",
         "srcVolIds"]
+
+
+class CredentialConstants:
+    """
+    Constants specific to PowerFlex credential management.
+    """
+    # The minimum Gateway version that supports credential management
+    MIN_GATEWAY_VERSION_FOR_CREDENTIALS = "4.0"
+
+    # The base URL for credential operations
+    BASE_CREDENTIAL_URL = "/Api/V1/Credential"
+
+    # Credential types
+    SERVER_CREDENTIAL = "serverCredential"
+    IOM_CREDENTIAL = "iomCredential"
+    VCENTER_CREDENTIAL = "vCenterCredential"
+    EM_CREDENTIAL = "emCredential"
+    SCALEIO_CREDENTIAL = "scaleIoCredential"
+    PS_CREDENTIAL = "psCredential"
+    OS_CREDENTIAL = "osCredential"
+    OS_USER_CREDENTIAL = "osUserCredential"
+
+    # List of all valid credential types
+    ALL_CREDENTIAL_TYPES = [
+        SERVER_CREDENTIAL,
+        IOM_CREDENTIAL,
+        VCENTER_CREDENTIAL,
+        EM_CREDENTIAL,
+        SCALEIO_CREDENTIAL,
+        PS_CREDENTIAL,
+        OS_CREDENTIAL,
+        OS_USER_CREDENTIAL
+    ]
+
+    # Credential types that support domain parameter
+    DOMAIN_SUPPORTED_TYPES = [
+        "vCenterCredential",
+        "emCredential",
+        "psCredential",
+        "osCredential",
+        "osUserCredential"
+    ]
+
+    # Content types for credential operations
+    XML_CONTENT_TYPE = "application/xml"
+    JSON_CONTENT_TYPE = "application/json"
+
+    # Create credential XML template
+    CREATE_CREDENTIAL_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+{credential_content}
+"""
+
+    # Update credential XML template
+    UPDATE_CREDENTIAL_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+{credential_content}
+"""

@@ -34,6 +34,7 @@ from PyPowerFlex.objects.managed_device import ManagedDevice
 from PyPowerFlex.objects.deployment import Deployment
 from PyPowerFlex.objects.firmware_repository import FirmwareRepository
 from PyPowerFlex.objects.host import Host
+from PyPowerFlex.objects.credential import Credential
 
 
 __all__ = [
@@ -56,4 +57,5 @@ __all__ = [
     'Deployment',
     'FirmwareRepository',
     'Host',
+    'Credential',
 ]

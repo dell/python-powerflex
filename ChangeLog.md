@@ -1,5 +1,12 @@
 # PyPowerFlex Change Log
 
+## Version 1.15.0 - released on 06/04/25
+- Added comprehensive credential management functionality supporting all PowerFlex credential types.
+- Implemented secure credential creation, retrieval, updating, and deletion capabilities.
+- Added support for domain parameters for applicable credential types.
+- Included version compatibility checks for PowerFlex Gateway versions.
+- Added detailed documentation and examples for all credential operations.
+
 ## Version 1.14.0 - released on 05/12/24
 - Added support for managing NVME over TCP entities including SDT and NVMe Host.
 

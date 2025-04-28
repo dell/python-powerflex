@@ -55,6 +55,17 @@ class VolumeType:
     thin = 'ThinProvisioned'
 
 
+class VolumeClass:
+    """Volume class types."""
+
+    supported_vol_classes = (
+      ['defaultclass', 'replication', 'csi', 'openstack', 'vvol', 'datastore',
+       'nasfs', 'nasvdm', 'nascluster', 'nas', 'management', 'snap_mobility',
+       'ntnx'])
+    for vol_class in supported_vol_classes:
+        locals()[vol_class] = vol_class
+
+
 class Volume(base_client.EntityRequest):
     """
     A class representing Volume client.
@@ -65,7 +76,8 @@ class Volume(base_client.EntityRequest):
                        sdc_guid=None,
                        allow_multiple_mappings=None,
                        allow_ext_managed=None,
-                       access_mode=None):
+                       access_mode=None,
+                       volume_class=VolumeClass.defaultclass):
         """Map PowerFlex volume to SDC.
 
         :param volume_id: str
@@ -74,6 +86,7 @@ class Volume(base_client.EntityRequest):
         :param allow_multiple_mappings: bool
         :param allow_ext_managed: bool
         :type access_mode: str
+        :param volume_class: str
         :return: dict
         """
 
@@ -87,7 +100,8 @@ class Volume(base_client.EntityRequest):
             "guid": sdc_guid,
             "allowMultipleMappings": allow_multiple_mappings,
             "allowOnExtManagedVol": allow_ext_managed,
-            "accessMode": access_mode
+            "accessMode": access_mode,
+            "volumeClass": volume_class
         }
 
         r, response = self.send_post_request(self.base_action_url,
@@ -111,7 +125,8 @@ class Volume(base_client.EntityRequest):
                name=None,
                volume_type=None,
                use_rmcache=None,
-               compression_method=None):
+               compression_method=None,
+               volume_class=VolumeClass.defaultclass):
         """Create PowerFlex volume.
 
         :param storage_pool_id: str
@@ -123,6 +138,7 @@ class Volume(base_client.EntityRequest):
         :param compression_method: one of predefined attributes of
                                    CompressionMethod
         :type compression_method: str
+        :param volume_class: str
         :return: dict
         """
 
@@ -132,39 +148,47 @@ class Volume(base_client.EntityRequest):
             'name': name,
             'volumeType': volume_type,
             'useRmcache': use_rmcache,
-            'compressionMethod': compression_method
+            'compressionMethod': compression_method,
+            'volumeClass': volume_class
         }
 
         return self._create_entity(params)
 
-    def delete(self, volume_id, remove_mode, allow_ext_managed=None):
+    def delete(self, volume_id, remove_mode, allow_ext_managed=None,
+               volume_class=VolumeClass.defaultclass):
         """Remove PowerFlex volume.
 
         :param volume_id: str
         :param remove_mode: one of predefined attributes of RemoveMode
         :param allow_ext_managed: bool
+        :param volume_class: str
         :return: None
         """
 
         params = {
             "removeMode": remove_mode,
-            "allowOnExtManagedVol": allow_ext_managed
+            "allowOnExtManagedVol": allow_ext_managed,
+            "volumeClass": volume_class
         }
 
         return self._delete_entity(volume_id, params)
 
-    def extend(self, volume_id, size_in_gb, allow_ext_managed=None):
+    def extend(self, volume_id, size_in_gb, allow_ext_managed=None,
+               volume_class=VolumeClass.defaultclass):
         """Extend PowerFlex volume.
 
         :param volume_id: str
         :param size_in_gb: int
         :param allow_ext_managed: bool
+        :param volume_class: str
         :return: dict
         """
 
         action = 'setVolumeSize'
 
-        params = {"sizeInGB": size_in_gb, "allowOnExtManagedVol": allow_ext_managed}
+        params = {"sizeInGB": size_in_gb,
+                  "allowOnExtManagedVol": allow_ext_managed,
+                  "volumeClass": volume_class}
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -223,7 +247,8 @@ class Volume(base_client.EntityRequest):
                           sdc_guid=None,
                           all_sdcs=None,
                           skip_appliance_validation=None,
-                          allow_ext_managed=None):
+                          allow_ext_managed=None,
+                          volume_class=VolumeClass.defaultclass):
         """Unmap PowerFlex volume from SDC.
 
         :param volume_id: str
@@ -232,6 +257,7 @@ class Volume(base_client.EntityRequest):
         :param all_sdcs: bool
         :param skip_appliance_validation: bool
         :param allow_ext_managed: bool
+        :param volume_class: str
         :return: dict
         """
 
@@ -249,7 +275,8 @@ class Volume(base_client.EntityRequest):
             "guid": sdc_guid,
             "allSdcs": all_sdcs,
             "skipApplianceValidation": skip_appliance_validation,
-            "allowOnExtManagedVol": allow_ext_managed
+            "allowOnExtManagedVol": allow_ext_managed,
+            "volumeClass": volume_class
         }
 
         r, response = self.send_post_request(self.base_action_url,
@@ -267,12 +294,14 @@ class Volume(base_client.EntityRequest):
 
         return self.get(entity_id=volume_id)
 
-    def rename(self, volume_id, name, allow_ext_managed=None):
+    def rename(self, volume_id, name, allow_ext_managed=None,
+               volume_class=VolumeClass.defaultclass):
         """Rename PowerFlex volume.
 
         :param volume_id: str
         :param name: str
         :param allow_ext_managed: bool
+        :param volume_class: str
         :return: dict
         """
 
@@ -280,7 +309,8 @@ class Volume(base_client.EntityRequest):
 
         params = {
             "newName": name,
-            "allowOnExtManagedVol": allow_ext_managed
+            "allowOnExtManagedVol": allow_ext_managed,
+            "volumeClass": volume_class
         }
 
         return self._rename_entity(action, volume_id, params)

@@ -1,6 +1,19 @@
 name: Run Lint Check via Pylint  
 
-on: [push]  
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+on:
+  # Run CI against all pushes (direct commits, also merged PRs), Pull Requests
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+  # Runs CI on every day (at 06:00 UTC)
+  schedule:
+    - cron: '0 6 * * *'
 
 jobs:
   lint:

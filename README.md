@@ -209,12 +209,22 @@ client.fault_set.clear('fba27fae00000001')
 # Create volume
 from PyPowerFlex.objects.volume import VolumeType
 from PyPowerFlex.objects.volume import CompressionMethod
+from PyPowerFlex.objects.volume import VolumeClass
 client.volume.create(storage_pool_id='76f2b2fd00000000',
                      size_in_gb=40,
                      name='new_thin_vol',
                      volume_type=VolumeType.thin,
                      use_rmcache=True,
                      compression_method=CompressionMethod.normal)
+
+# Volume can be created with custom volume class
+client.volume.create(storage_pool_id='76f2b2fd00000001',
+                     size_in_gb=40,
+                     name='new_custom_class_volume',
+                     volume_type=VolumeType.thin,
+                     use_rmcache=True,
+                     compression_method=CompressionMethod.normal,
+                     volume_class=VolumeClass.datastore)
 
 # Extend volume size
 client.volume.extend(volume_id='4a3a153e00000000',

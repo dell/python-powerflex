@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Dell Inc. or its subsidiaries.
+# Copyright (c) 2025 Dell Inc. or its subsidiaries.
 # All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='PyPowerFlex',
-    version='1.14.0',
+    version='1.14.1',
     description='Python library for Dell PowerFlex',
     author='Ansible Team at Dell',
     author_email='ansible.team@dell.com',

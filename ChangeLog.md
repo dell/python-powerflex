@@ -1,6 +1,6 @@
 # PyPowerFlex Change Log
 
-## Version 1.14.1 - released on 13/06/25
+## Version 1.14.1 - released on 26/06/25
 - Added support for custom volume type for volume operations.
 
 ## Version 1.14.0 - released on 05/12/24

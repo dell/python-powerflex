@@ -1,5 +1,8 @@
 .vscode
 __pycache__
+build/
+PyPowerFlex.egg-info/
+test.py
 
 # pytest coverage
 .coverage

@@ -21,7 +21,7 @@ from setuptools import setup
 
 setup(
     name='PyPowerFlex',
-    version='1.14.1',
+    version='2.0.0',
     description='Python library for Dell PowerFlex',
     author='Ansible Team at Dell',
     author_email='ansible.team@dell.com',

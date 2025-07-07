@@ -18,9 +18,12 @@
 # pylint: disable=too-few-public-methods,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
 
 import logging
-
 import requests
 
+import marshmallow_dataclass
+from dataclasses import field
+from marshmallow import EXCLUDE, validate
+from marshmallow_dataclass import dataclass
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
 
@@ -37,11 +40,115 @@ class RFCacheOperationMode:
     read_and_write = 'ReadAndWrite'
     write_miss = 'WriteMiss'
 
+@dataclass
+class ProtectionDomainSchema:
+    id:str = field(metadata= {
+        "required": False,
+        "load_default": "",
+    })
+    name:str
+    protectionDomainState:str = field(metadata= {
+        "required": False,
+        "load_default": "Active",
+        "validate": validate.OneOf(["Active", "Inactive"]),
+    }) ## optional
+    rebuildNetworkThrottlingEnabled:bool = field(metadata= {
+        "required": False,
+        "load_default": False,
+    })
+    rebuildNetworkThrottlingInKbps:int = field(metadata= {
+        "allow_none": True,
+        "required": False,
+        "load_default": None,
+    })
+    overallConcurrentIoLimit:int = field(metadata= {
+        "required": False,
+        "load_default": 4,
+    })
+    class Meta:
+        unknown = EXCLUDE
+
+def load_protection_domain_schema(obj):
+    schema = marshmallow_dataclass.class_schema(ProtectionDomainSchema)
+    return schema().load(obj)
 
 class ProtectionDomain(base_client.EntityRequest):
     """
     A class representing Protection Domain client.
     """
+    def list(self):
+        """List PowerFlex protection domains.
+
+        :rtype: list[dict]
+        """
+        return list(map(load_protection_domain_schema, self.get()))
+
+    def get_by_name(self, name):
+        """Get PowerFlex protection domain.
+
+        :type name: str
+        :rtype: dict
+        """
+        result = self.get(filter_fields={'name': name})
+        if len(result) == 1:
+            return load_protection_domain_schema(result[0])
+        return None
+    
+    def get_by_id(self, id):
+        """Get PowerFlex protection domain.
+
+        :type id: str
+        :rtype: dict
+        """
+        return load_protection_domain_schema(self.get(entity_id=id))
+
+    def delete(self, id):
+        """Remove PowerFlex protection domain.
+
+        :type id: str
+        :rtype: None
+        """
+
+        return self._delete_entity(id)
+
+    def create(self, pd):
+        """Create PowerFlex protection domain.
+
+        :type pd: dict
+        :rtype: dict
+        """
+        pd = load_protection_domain_schema(pd)
+        params = {"name": pd.name}
+        new_pd = load_protection_domain_schema(self._create_entity(params))
+        if pd.protectionDomainState == "Inactive":
+            new_pd = load_protection_domain_schema(self.inactivate(new_pd.id, force=True))
+        return new_pd
+
+    def update(self, pd, new_pd):
+        """Create PowerFlex protection domain.
+
+        :type pd: dict
+        :type new_pd: dict
+        :rtype: dict
+        """
+        if pd.name != new_pd.name:
+            self.rename(pd.id, new_pd.name)
+        if pd.protectionDomainState != new_pd.protectionDomainState:
+            if new_pd.protectionDomainState == "Inactive":
+                self.inactivate(pd.id, force=True)
+            else:
+                self.activate(pd.id, force=True)
+        return self.get_by_id(pd.id)
+
+    def dump(self, pd):
+        """Dump PowerFlex protection domain.
+
+        :type pd: dict
+        :rtype: dict
+        """
+        schema = marshmallow_dataclass.class_schema(ProtectionDomainSchema)
+        return schema().dump(pd)
+
     def activate(self, protection_domain_id, force=False):
         """Activate PowerFlex protection domain.
 
@@ -70,17 +177,6 @@ class ProtectionDomain(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=protection_domain_id)
-
-    def create(self, name):
-        """Create PowerFlex protection domain.
-
-        :type name: str
-        :rtype: dict
-        """
-
-        params = {"name": name}
-
-        return self._create_entity(params)
 
     def get_sdss(self, protection_domain_id, filter_fields=None, fields=None):
         """Get related PowerFlex SDSs for protection domain.

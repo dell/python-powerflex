@@ -17,10 +17,11 @@
 
 # pylint: disable=too-few-public-methods,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
 
+import copy
 import logging
+import marshmallow_dataclass
 import requests
 
-import marshmallow_dataclass
 from dataclasses import field
 from marshmallow import EXCLUDE, validate
 from marshmallow_dataclass import dataclass
@@ -76,6 +77,8 @@ class ProtectionDomain(base_client.EntityRequest):
     """
     A class representing Protection Domain client.
     """
+    instance = None
+
     def list(self):
         """List PowerFlex protection domains.
 
@@ -90,9 +93,11 @@ class ProtectionDomain(base_client.EntityRequest):
         :rtype: dict
         """
         result = self.get(filter_fields={'name': name})
-        if len(result) == 1:
-            return load_protection_domain_schema(result[0])
-        return None
+        if len(result) >= 1:
+            self.instance = load_protection_domain_schema(result[0])
+        else:
+            self.instance = None
+        return copy.deepcopy(self.instance)
     
     def get_by_id(self, id):
         """Get PowerFlex protection domain.
@@ -100,7 +105,8 @@ class ProtectionDomain(base_client.EntityRequest):
         :type id: str
         :rtype: dict
         """
-        return load_protection_domain_schema(self.get(entity_id=id))
+        self.instance = load_protection_domain_schema(self.get(entity_id=id))
+        return copy.deepcopy(self.instance)
 
     def delete(self, id):
         """Remove PowerFlex protection domain.
@@ -108,7 +114,6 @@ class ProtectionDomain(base_client.EntityRequest):
         :type id: str
         :rtype: None
         """
-
         return self._delete_entity(id)
 
     def create(self, pd):
@@ -119,35 +124,34 @@ class ProtectionDomain(base_client.EntityRequest):
         """
         pd = load_protection_domain_schema(pd)
         params = {"name": pd.name}
-        new_pd = load_protection_domain_schema(self._create_entity(params))
+        self.instance = load_protection_domain_schema(self._create_entity(params))
         if pd.protectionDomainState == "Inactive":
-            new_pd = load_protection_domain_schema(self.inactivate(new_pd.id, force=True))
-        return new_pd
+            self.instance = load_protection_domain_schema(self.inactivate(self.instance.id, force=True))
+        return copy.deepcopy(self.instance)
 
-    def update(self, pd, new_pd):
+    def update(self, pd):
         """Create PowerFlex protection domain.
 
         :type pd: dict
         :type new_pd: dict
         :rtype: dict
         """
-        if pd.name != new_pd.name:
-            self.rename(pd.id, new_pd.name)
-        if pd.protectionDomainState != new_pd.protectionDomainState:
-            if new_pd.protectionDomainState == "Inactive":
-                self.inactivate(pd.id, force=True)
+        if pd.name != self.instance.name:
+            self.rename(pd.id, pd.name)
+        if pd.protectionDomainState != self.instance.protectionDomainState:
+            if pd.protectionDomainState == "Inactive":
+                self.inactivate(self.instance.id, force=True)
             else:
-                self.activate(pd.id, force=True)
-        return self.get_by_id(pd.id)
+                self.activate(self.instance.id, force=True)
+        self.instance = self.get_by_id(self.instance.id)
+        return copy.deepcopy(self.instance)
 
-    def dump(self, pd):
-        """Dump PowerFlex protection domain.
-
-        :type pd: dict
+    def dump(self):
+        """Dump PowerFlex protection domain in json.
         :rtype: dict
         """
         schema = marshmallow_dataclass.class_schema(ProtectionDomainSchema)
-        return schema().dump(pd)
+        return schema().dump(self.instance)
 
     def activate(self, protection_domain_id, force=False):
         """Activate PowerFlex protection domain.

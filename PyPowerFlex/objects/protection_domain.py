@@ -94,12 +94,56 @@ class ProtectionDomainSchema(base_client.BaseSchema):
     )
     overall_concurrent_io_limit = fields.Integer(
         metadata={
-            "description": "Overall concurrent io limit",
+            "description": "Overall concurrent IO limit, default: 4",
+            "updatable": True,
         }
     )
     bandwidth_limit_overall_ios = fields.Integer(
         metadata={
-            "description": "Bandwidth limit overall ios",
+            "description": "Bandwidth limit overall IOs, default: 400",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_bg_dev_scanner = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit background device scanner, default: 10",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_garbage_collector = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit garbage collector, default: 65535",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_singly_impacted_rebuild = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit singly impacted rebuild, default: 400",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_doubly_impacted_rebuild = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit doubly impacted rebuild, default: 400",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_rebalance = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit rebalance, default: 40",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_other = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit rebalance, default: 10",
+            "updatable": True,
+        }
+    )
+    bandwidth_limit_node_network = fields.Integer(
+        metadata={
+            "description": "Bandwidth limit node network, default: 25",
+            "updatable": True,
         }
     )
     # links = fields.List(fields.Nested(LinkSchema),
@@ -111,6 +155,7 @@ class ProtectionDomainSchema(base_client.BaseSchema):
 
 def load_protection_domain_schema(obj):
     return ProtectionDomainSchema().load(obj)
+
 
 class ProtectionDomain(base_client.EntityRequest):
     """
@@ -196,7 +241,33 @@ class ProtectionDomain(base_client.EntityRequest):
             self.set_rebalance_enabled(pd['id'], pd['rebalance_enabled'])
         # self.disable_inflight_bandwidth_flow_control(pd['id'])
         # self.enable_inflight_bandwidth_flow_control(pd['id'])
-        # self.set_secondary_io_policy(pd['id'], "Invalid")
+
+        policy = {
+            # TODO: unlimited, favorApplication
+            "policy": "favorApplication",
+        }
+        if pd['overall_concurrent_io_limit'] != current_pd['overall_concurrent_io_limit']:
+            policy['overallConcurrentIoLimit'] = pd['overall_concurrent_io_limit']
+        if pd['bandwidth_limit_overall_ios'] != current_pd['bandwidth_limit_overall_ios']:
+            policy['bandwidthLimitOverallIos'] = pd['bandwidth_limit_overall_ios']
+        if pd['bandwidth_limit_bg_dev_scanner'] != current_pd['bandwidth_limit_bg_dev_scanner']:
+            policy['bandwidthLimitBgDevScanner'] = pd['bandwidth_limit_bg_dev_scanner']
+        if pd['bandwidth_limit_garbage_collector'] != current_pd['bandwidth_limit_garbage_collector']:
+            policy['bandwidthLimitGarbageCollector'] = pd['bandwidth_limit_garbage_collector']
+        if pd['bandwidth_limit_singly_impacted_rebuild'] != current_pd['bandwidth_limit_singly_impacted_rebuild']:
+            policy['bandwidthLimitSinglyImpactedRebuild'] = pd['bandwidth_limit_singly_impacted_rebuild']
+        if pd['bandwidth_limit_doubly_impacted_rebuild'] != current_pd['bandwidth_limit_doubly_impacted_rebuild']:
+            policy['bandwidthLimitDoublyImpactedRebuild'] = pd['bandwidth_limit_doubly_impacted_rebuild']
+        if pd['bandwidth_limit_rebalance'] != current_pd['bandwidth_limit_rebalance']:
+            policy['bandwidthLimitRebalance'] = pd['bandwidth_limit_rebalance']
+        if pd['bandwidth_limit_other'] != current_pd['bandwidth_limit_other']:
+            policy['bandwidthLimitOther'] = pd['bandwidth_limit_other']
+        if pd['bandwidth_limit_node_network'] != current_pd['bandwidth_limit_node_network']:
+            policy['bandwidthLimitNodeNetwork'] = pd['bandwidth_limit_node_network']
+        
+        if len(policy) > 1:
+            has_update = True
+            self.set_secondary_io_policy(pd['id'], policy)
 
         return has_update, self.get_by_id(pd['id'])
 
@@ -352,22 +423,40 @@ class ProtectionDomain(base_client.EntityRequest):
         """Set secondary I/O policy.
 
         :type id: str
-        :type policy: str
+        :type policy: Dict
         :rtype: None
         """
 
         action = 'setSecondaryIoPolicy'
         params = {
-            "PriorityPolicy": "FavorAppIo",
-            "overall_concurrent_io_limit": 3
+            "policy": policy["policy"],
         }
+        if 'overallConcurrentIoLimit' in policy:
+            params["overallConcurrentIoLimit"] = policy["overallConcurrentIoLimit"]
+        if 'bandwidwith_limit_overall_ios' in policy:
+            params['bandwidthLimitOverallIos'] = policy['bandwidwith_limit_overall_ios']
+        if 'bandwidth_limit_bg_dev_scanner' in policy:
+            params['bandwidthLimitBgDevScanner'] = policy['bandwidth_limit_bg_dev_scanner']
+        if 'bandwidth_limit_garbage_collector' in policy:
+            params['bandwidthLimitGarbageCollector'] = policy['bandwidth_limit_garbage_collector']
+        if 'bandwidth_limit_singly_impacted_rebuild' in policy:
+            params['bandwidthLimitSinglyImpactedRebuild'] = policy['bandwidth_limit_singly_impacted_rebuild']
+        if 'bandwidth_limit_doubly_impacted_rebuild' in policy:
+            params['bandwidthLimitDoublyImpactedRebuild'] = policy['bandwidth_limit_doubly_impacted_rebuild']
+        if 'bandwidth_limit_rebalance' in policy:
+            params['bandwidthLimitRebalance'] = policy['bandwidth_limit_rebalance']
+        if 'bandwidth_limit_other' in policy:
+            params['bandwidthLimitOther'] = policy['bandwidth_limit_other']
+        if 'bandwidth_limit_node_network' in policy:
+            params['bandwidthLimitNodeNetwork'] = policy['bandwidth_limit_node_network']
+
+        print(params)
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
                                              entity_id=id,
                                              params=params)
-        print(response)
         if r.status_code != requests.codes.ok:
             msg = (
                 f"Failed to set secondary I/O policy in PowerFlex {self.entity} "

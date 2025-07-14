@@ -450,8 +450,6 @@ class ProtectionDomain(base_client.EntityRequest):
         if 'bandwidth_limit_node_network' in policy:
             params['bandwidthLimitNodeNetwork'] = policy['bandwidth_limit_node_network']
 
-        print(params)
-
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
@@ -462,8 +460,8 @@ class ProtectionDomain(base_client.EntityRequest):
                 f"Failed to set secondary I/O policy in PowerFlex {self.entity} "
                 f"with id {id}. Error: {response}"
             )
-            #LOG.error(msg)
-            #raise exceptions.PowerFlexClientException(msg)
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
 
     def get_sdss(self, protection_domain_id, filter_fields=None, fields=None):
         """Get related PowerFlex SDSs for protection domain.

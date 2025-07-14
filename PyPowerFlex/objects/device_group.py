@@ -17,7 +17,6 @@
 
 # pylint: disable=too-few-public-methods,no-member,too-many-arguments,too-many-positional-arguments,duplicate-code
 
-import copy
 import logging
 import requests
 
@@ -49,8 +48,6 @@ class DeviceGroup(base_client.EntityRequest):
     """
     A class representing Device Group client.
     """
-    schema = None
-
     def list(self):
         """List PowerFlex device groups.
 
@@ -64,8 +61,7 @@ class DeviceGroup(base_client.EntityRequest):
         :type id: str
         :rtype: dict
         """
-        self.schema = load_device_group_schema(self.get(entity_id=id))
-        return copy.deepcopy(self.schema)
+        return load_device_group_schema(self.get(entity_id=id))
 
     def get_by_name(self, name):
         """Get PowerFlex device group.
@@ -75,8 +71,6 @@ class DeviceGroup(base_client.EntityRequest):
         """
         result = self.get(filter_fields={'name': name})
         if len(result) >= 1:
-            self.schema = load_device_group_schema(result[0])
-            return copy.deepcopy(self.schema)
+            return load_device_group_schema(result[0])
         else:
-            self.schema = None
             return None

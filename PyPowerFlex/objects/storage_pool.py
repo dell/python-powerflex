@@ -62,7 +62,7 @@ class StoragePoolSchema(base_client.BaseSchema):
     wrc_device_group_id = fields.Str(
         metadata={
             "description": "Device Group Id",
-            "updatable": False,
+            #"updatable": False,
         }
     )
     gen_type = fields.Str(

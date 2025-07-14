@@ -86,22 +86,27 @@ class StoragePoolSchema(base_client.BaseSchema):
     fragmentation_enabled = fields.Boolean(
         metadata={
             "description": "Enable Fragmentation, default: False",
-            "updatable": True,
+            # "updatable": True,
         }
     )
     over_provisioning_factor = fields.Integer(
-        load_default=0,
         validate=validate.And(validate_over_provisioning_factor),
         metadata={
-            "description": "Over Provisioning Factor, range: 100-10000, set 0 to disable over provisioning. Default: 0",
+            "description": "Over Provisioning Factor, range: 0, 100-10000, set 0 to disable over provisioning. Default: 0",
         }
     )
     physical_size_gb = fields.Integer(
         required=True,
         data_key="physicalSizeGB",
         metadata={
-            "description": "Physical Size in GB, set -1 to use all available capacity",
-            "updatable": True, # when update, only accept larger value
+            "description": "Physical Size in GB, set -1 to use all available capacity. It only accepts larger value during update.",
+            "updatable": True,
+        }
+    )
+    raw_size_gb = fields.Integer(
+        data_key="rawSizeGB",
+        metadata={
+            "description": "Raw Size in GB",
         }
     )
     # num_data_slices = fields.Integer(
@@ -127,13 +132,13 @@ class StoragePoolSchema(base_client.BaseSchema):
     compression_method = fields.Str(
         validate=validate.OneOf(["None", "Normal"]),
         metadata={
-            "description": "Compression Method: None/Normal",
+            "description": "Compression Method: None/Normal. Default: Normal",
             "updatable": True,
         }
     )
     zero_padding_enabled = fields.Boolean(
         metadata={
-            "description": "zero padding enabled",
+            "description": "Zero padding enabled. Default: True",
         }
     )
 
@@ -246,9 +251,10 @@ class StoragePool(base_client.EntityRequest):
             has_update = True
             self.set_capacity_alert_thresholds(sp['id'], high_threshold, critical_threshold)
 
-        if sp['fragmentation_enabled'] != current_sp['fragmentation_enabled']:
-            has_update = True
-            self.set_fragmentation_enabled(sp['id'], sp['fragmentation_enabled'])
+        # TODO: add support for fragmentation, currently update would fail with error 'Could not find Storage Pool'
+        # if sp['fragmentation_enabled'] != current_sp['fragmentation_enabled']:
+        #     has_update = True
+        #     self.set_fragmentation_enabled(sp['id'], sp['fragmentation_enabled'])
         
         if sp['over_provisioning_factor'] != current_sp['over_provisioning_factor']:
             has_update = True
@@ -257,6 +263,10 @@ class StoragePool(base_client.EntityRequest):
         if sp['physical_size_gb'] != current_sp['physical_size_gb']:
             has_update = True
             self.resize(sp['id'], sp['physical_size_gb'])
+
+        if sp['compression_method'] != current_sp['compression_method']:
+            has_update = True
+            self.set_compression_method(sp['id'], sp['compression_method'])
 
         return has_update, self.get_by_id(sp['id'])
 
@@ -459,7 +469,7 @@ class StoragePool(base_client.EntityRequest):
 
         :type storage_pool_id: str
         :type zero_padding_enabled: bool
-        :rtype: dict
+        :rtype: None
         """
 
         action = 'setZeroPaddingPolicy'
@@ -477,8 +487,6 @@ class StoragePool(base_client.EntityRequest):
                 f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
 
     def set_protected_maintenance_mode_io_priority_policy(
             self, storage_pool_id, policy, concurrent_ios_per_device, bw_limit_per_device):

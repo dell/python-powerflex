@@ -59,6 +59,12 @@ class StoragePoolSchema(base_client.BaseSchema):
             "updatable": False,
         }
     )
+    wrc_device_group_id = fields.Str(
+        metadata={
+            "description": "Device Group Id",
+            "updatable": False,
+        }
+    )
     gen_type = fields.Str(
         #required=True,  # 5.0.0 only supports EC type
         metadata={
@@ -116,6 +122,13 @@ class StoragePoolSchema(base_client.BaseSchema):
         metadata={
             "description": "Protection Scheme: TwoPlusTwo/EightPlusTwo",
             "updatable": False,
+        }
+    )
+    compression_method = fields.Str(
+        validate=validate.OneOf(["None", "Normal"]),
+        metadata={
+            "description": "Compression Method: None/Normal",
+            "updatable": True,
         }
     )
     zero_padding_enabled = fields.Boolean(
@@ -180,12 +193,15 @@ class StoragePool(base_client.EntityRequest):
         sp = load_storage_pool_schema(sp)
 
         params = {
-            "name": sp['name'],
             "protectionDomainId": sp['protection_domain_id'],
             "deviceGroupId": sp['device_group_id'],
             "gen": "EC",
-            # "zeroPaddingEnabled": zero_padding_enabled
         }
+
+        if "name" in sp:
+            params["name"] = sp["name"]
+        if "compression_method" in sp:
+            params["compressionMethod"] = sp["compression_method"]
 
         if sp["protection_scheme"] == "TwoPlusTwo":
             params["numDataSlices"] = 2
@@ -234,11 +250,11 @@ class StoragePool(base_client.EntityRequest):
             has_update = True
             self.set_fragmentation_enabled(sp['id'], sp['fragmentation_enabled'])
         
-        if sp['over_provisioning_factor'] != sp['over_provisioning_factor']:
+        if sp['over_provisioning_factor'] != current_sp['over_provisioning_factor']:
             has_update = True
             self.set_over_provisioning_factor(sp['id'], sp['over_provisioning_factor'])
 
-        if sp['physical_size_gb'] != sp['physical_size_gb']:
+        if sp['physical_size_gb'] != current_sp['physical_size_gb']:
             has_update = True
             self.resize(sp['id'], sp['physical_size_gb'])
 
@@ -323,9 +339,9 @@ class StoragePool(base_client.EntityRequest):
         :rtype: None
         """
 
-        action = 'setStoragePoolName'
+        action = 'renameStoragePool'
 
-        params = {"name": name}
+        params = {"newName": name}
         self._rename_entity(action, storage_pool_id, params)
 
     def set_capacity_alert_thresholds(self, storage_pool_id, high_threshold, critical_threshold):
@@ -437,8 +453,6 @@ class StoragePool(base_client.EntityRequest):
                 f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
 
     def set_zero_padding_policy(self, storage_pool_id, zero_padding_enabled):
         """Enable/disable zero padding for PowerFlex storage pool.

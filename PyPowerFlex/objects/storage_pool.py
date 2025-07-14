@@ -18,120 +18,231 @@
 # pylint: disable=too-few-public-methods,too-many-public-methods,no-member,too-many-arguments,too-many-positional-arguments,too-many-locals,cyclic-import,duplicate-code
 
 import logging
-
 import requests
 
-from PyPowerFlex import base_client
-from PyPowerFlex import exceptions
+from marshmallow import INCLUDE, fields, validate, validates_schema, ValidationError
+from PyPowerFlex import base_client, exceptions
 from PyPowerFlex.objects import Sds
+from PyPowerFlex.objects.protection_domain import ProtectionDomain
 
 
 LOG = logging.getLogger(__name__)
 
+def validate_over_provisioning_factor(value):
+    if value != 0 and (value < 100 or value > 10000):
+        raise ValidationError("Not an valid value.")
 
-class CompressionMethod:
-    """Storage pool compression methods."""
+class StoragePoolSchema(base_client.BaseSchema):
+    id = fields.Str(
+        metadata={
+            "description": "Storage Pool Id",
+        }
+    )
+    name = fields.Str(
+        allow_none=True,
+        metadata={
+            "description": "Storage Pool Name",
+            "updatable": True,
+        }
+    )
+    protection_domain_id = fields.Str(
+        required=True,
+        metadata={
+            "description": "Protection Domain Id",
+            "updatable": False,
+        }
+    )
+    device_group_id = fields.Str(
+        required=True,
+        metadata={
+            "description": "Device Group Id",
+            "updatable": False,
+        }
+    )
+    gen_type = fields.Str(
+        #required=True,  # 5.0.0 only supports EC type
+        metadata={
+            "description": "Gen Type, EC or MIRRORING",
+        }
+    )
+    capacity_alert_high_threshold = fields.Integer(
+        metadata={
+            "description": "Capacity Alert High Threshold, default: 80",
+            "updatable": True,
+        }
+    )
+    capacity_alert_critical_threshold = fields.Integer(
+        metadata={
+            "description": "Capacity Alert Critical Threshold, default: 90",
+            "updatable": True,
+        }
+    )
+    fragmentation_enabled = fields.Boolean(
+        metadata={
+            "description": "Enable Fragmentation, default: False",
+            "updatable": True,
+        }
+    )
+    over_provisioning_factor = fields.Integer(
+        load_default=0,
+        validate=validate.And(validate_over_provisioning_factor),
+        metadata={
+            "description": "Over Provisioning Factor, range: 100-10000, set 0 to disable over provisioning. Default: 0",
+        }
+    )
+    physical_size_gb = fields.Integer(
+        required=True,
+        data_key="physicalSizeGB",
+        metadata={
+            "description": "Physical Size in GB, set -1 to use all available capacity",
+            "updatable": True, # when update, only accept larger value
+        }
+    )
+    # num_data_slices = fields.Integer(
+    #     required=True,
+    #     metadata={
+    #         "description": "Number of Data Slices",
+    #     }
+    # )
+    # numProtectionSlices = fields.Integer(
+    #     required=True,
+    #     metadata={
+    #         "description": "Number of Protection Slices",
+    #     }
+    # )
+    protection_scheme = fields.Str(
+        required=True,
+        validate=validate.OneOf(["TwoPlusTwo", "EightPlusTwo"]),
+        metadata={
+            "description": "Protection Scheme: TwoPlusTwo/EightPlusTwo",
+            "updatable": False,
+        }
+    )
+    zero_padding_enabled = fields.Boolean(
+        metadata={
+            "description": "zero padding enabled",
+        }
+    )
 
-    invalid = 'Invalid'
-    none = 'None'
-    normal = 'Normal'
+    # @validates_schema
+    # def validate_capacity_alert_threshold(self, data, **kwargs):
+    #     if data["capacity_alert_high_threshold"] >= data["capacity_alert_critical_threshold"]:
+    #         raise ValidationError("capacity_alert_critical_threshold must be greater than capacity_alert_high_threshold")
+    
+    # class Meta:
+    #     unknown = INCLUDE
 
 
-class DataLayout:
-    """Storage pool data layouts."""
-
-    invalid = 'InvalidLayout'
-    medium = 'MediumGranularity'
-    fine = 'FineGranularity'
-
-
-class ExternalAccelerationType:
-    """Storage pool external acceleration types."""
-
-    none = 'None'
-    read = 'Read'
-    write = 'Write'
-    read_and_write = 'ReadAndWrite'
-
-
-class MediaType:
-    """Storage pool media types."""
-
-    hdd = 'HDD'
-    ssd = 'SSD'
-    transitional = 'Transitional'
-
-
-class RmcacheWriteHandlingMode:
-    """Rmcache write handling modes."""
-
-    passthrough = 'Passthrough'
-    cached = 'Cached'
+def load_storage_pool_schema(obj):
+    return StoragePoolSchema().load(obj)
 
 
 class StoragePool(base_client.EntityRequest):
     """
     A class representing Storage Pool client.
     """
-    def create(self,
-               media_type,
-               protection_domain_id,
-               checksum_enabled=None,
-               compression_method=None,
-               data_layout=None,
-               external_acceleration_type=None,
-               fgl_accp_id=None,
-               name=None,
-               rmcache_write_handling_mode=None,
-               spare_percentage=None,
-               use_rfcache=None,
-               use_rmcache=None,
-               zero_padding_enabled=None):
-        """Create PowerFlex storage pool.
+    def list(self):
+        """List PowerFlex storage pools.
 
-        :param media_type: one of predefined attributes of MediaType
-        :type media_type: str
-        :type protection_domain_id: str
-        :type checksum_enabled: bool
-        :param compression_method: one of predefined attributes of
-                                   CompressionMethod
-        :type compression_method: str
-        :param data_layout: one of predefined attributes of DataLayout
-        :type data_layout: str
-        :param external_acceleration_type: one of predefined attributes of
-                                           ExternalAccelerationType
-        :type external_acceleration_type: str
-        :type fgl_accp_id: str
-        :type name: str
-        :param rmcache_write_handling_mode: one of predefined attributes of
-                                            RmcacheWriteHandlingMode
-        :type spare_percentage: int
-        :type use_rfcache: bool
-        :type use_rmcache: bool
-        :type zero_padding_enabled: bool
+        :rtype: list[dict]
+        """
+        return list(map(load_storage_pool_schema, self.get()))
+
+    def get_by_id(self, id):
+        """Get PowerFlex storage pool.
+
+        :type id: str
         :rtype: dict
         """
+        return load_storage_pool_schema(self.get(entity_id=id))
 
-        if data_layout == DataLayout.fine and not fgl_accp_id:
-            msg = 'fgl_accp_id must be set for Fine Granular Storage Pool.'
-            raise exceptions.InvalidInput(msg)
+    def get_by_name(self, protion_domain_id, name):
+        """Get PowerFlex storage pool.
+
+        :type protection_domain_id: str
+        :type name: str
+        :rtype: dict
+        """
+        pdo = ProtectionDomain(self.token, self.configuration)
+        
+        result = pdo.get_storage_pools(protion_domain_id, filter_fields={'name': name})
+        if len(result) >= 1:
+            return load_storage_pool_schema(result[0])
+        else:
+            return None
+
+    def create(self, sp):
+        """Create PowerFlex storage pool.
+
+        :type sp: dict
+        :rtype: dict
+        """
+        sp = load_storage_pool_schema(sp)
+
         params = {
-            "mediaType": media_type,
-            "protectionDomainId": protection_domain_id,
-            "checksumEnabled": checksum_enabled,
-            "compressionMethod": compression_method,
-            "dataLayout": data_layout,
-            "externalAccelerationType": external_acceleration_type,
-            "fglAccpId": fgl_accp_id,
-            "name": name,
-            "rmcacheWriteHandlingMode": rmcache_write_handling_mode,
-            "sparePercentage": spare_percentage,
-            "useRfcache": use_rfcache,
-            "useRmcache": use_rmcache,
-            "zeroPaddingEnabled": zero_padding_enabled
+            "name": sp['name'],
+            "protectionDomainId": sp['protection_domain_id'],
+            "deviceGroupId": sp['device_group_id'],
+            "gen": "EC",
+            # "zeroPaddingEnabled": zero_padding_enabled
         }
 
-        return self._create_entity(params)
+        if sp["protection_scheme"] == "TwoPlusTwo":
+            params["numDataSlices"] = 2
+            params["numProtectionSlices"] = 2
+        else:
+            params["numDataSlices"] = 8
+            params["numProtectionSlices"] = 2
+
+        if sp["physical_size_gb"] == -1:
+            params["useAllAvailableCapacity"] = True
+        else:
+            params["physicalSizeGB"] = sp["physical_size_gb"]
+
+        new_sp = load_storage_pool_schema(self._create_entity(params))
+        sp['id'] = new_sp['id']
+        _, sp = self.update(StoragePoolSchema().dump(sp))
+
+        return sp
+
+    def update(self, sp):
+        """Update PowerFlex storage pool.
+
+        :type sp: dict
+        :rtype: dict
+        """
+        current_sp = self.get_by_id(sp['id'])
+        sp = load_storage_pool_schema({**StoragePoolSchema().dump(current_sp), **sp})
+
+        has_update = False
+
+        if sp['name'] != current_sp['name']:
+            has_update = True
+            self.rename(sp['id'], sp['name'])
+        
+        high_threshold = None
+        critical_threshold = None
+        if sp['capacity_alert_high_threshold'] != current_sp['capacity_alert_high_threshold']:
+            high_threshold = sp['capacity_alert_high_threshold']
+        if sp['capacity_alert_critical_threshold'] != current_sp['capacity_alert_critical_threshold']:
+            critical_threshold = sp['capacity_alert_critical_threshold']
+        if high_threshold or critical_threshold:
+            has_update = True
+            self.set_capacity_alert_thresholds(sp['id'], high_threshold, critical_threshold)
+
+        if sp['fragmentation_enabled'] != current_sp['fragmentation_enabled']:
+            has_update = True
+            self.set_fragmentation_enabled(sp['id'], sp['fragmentation_enabled'])
+        
+        if sp['over_provisioning_factor'] != sp['over_provisioning_factor']:
+            has_update = True
+            self.set_over_provisioning_factor(sp['id'], sp['over_provisioning_factor'])
+
+        if sp['physical_size_gb'] != sp['physical_size_gb']:
+            has_update = True
+            self.resize(sp['id'], sp['physical_size_gb'])
+
+        return has_update, self.get_by_id(sp['id'])
 
     def delete(self, storage_pool_id):
         """Remove PowerFlex storage pool.
@@ -209,25 +320,28 @@ class StoragePool(base_client.EntityRequest):
 
         :type storage_pool_id: str
         :type name: str
-        :rtype: dict
+        :rtype: None
         """
 
         action = 'setStoragePoolName'
 
         params = {"name": name}
-        return self._rename_entity(action, storage_pool_id, params)
+        self._rename_entity(action, storage_pool_id, params)
 
-    def set_checksum_enabled(self, storage_pool_id, checksum_enabled):
-        """Enable/disable checksum for PowerFlex storage pool.
+    def set_capacity_alert_thresholds(self, storage_pool_id, high_threshold, critical_threshold):
+        """Set the capacity alert thresholds for the specified Storage Pool.
 
-        :type storage_pool_id: str
-        :type checksum_enabled: bool
-        :rtype: dict
+        :type high_threshold: int
+        :type critical_threshold: int
+        :rtype: None
         """
 
-        action = 'setChecksumEnabled'
+        action = 'setCapacityAlertThresholds'
 
-        params = {"checksumEnabled": checksum_enabled}
+        params = {
+            "capacityAlertHighThresholdPercent": high_threshold,
+            "capacityAlertCriticalThresholdPercent": critical_threshold
+        }
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
@@ -236,12 +350,67 @@ class StoragePool(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = (
-                f'Failed to enable/disable checksum for PowerFlex {self.entity} '
+                f'Failed to set the capacity alert thresholds for PowerFlex {self.entity}'
                 f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-        return self.get(entity_id=storage_pool_id)
+    def set_over_provisioning_factor(self, storage_pool_id, over_provisioning_factor):
+        """Set the over provisioning factor for PowerFlex storage pool.
+
+        :type storage_pool_id: str
+        :type over_provisioning_factor: int
+        :rtype: None
+        """
+
+        action = 'setOverProvisioningFactor'
+
+        params = {
+            "overProvisioningFactor": over_provisioning_factor
+        }
+
+        r, response = self.send_post_request(self.base_action_url,
+                                        action=action,
+                                        entity=self.entity,
+                                        entity_id=storage_pool_id,
+                                        params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (
+                f'Failed to set the over provisioning factor for PowerFlex {self.entity}'
+                f' with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+    def resize(self, storage_pool_id, size_in_gb):
+        """Set the size for PowerFlex storage pool.
+
+        :type storage_pool_id: str
+        :type size: int
+        :rtype: None
+        """
+
+        action = 'modifyStoragePoolSize'
+
+        params = {
+            "physicalSizeGB": size_in_gb
+        }
+
+        if size_in_gb == -1:
+            params = {
+                "useAllAvailableCapacity": True
+            }
+
+        r, response = self.send_post_request(self.base_action_url,
+                                        action=action,
+                                        entity=self.entity,
+                                        entity_id=storage_pool_id,
+                                        params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (
+                f'Failed to modify the size for PowerFlex {self.entity}'
+                f' with id {storage_pool_id}. Error: {response}')
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
 
     def set_compression_method(self, storage_pool_id, compression_method):
         """Set compression method for PowerFlex storage pool.
@@ -271,218 +440,6 @@ class StoragePool(base_client.EntityRequest):
 
         return self.get(entity_id=storage_pool_id)
 
-    def set_external_acceleration_type(
-            self,
-            storage_pool_id,
-            external_acceleration_type,
-            override_device_configuration=None,
-            keep_device_ext_acceleration=None
-    ):
-        """Set external acceleration type for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :param external_acceleration_type: one of predefined attributes of
-                                           ExternalAccelerationType
-        :type external_acceleration_type: str
-        :type override_device_configuration: bool
-        :type keep_device_ext_acceleration: bool
-        :rtype: dict
-        """
-
-        action = 'setExternalAccelerationType'
-
-        if all([override_device_configuration, keep_device_ext_acceleration]):
-            msg = ('Either override_device_configuration or '
-                   'keep_device_specific_external_acceleration can be set.')
-            raise exceptions.InvalidInput(msg)
-        params = {
-            "externalAccelerationType": external_acceleration_type,
-            "overrideDeviceConfiguration": override_device_configuration,
-            "keepDeviceSpecificExternalAcceleration": keep_device_ext_acceleration
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (f'Failed to set external acceleration type for PowerFlex '
-                   f'{self.entity} with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_media_type(self,
-                       storage_pool_id,
-                       media_type,
-                       override_device_configuration=None):
-        """Set media type for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :param media_type: one of predefined attributes of MediaType
-        :type media_type: str
-        :type override_device_configuration: bool
-        :rtype: dict
-        """
-
-        action = 'setMediaType'
-
-        params = {
-            "mediaType": media_type,
-            "overrideDeviceConfiguration": override_device_configuration
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (f'Failed to set media type for PowerFlex {self.entity} '
-                   f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_rebalance_enabled(self, storage_pool_id, rebalance_enabled):
-        """Enable/disable rebalance for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :type rebalance_enabled: str
-        :rtype: dict
-        """
-
-        action = 'setRebalanceEnabled'
-
-        params = {
-            "rebalanceEnabled": rebalance_enabled
-        }
-
-        r, _ = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to enable/disable rebalance for PowerFlex {self.entity}'
-                ' with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_rebuild_enabled(self, storage_pool_id, rebuild_enabled):
-        """Enable/disable rebuild for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :type rebuild_enabled: bool
-        :rtype: dict
-        """
-
-        action = 'setRebuildEnabled'
-
-        params = {
-            "rebuildEnabled": rebuild_enabled
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to enable/disable rebuild for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_spare_percentage(self, storage_pool_id, spare_percentage):
-        """Set spare percentage for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :type spare_percentage: int
-        :rtype: dict
-        """
-
-        action = 'setSparePercentage'
-
-        params = {
-            "sparePercentage": spare_percentage
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set spare percentage for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_use_rfcache(self, storage_pool_id, use_rfcache):
-        """Enable/disable Rfcache usage for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :type use_rfcache: boold
-        :rtype: dict
-        """
-
-        action = 'disableRfcache'
-        if use_rfcache:
-            action = 'enableRfcache'
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id)
-        if r.status_code != requests.codes.ok:
-            msg = (f'Failed to set Rfcache usage for PowerFlex {self.entity} '
-                   f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_use_rmcache(self, storage_pool_id, use_rmcache):
-        """Enable/disable Rmcache usage for PowerFlex storage pool.
-
-        :type storage_pool_id: str
-        :type use_rmcache: boold
-        :rtype: dict
-        """
-
-        action = 'setUseRmcache'
-
-        params = {
-            "useRmcache": use_rmcache
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (f'Failed to set Rmcache usage for PowerFlex {self.entity} '
-                   f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
     def set_zero_padding_policy(self, storage_pool_id, zero_padding_enabled):
         """Enable/disable zero padding for PowerFlex storage pool.
 
@@ -503,68 +460,6 @@ class StoragePool(base_client.EntityRequest):
         if r.status_code != requests.codes.ok:
             msg = (
                 f'Failed to set Zero Padding policy for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_rep_cap_max_ratio(self, storage_pool_id, rep_cap_max_ratio):
-        """Set the replication journal capacity ratio on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type rep_cap_max_ratio: bool
-        :rtype: dict
-        """
-
-        action = 'setReplicationJournalCapacity'
-
-        params = {
-            "replicationJournalCapacityMaxRatio": rep_cap_max_ratio
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set the replication journal capacity ratio for PowerFlex {self.entity}'
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_cap_alert_thresholds(
-            self,
-            storage_pool_id,
-            cap_alert_high_threshold,
-            cap_alert_critical_threshold):
-        """Set the capacity alert thresholds on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type cap_alert_high_threshold: str
-        :type cap_alert_critical_threshold: str
-        :rtype: dict
-        """
-
-        action = 'setCapacityAlertThresholds'
-
-        params = {
-            "capacityAlertHighThresholdPercent": cap_alert_high_threshold,
-            "capacityAlertCriticalThresholdPercent": cap_alert_critical_threshold
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set the capacity alert thresholds for PowerFlex {self.entity}'
                 f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -679,132 +574,6 @@ class StoragePool(base_client.EntityRequest):
 
         return self.get(entity_id=storage_pool_id)
 
-    def set_rmcache_write_handling_mode(
-            self, storage_pool_id, rmcache_write_handling_mode):
-        """Set the RM cache write handling mode on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type rmcache_write_handling_mode: str
-        :rtype: dict
-        """
-
-        action = 'setRmcacheWriteHandlingMode'
-
-        params = {
-            'rmcacheWriteHandlingMode': rmcache_write_handling_mode
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set the RM cache write handling mode for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_rebuild_rebalance_parallelism_limit(
-            self, storage_pool_id, no_of_parallel_rebuild_rebalance_jobs_per_device):
-        """Set the rebuild rebalance parallelism limit  on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type no_of_parallel_rebuild_rebalance_jobs_per_device: str
-        :rtype: dict
-        """
-
-        action = 'setRebuildRebalanceParallelism'
-
-        params = {
-            "limit": no_of_parallel_rebuild_rebalance_jobs_per_device
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set rebuild rebalance parallelism limit for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_persistent_checksum(
-            self,
-            storage_pool_id,
-            enable,
-            validate,
-            builder_limit):
-        """Set the persistent_checksum on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type enable: bool
-        :type validate: bool
-        :type builder_limit: str
-        :rtype: dict
-        """
-
-        action = 'disablePersistentChecksum'
-        params = None
-        if enable is True:
-            action = 'enablePersistentChecksum'
-            params = {"validateOnRead": validate, "builderLimitInKb": builder_limit}
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set the persistent checksum for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def modify_persistent_checksum(
-            self,
-            storage_pool_id,
-            validate,
-            builder_limit):
-        """Modify the persistent_checksum on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type validate: bool
-        :type builder_limit: str
-        :rtype: dict
-        """
-
-        action = 'modifyPersistentChecksum'
-        params = {
-            "validateOnRead": validate,
-            "builderLimitInKb": builder_limit
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to modify the persistent checksum for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
     def set_fragmentation_enabled(self, storage_pool_id, enable_fragmentation):
         """Enable/Disable the fragmentation on the specified Storage Pool.
 
@@ -827,8 +596,6 @@ class StoragePool(base_client.EntityRequest):
                 f'with id {storage_pool_id}. Error: {response}')
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
 
     def query_selected_statistics(self, properties, ids=None):
         """Query PowerFlex storage pool statistics.

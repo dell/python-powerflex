@@ -18,10 +18,10 @@
 # pylint: disable=no-member,import-error,broad-exception-raised
 
 import logging
-
 import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from marshmallow import EXCLUDE, INCLUDE, Schema
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
 
@@ -446,7 +446,7 @@ class EntityRequest(Request):
             params (dict, optional): Parameters for the entity.
 
         Returns:
-            dict: The renamed entity.
+            None.
 
         Raises:
             PowerFlexFailRenaming: If the entity fails to be renamed.
@@ -461,8 +461,6 @@ class EntityRequest(Request):
                                                    response)
             LOG.error(exc.message)
             raise exc
-
-        return self.get(entity_id=entity_id)
 
     def get(self, entity_id=None, filter_fields=None, fields=None):
         """
@@ -606,3 +604,15 @@ class EntityRequest(Request):
             LOG.error(exc.message)
             raise exc
         return response
+
+def camelcase(s):
+    parts = iter(s.split("_"))
+    return next(parts) + "".join(i.title() for i in parts)
+
+
+class BaseSchema(Schema):
+    def on_bind_field(self, field_name, field_obj):
+        field_obj.data_key = camelcase(field_obj.data_key or field_name)
+
+    class Meta:
+        unknown = EXCLUDE

@@ -16,6 +16,7 @@
 """This module contains the objects for interacting with the PowerFlex APIs."""
 
 from PyPowerFlex.objects.device import Device
+from PyPowerFlex.objects.device_group import DeviceGroup
 from PyPowerFlex.objects.fault_set import FaultSet
 from PyPowerFlex.objects.protection_domain import ProtectionDomain
 from PyPowerFlex.objects.sdc import Sdc
@@ -38,6 +39,7 @@ from PyPowerFlex.objects.host import Host
 
 __all__ = [
     'Device',
+    'DeviceGroup',
     'FaultSet',
     'ProtectionDomain',
     'Sdc',

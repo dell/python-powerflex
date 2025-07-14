@@ -43,6 +43,7 @@ class PowerFlexClient:
         'configuration',
         'token',
         'device',
+        'device_group',
         'fault_set',
         'protection_domain',
         'sdc',
@@ -100,6 +101,7 @@ class PowerFlexClient:
         """
         self.configuration.validate()
         self.__add_storage_entity('device', objects.Device)
+        self.__add_storage_entity('device_group', objects.DeviceGroup)
         self.__add_storage_entity('fault_set', objects.FaultSet)
         self.__add_storage_entity('protection_domain',
                                   objects.ProtectionDomain)

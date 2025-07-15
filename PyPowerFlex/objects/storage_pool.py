@@ -235,6 +235,19 @@ class StoragePool(base_client.EntityRequest):
         current_sp = self.get_by_id(sp['id'])
         sp = load_storage_pool_schema({**StoragePoolSchema().dump(current_sp), **sp})
 
+        if sp['protection_domain_id'] != current_sp['protection_domain_id']:
+            e = exceptions.nonupdatable_exception("protection_domain_id", self.entity, sp['id'])
+            LOG.error(e.message)
+            raise e
+        if sp['device_group_id'] != current_sp['device_group_id']:
+            e = exceptions.nonupdatable_exception("device_group_id", self.entity, sp['id'])
+            LOG.error(e.message)
+            raise e
+        if sp['protection_scheme'] != current_sp['protection_scheme']:
+            e = exceptions.nonupdatable_exception("protection_scheme", self.entity, sp['id'])
+            LOG.error(e.message)
+            raise e
+
         has_update = False
 
         if sp['name'] != current_sp['name']:

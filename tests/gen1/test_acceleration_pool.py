@@ -13,16 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Module for testing accelaration pool client."""
+"""Module for testing acceleration pool client."""
 
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects import acceleration_pool
-import tests
+from PyPowerFlex.gen1.objects import acceleration_pool
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestAccelerationPoolClient(tests.PyPowerFlexTestCase):
+class TestAccelerationPoolClient(PyPowerFlexTestCase):
     """
     Test class for the AccelerationPoolClient.
     """

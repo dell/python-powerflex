@@ -17,11 +17,11 @@
 
 # pylint: disable=import-error
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='PyPowerFlex',
-    version='1.14.1',
+    version='1.15.0',
     description='Python library for Dell PowerFlex',
     author='Ansible Team at Dell',
     author_email='ansible.team@dell.com',
@@ -33,7 +33,8 @@ setup(
     classifiers=['License :: OSI Approved :: Apache Software License'],
     packages=[
         'PyPowerFlex',
-        'PyPowerFlex.objects',
+        'PyPowerFlex.gen1',
+        'PyPowerFlex.gen2',
     ],
     python_requires='>=3.5'
 )

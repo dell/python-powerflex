@@ -18,11 +18,11 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects import sdt
-import tests
+from PyPowerFlex.gen1.objects import sdt
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestSdtClient(tests.PyPowerFlexTestCase):
+class TestSdtClient(PyPowerFlexTestCase):
     """
     Tests for the SdtClient class.
     """

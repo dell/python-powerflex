@@ -18,10 +18,10 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-import tests
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestReplicationConsistencyGroupClient(tests.PyPowerFlexTestCase):
+class TestReplicationConsistencyGroupClient(PyPowerFlexTestCase):
     """
     Tests for the ReplicationConsistencyGroupClient.
     """

@@ -18,11 +18,11 @@
 # pylint: disable=invalid-name,too-many-public-methods,duplicate-code
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects import protection_domain
-import tests
+from PyPowerFlex.gen1.objects import protection_domain
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestProtectionDomainClient(tests.PyPowerFlexTestCase):
+class TestProtectionDomainClient(PyPowerFlexTestCase):
     """
     Test class for the ProtectionDomainClient.
     """

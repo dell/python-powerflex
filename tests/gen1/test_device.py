@@ -18,11 +18,11 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects.device import MediaType
-import tests
+from PyPowerFlex.gen1.objects.device import MediaType
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestDeviceClient(tests.PyPowerFlexTestCase):
+class TestDeviceClient(PyPowerFlexTestCase):
     """
     Test class for DeviceClient.
     """

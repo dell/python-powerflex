@@ -18,10 +18,10 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-import tests
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestManagedDeviceClient(tests.PyPowerFlexTestCase):
+class TestManagedDeviceClient(PyPowerFlexTestCase):
     """
     Test class for the ManagedDeviceClient.
     """

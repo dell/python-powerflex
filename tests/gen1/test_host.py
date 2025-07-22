@@ -18,10 +18,10 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-import tests
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestHostClient(tests.PyPowerFlexTestCase):
+class TestHostClient(PyPowerFlexTestCase):
     """
     Tests for the HostClient class.
     """

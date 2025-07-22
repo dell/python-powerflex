@@ -18,10 +18,10 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-import tests
+from tests.gen1 import PyPowerFlexTestCase
 
 
-class TestReplicationPairClient(tests.PyPowerFlexTestCase):
+class TestReplicationPairClient(PyPowerFlexTestCase):
     """
     Test class for the ReplicationPairClient.
     """

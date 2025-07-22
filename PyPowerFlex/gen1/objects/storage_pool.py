@@ -23,7 +23,7 @@ import requests
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects import Sds
+from PyPowerFlex.gen1.objects import Sds
 
 
 LOG = logging.getLogger(__name__)

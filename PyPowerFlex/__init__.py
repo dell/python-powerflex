@@ -21,10 +21,10 @@ from packaging import version
 
 from PyPowerFlex import configuration
 from PyPowerFlex import exceptions
-from PyPowerFlex import objects
 from PyPowerFlex import token
 from PyPowerFlex import utils
-
+import PyPowerFlex.gen1.objects as gen1
+import PyPowerFlex.gen2.objects as gen2
 
 __all__ = [
     'PowerFlexClient'
@@ -39,6 +39,7 @@ class PowerFlexClient:
     access to the various storage entities available in the PowerFlex system.
     """
     __slots__ = (
+        # gen1
         '__is_initialized',
         'configuration',
         'token',
@@ -60,7 +61,9 @@ class PowerFlexClient:
         'managed_device',
         'deployment',
         'firmware_repository',
-        'host'
+        'host',
+        # gen2
+        'storage_node',
     )
 
     def __init__(self,
@@ -98,36 +101,52 @@ class PowerFlexClient:
         Raises:
             PowerFlexClientException: If the PowerFlex API version is lower than 3.0.
         """
+        # unchanged resources here
+        self.__add_storage_entity('system', gen1.System)
+        self.__add_storage_entity('sdc', gen1.Sdc)
+        self.__add_storage_entity('sdt', gen1.Sdt)
         self.configuration.validate()
-        self.__add_storage_entity('device', objects.Device)
-        self.__add_storage_entity('fault_set', objects.FaultSet)
-        self.__add_storage_entity('protection_domain',
-                                  objects.ProtectionDomain)
-        self.__add_storage_entity('sdc', objects.Sdc)
-        self.__add_storage_entity('sds', objects.Sds)
-        self.__add_storage_entity('sdt', objects.Sdt)
-        self.__add_storage_entity('snapshot_policy', objects.SnapshotPolicy)
-        self.__add_storage_entity('storage_pool', objects.StoragePool)
-        self.__add_storage_entity('acceleration_pool',
-                                  objects.AccelerationPool)
-        self.__add_storage_entity('system', objects.System)
-        self.__add_storage_entity('volume', objects.Volume)
-        self.__add_storage_entity('utility', objects.PowerFlexUtility)
-        self.__add_storage_entity(
-            'replication_consistency_group',
-            objects.ReplicationConsistencyGroup)
-        self.__add_storage_entity('replication_pair', objects.ReplicationPair)
-        self.__add_storage_entity('service_template', objects.ServiceTemplate)
-        self.__add_storage_entity('managed_device', objects.ManagedDevice)
-        self.__add_storage_entity('deployment', objects.Deployment)
-        self.__add_storage_entity(
-            'firmware_repository',
-            objects.FirmwareRepository)
-        self.__add_storage_entity('host', objects.Host)
+
         utils.init_logger(self.configuration.log_level)
         if version.parse(self.system.api_version()) < version.Version('3.0'):
             raise exceptions.PowerFlexClientException(
                 'PowerFlex (VxFlex OS) versions lower than '
                 '3.0 are not supported.'
             )
+
+        if version.parse(self.system.api_version()) > version.Version('3.0') and \
+           version.parse(self.system.api_version()) < version.Version('5.0'):
+            self.add_objects_gen1()
+        elif version.parse(self.system.api_version()) > version.Version('5.0'):
+            self.add_objects_gen2()
         self.__is_initialized = True
+
+    def add_objects_gen1(self):
+        self.__add_storage_entity('device', gen1.Device)
+        self.__add_storage_entity(
+            'fault_set', gen1.FaultSet)
+        self.__add_storage_entity('protection_domain',
+                                  gen1.ProtectionDomain)
+        self.__add_storage_entity('sds', gen1.Sds)
+        self.__add_storage_entity(
+            'snapshot_policy', gen1.SnapshotPolicy)
+        self.__add_storage_entity('storage_pool', gen1.StoragePool)
+        self.__add_storage_entity('acceleration_pool',
+                                  gen1.AccelerationPool)
+        self.__add_storage_entity('volume', gen1.Volume)
+        self.__add_storage_entity('utility', gen1.PowerFlexUtility)
+        self.__add_storage_entity(
+            'replication_consistency_group',
+            gen1.ReplicationConsistencyGroup)
+        self.__add_storage_entity('replication_pair', gen1.ReplicationPair)
+        self.__add_storage_entity('service_template', gen1.ServiceTemplate)
+        self.__add_storage_entity('managed_device', gen1.ManagedDevice)
+        self.__add_storage_entity('deployment', gen1.Deployment)
+        self.__add_storage_entity(
+            'firmware_repository',
+            gen1.FirmwareRepository)
+        self.__add_storage_entity('host', gen1.Host)
+
+    def add_objects_gen2(self):
+        self.__add_storage_entity('storage_node', gen2.StorageNode)
+        # self.__add_storage_entity('volume', gen2.Volume)

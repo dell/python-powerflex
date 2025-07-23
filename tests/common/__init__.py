@@ -36,7 +36,6 @@ class MockResponse(requests.Response):
 
     Defines http replies from mocked calls to do_request().
     """
-
     def __init__(self, content, status_code=200):
         """
         Initialize a MockResponse.
@@ -81,6 +80,17 @@ class PyPowerFlexTestCase(TestCase):
 
     Provides a mocked HTTP response for testing.
     """
+    VERSION_API_PATH = '/version'
+
+    @classmethod
+    def version(cls, new_version):
+        def decorator(subclass):
+            cls.DEFAULT_MOCK_RESPONSES[
+                PyPowerFlexTestCase.RESPONSE_MODE.Valid
+            ][cls.VERSION_API_PATH] = new_version
+            return subclass
+        return decorator
+
     RESPONSE_MODE = (
         collections.namedtuple('RESPONSE_MODE', 'Valid Invalid BadStatus')
         (Valid='Valid', Invalid='Invalid', BadStatus='BadStatus')
@@ -95,11 +105,11 @@ class PyPowerFlexTestCase(TestCase):
     DEFAULT_MOCK_RESPONSES = {
         RESPONSE_MODE.Valid: {
             '/login': 'token',
-            '/version': '5.0',
+            VERSION_API_PATH: '3.5',
             '/logout': '',
         },
         RESPONSE_MODE.Invalid: {
-            '/version': '2.5',
+            VERSION_API_PATH: '2.5',
         },
         RESPONSE_MODE.BadStatus: {
             '/login': MockResponse(
@@ -193,8 +203,7 @@ class PyPowerFlexTestCase(TestCase):
         if mode is None:
             mode = self.__http_response_mode
 
-        api_path = url.split(
-            '/api')[1] if ('/api' in url) else request_url.split('/api')[1]
+        api_path = url.split('/api')[1] if ('/api' in url) else request_url.split('/api')[1]
         try:
             if api_path == "/login":
                 response = self.RESPONSE_MODE.Valid[0]

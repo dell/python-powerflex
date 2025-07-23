@@ -17,7 +17,7 @@
 
 # pylint: disable=import-error
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='PyPowerFlex',
@@ -33,8 +33,8 @@ setup(
     classifiers=['License :: OSI Approved :: Apache Software License'],
     packages=[
         'PyPowerFlex',
-        'PyPowerFlex.gen1',
-        'PyPowerFlex.gen2',
+        'PyPowerFlex.objects.gen1',
+        'PyPowerFlex.objects.gen2',
     ],
     python_requires='>=3.5'
 )

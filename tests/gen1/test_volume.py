@@ -18,9 +18,8 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.gen1.objects import volume
-# import tests
-from tests.gen1 import PyPowerFlexTestCase
+from PyPowerFlex.objects.gen1 import volume
+from tests.common import PyPowerFlexTestCase
 
 class TestVolumeClient(PyPowerFlexTestCase):
     """

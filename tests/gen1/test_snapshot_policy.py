@@ -18,8 +18,8 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.gen1.objects import snapshot_policy as sp
-from tests.gen1 import PyPowerFlexTestCase
+from PyPowerFlex.objects.gen1 import snapshot_policy as sp
+from tests.common import PyPowerFlexTestCase
 
 
 class TestSnapshotPolicyClient(PyPowerFlexTestCase):

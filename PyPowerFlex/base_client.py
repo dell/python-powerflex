@@ -373,6 +373,7 @@ class EntityRequest(Request):
     base_type_special_action_url = '/types/{entity}/instances/action/{action}'
     query_mdm_cluster_url = '/instances/{entity}/queryMdmCluster'
     list_statistics_url = '/types/{entity}/instances/action/{action}'
+    metrics_query_url = '/dtapi/rest/v1/metrics/query'
     service_template_url = '/V1/ServiceTemplate'
     managed_device_url = '/V1/ManagedDevice'
     deployment_url = '/V1/Deployment'

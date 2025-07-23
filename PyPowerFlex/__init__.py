@@ -23,8 +23,9 @@ from PyPowerFlex import configuration
 from PyPowerFlex import exceptions
 from PyPowerFlex import token
 from PyPowerFlex import utils
-import PyPowerFlex.gen1.objects as gen1
-import PyPowerFlex.gen2.objects as gen2
+import PyPowerFlex.objects.common as common
+import PyPowerFlex.objects.gen1 as gen1
+import PyPowerFlex.objects.gen2 as gen2
 
 __all__ = [
     'PowerFlexClient'
@@ -101,10 +102,8 @@ class PowerFlexClient:
         Raises:
             PowerFlexClientException: If the PowerFlex API version is lower than 3.0.
         """
-        # unchanged resources here
-        self.__add_storage_entity('system', gen1.System)
-        self.__add_storage_entity('sdc', gen1.Sdc)
-        self.__add_storage_entity('sdt', gen1.Sdt)
+        # common objects here
+        self.add_objects_common()
         self.configuration.validate()
 
         utils.init_logger(self.configuration.log_level)
@@ -117,9 +116,15 @@ class PowerFlexClient:
         if version.parse(self.system.api_version()) > version.Version('3.0') and \
            version.parse(self.system.api_version()) < version.Version('5.0'):
             self.add_objects_gen1()
-        elif version.parse(self.system.api_version()) > version.Version('5.0'):
+        elif version.parse(self.system.api_version()) >= version.Version('5.0'):
             self.add_objects_gen2()
         self.__is_initialized = True
+
+    def add_objects_common(self):
+        self.__add_storage_entity('system', common.System)
+        self.__add_storage_entity('sdc', common.Sdc)
+        self.__add_storage_entity('sdt', common.Sdt)
+        self.__add_storage_entity('host', common.Host)
 
     def add_objects_gen1(self):
         self.__add_storage_entity('device', gen1.Device)
@@ -145,8 +150,7 @@ class PowerFlexClient:
         self.__add_storage_entity(
             'firmware_repository',
             gen1.FirmwareRepository)
-        self.__add_storage_entity('host', gen1.Host)
 
     def add_objects_gen2(self):
         self.__add_storage_entity('storage_node', gen2.StorageNode)
-        # self.__add_storage_entity('volume', gen2.Volume)
+        self.__add_storage_entity('utility', gen2.PowerFlexUtility)

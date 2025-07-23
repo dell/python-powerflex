@@ -15,18 +15,14 @@
 
 """This module contains the objects for interacting with the PowerFlex APIs."""
 
-from PyPowerFlex.gen2.objects.sdc import Sdc
-from PyPowerFlex.gen2.objects.sdt import Sdt
-from PyPowerFlex.gen2.objects.storage_node import StorageNode
-from PyPowerFlex.gen2.objects.system import System
-from PyPowerFlex.gen2.objects.volume import Volume
-from PyPowerFlex.gen2.objects.utility import PowerFlexUtility
+from PyPowerFlex.objects.common.system import System
+from PyPowerFlex.objects.common.host import Host
+from PyPowerFlex.objects.common.sdc import Sdc
+from PyPowerFlex.objects.common.sdt import Sdt
 
 __all__ = [
     'Sdc',
     'Sdt',
-    'StorageNode',
     'System',
-    'Volume',
-    'PowerFlexUtility',
+    'Host',
 ]

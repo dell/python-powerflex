@@ -18,10 +18,11 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.gen2.objects import storage_node
-from tests.gen1 import PyPowerFlexTestCase
+from PyPowerFlex.objects.gen2 import storage_node
+from tests.common import PyPowerFlexTestCase
 
 
+@PyPowerFlexTestCase.version('5.0')
 class TestStorageNodeClient(PyPowerFlexTestCase):
     """
     Tests for the StorageNodeClient class.
@@ -41,273 +42,265 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
                 f'/types/{storage_node.StorageNode.entity}/instances':
-                    {'id': self.fake_sds_id},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}':
-                    {'id': self.fake_sds_id},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/addIp':
+                    {'id': self.fake_node_id},
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}':
+                    {'id': self.fake_node_id},
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/addIp':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/removeSds':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/removestorage_node':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/relationships/Device':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/relationships/Device':
                     [],
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/setSdsName':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodeName':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/removeSdsIp':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/removestorage_nodeIp':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/setSdsIpRole':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodeIpRole':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/setSdsPort':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodePort':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/enableRfcache':
-                    {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/disableRfcache':
-                    {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/setSdsRmcacheEnabled':
-                    {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/setSdsRmcacheSize':
-                    {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_sds_id}/action/setSdsPerformanceParameters':
+                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodePerformanceParameters':
                     {},
                 f'/types/{storage_node.StorageNode.entity}'
                 '/instances/action/querySelectedStatistics': {
-                    self.fake_sds_id: {'rfcacheFdReadTimeGreater5Sec': 0}
+                    self.fake_node_id: {'rfcacheFdReadTimeGreater5Sec': 0}
                         },
             },
             self.RESPONSE_MODE.Invalid: {
-                '/types/Sds/instances':
+                f'/types/{storage_node.StorageNode.entity}/instances':
                     {},
             }
         }
 
-    def test_sds_add_ip(self):
+    def test_storage_node_add_ip(self):
         """
-        Test the add_ip method of the SdsClient.
+        Test the add_ip method of the storage_node client.
         """
-        self.client.sds.add_ip(self.fake_sds_id, self.fake_sds_ips[0])
+        self.client.storage_node.add_ip(self.fake_node_id, self.fake_node_ips[0])
 
-    def test_sds_add_ip_bad_status(self):
+    def test_storage_node_add_ip_bad_status(self):
         """
-        Test the add_ip method of the SdsClient with a bad status.
+        Test the add_ip method of the storage_node client with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.add_ip,
-                              self.fake_sds_id,
-                              self.fake_sds_ips[0])
+                              self.client.storage_node.add_ip,
+                              self.fake_node_id,
+                              self.fake_node_ips[0])
 
-    def test_sds_create(self):
+    def test_storage_node_create(self):
         """
-        Test the create method of the SdsClient.
+        Test the create method of the storage_node client.
         """
-        self.client.sds.create(protection_domain_id=self.fake_pd_id,
-                               sds_ips=self.fake_sds_ips)
+        self.client.storage_node.create(protection_domain_id=self.fake_pd_id,
+                               storage_node_ips=self.fake_node_ips)
 
-    def test_sds_create_bad_status(self):
+    def test_storage_node_create_bad_status(self):
         """
-        Test the create method of the SdsClient with a bad status.
+        Test the create method of the storage_node client with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailCreating,
-                              self.client.sds.create,
+                              self.client.storage_node.create,
                               protection_domain_id=self.fake_pd_id,
-                              sds_ips=self.fake_sds_ips)
+                              storage_node_ips=self.fake_node_ips)
 
-    def test_sds_create_no_id_in_response(self):
+    def test_storage_node_create_no_id_in_response(self):
         """
-        Test the create method of the SdsClient with no ID in the response.
+        Test the create method of the storage_node client with no ID in the response.
         """
         with self.http_response_mode(self.RESPONSE_MODE.Invalid):
             self.assertRaises(KeyError,
-                              self.client.sds.create,
+                              self.client.storage_node.create,
                               protection_domain_id=self.fake_pd_id,
-                              sds_ips=self.fake_sds_ips)
+                              storage_node_ips=self.fake_node_ips)
 
-    def test_sds_delete(self):
+    def test_storage_node_delete(self):
         """
-        Test the delete method of the SdsClient.
+        Test the delete method of the storage_node client.
         """
-        self.client.sds.delete(self.fake_sds_id)
+        self.client.storage_node.delete(self.fake_node_id)
 
-    def test_sds_delete_bad_status(self):
+    def test_storage_node_delete_bad_status(self):
         """
-        Test the delete method of the SdsClient with a bad status.
+        Test the delete method of the storage_node client with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
-                              self.client.sds.delete,
-                              self.fake_sds_id)
+                              self.client.storage_node.delete,
+                              self.fake_node_id)
 
-    def test_sds_get_devices(self):
+    def test_storage_node_get_devices(self):
         """
-        Test the get_devices method of the SdsClient.
+        Test the get_devices method of the storage_node client.
         """
-        self.client.sds.get_devices(self.fake_sds_id)
+        self.client.storage_node.get_devices(self.fake_node_id)
 
-    def test_sds_get_devices_bad_status(self):
+    def test_storage_node_get_devices_bad_status(self):
         """
-        Test the get_devices method of the SdsClient with a bad status.
+        Test the get_devices method of the storage_node client with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.get_devices,
-                              self.fake_sds_id)
+                              self.client.storage_node.get_devices,
+                              self.fake_node_id)
 
-    def test_sds_rename(self):
+    def test_storage_node_rename(self):
         """
-        Test the rename method of the SdsClient.
+        Test the rename method of the storage_node client.
         """
-        self.client.sds.rename(self.fake_sds_id, name='new_name')
+        self.client.storage_node.rename(self.fake_node_id, name='new_name')
 
-    def test_sds_rename_bad_status(self):
+    def test_storage_node_rename_bad_status(self):
         """
-        Test the rename method of the SdsClient with a bad status.
+        Test the rename method of the storage_node client with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailRenaming,
-                              self.client.sds.rename,
-                              self.fake_sds_id,
+                              self.client.storage_node.rename,
+                              self.fake_node_id,
                               name='new_name')
 
-    def test_sds_remove_ip(self):
+    def test_storage_node_remove_ip(self):
         """
-        Test the remove_ip method of the SdsClient.
+        Test the remove_ip method of the storage_node client.
         """
-        self.client.sds.remove_ip(self.fake_sds_id, ip='1.2.3.4')
+        self.client.storage_node.remove_ip(self.fake_node_id, ip='1.2.3.4')
 
-    def test_sds_remove_ip_bad_status(self):
+    def test_storage_node_remove_ip_bad_status(self):
         """
-        Test the remove_ip method of the SdsClient with a bad status.
+        Test the remove_ip method of the storage_node client with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.remove_ip,
-                              self.fake_sds_id,
+                              self.client.storage_node.remove_ip,
+                              self.fake_node_id,
                               ip='1.2.3.4')
 
-    def test_sds_set_ip_role(self):
+    def test_storage_node_set_ip_role(self):
         """
         Test the set_ip_role method.
         """
-        self.client.sds.set_ip_role(self.fake_sds_id,
+        self.client.storage_node.set_ip_role(self.fake_node_id,
                                     ip='1.2.3.4',
-                                    role=sds.SdsIpRoles.sdc_only,
+                                    role=storage_node.storage_nodeIpRoles.sdc_only,
                                     force=True)
 
-    def test_sds_set_ip_role_bad_status(self):
+    def test_storage_node_set_ip_role_bad_status(self):
         """
         Test the set_ip_role method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.set_ip_role,
-                              self.fake_sds_id,
+                              self.client.storage_node.set_ip_role,
+                              self.fake_node_id,
                               ip='1.2.3.4',
-                              role=sds.SdsIpRoles.sdc_only,
+                              role=storage_node.storage_nodeIpRoles.sdc_only,
                               force=True)
 
-    def test_sds_set_port(self):
+    def test_storage_node_set_port(self):
         """
         Test the set_port method.
         """
-        self.client.sds.set_port(self.fake_sds_id, sds_port=4443)
+        self.client.storage_node.set_port(self.fake_node_id, storage_node_port=4443)
 
-    def test_sds_set_port_bad_status(self):
+    def test_storage_node_set_port_bad_status(self):
         """
         Test the set_port method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.set_port,
-                              self.fake_sds_id,
-                              sds_port=4443)
+                              self.client.storage_node.set_port,
+                              self.fake_node_id,
+                              storage_node_port=4443)
 
-    def test_sds_set_rfcache_enabled(self):
+    def test_storage_node_set_rfcache_enabled(self):
         """
         Test the set_rfcache_enabled method.
         """
-        self.client.sds.set_rfcache_enabled(self.fake_sds_id,
+        self.client.storage_node.set_rfcache_enabled(self.fake_node_id,
                                             rfcache_enabled=True)
 
-    def test_sds_set_rfcache_enabled_bad_status(self):
+    def test_storage_node_set_rfcache_enabled_bad_status(self):
         """
         Test the set_rfcache_enabled method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.set_rfcache_enabled,
-                              self.fake_sds_id,
+                              self.client.storage_node.set_rfcache_enabled,
+                              self.fake_node_id,
                               rfcache_enabled=True)
 
-    def test_sds_set_rmcache_enabled(self):
+    def test_storage_node_set_rmcache_enabled(self):
         """
         Test the set_rmcache_enabled method.
         """
-        self.client.sds.set_rmcache_enabled(self.fake_sds_id,
+        self.client.storage_node.set_rmcache_enabled(self.fake_node_id,
                                             rmcache_enabled=True)
 
-    def test_sds_set_rmcache_enabled_bad_status(self):
+    def test_storage_node_set_rmcache_enabled_bad_status(self):
         """
         Test the set_rmcache_enabled method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.set_rmcache_enabled,
-                              self.fake_sds_id,
+                              self.client.storage_node.set_rmcache_enabled,
+                              self.fake_node_id,
                               rmcache_enabled=True)
 
-    def test_sds_set_rmcache_size(self):
+    def test_storage_node_set_rmcache_size(self):
         """
         Test the set_rmcache_size method.
         """
-        self.client.sds.set_rmcache_size(self.fake_sds_id,
+        self.client.storage_node.set_rmcache_size(self.fake_node_id,
                                          rmcache_size=128)
 
-    def test_sds_set_rmcache_size_bad_status(self):
+    def test_storage_node_set_rmcache_size_bad_status(self):
         """
         Test the set_rmcache_size method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.sds.set_rmcache_size,
-                              self.fake_sds_id,
+                              self.client.storage_node.set_rmcache_size,
+                              self.fake_node_id,
                               rmcache_size=128)
 
-    def test_sds_set_performance_parameters(self):
+    def test_storage_node_set_performance_parameters(self):
         """
         Test the set_performance_parameters method.
         """
-        self.client.sds.set_performance_parameters(
-            self.fake_sds_id,
-            performance_profile=sds.PerformanceProfile.highperformance)
+        self.client.storage_node.set_performance_parameters(
+            self.fake_node_id,
+            performance_profile=storage_node.PerformanceProfile.highperformance)
 
-    def test_sds_set_performance_parameters_bad_status(self):
+    def test_storage_node_set_performance_parameters_bad_status(self):
         """
         Test the set_performance_parameters method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
-                self.client.sds.set_performance_parameters,
-                self.fake_sds_id,
-                performance_profile=sds.PerformanceProfile.highperformance)
+                self.client.storage_node.set_performance_parameters,
+                self.fake_node_id,
+                performance_profile=storage_node.PerformanceProfile.highperformance)
 
-    def test_sds_query_selected_statistics(self):
+    def test_storage_node_query_selected_statistics(self):
         """
         Test the query_selected_statistics method.
         """
-        ret = self.client.sds.query_selected_statistics(
+        ret = self.client.storage_node.query_selected_statistics(
             properties=["rfcacheFdReadTimeGreater5Sec"]
         )
-        assert ret.get(self.fake_sds_id).get(
+        assert ret.get(self.fake_node_id).get(
             "rfcacheFdReadTimeGreater5Sec") == 0
 
-    def test_sds_query_selected_statistics_bad_status(self):
+    def test_storage_node_query_selected_statistics_bad_status(self):
         """
         Test the query_selected_statistics method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexFailQuerying,
-                self.client.sds.query_selected_statistics,
+                self.client.storage_node.query_selected_statistics,
                 properties=["rfcacheFdReadTimeGreater5Sec"],
             )

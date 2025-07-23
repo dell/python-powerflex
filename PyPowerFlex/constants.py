@@ -240,6 +240,10 @@ class StoragePoolConstants:
     DEFAULT_STATISTICS_PROPERTIES_ABOVE_3_5 = [
         "thinCapacityAllocatedInKm", "thinUserDataCapacityInKb"]
 
+    DEFAULT_QUERY_METRICS = [
+        ""
+    ]
+
 
 class VolumeConstants:
     """

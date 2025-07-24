@@ -153,4 +153,6 @@ class PowerFlexClient:
 
     def add_objects_gen2(self):
         self.__add_storage_entity('storage_node', gen2.StorageNode)
+        self.__add_storage_entity('protection_domain', gen2.ProtectionDomain)
+        self.__add_storage_entity('storage_pool', gen2.StoragePool)
         self.__add_storage_entity('utility', gen2.PowerFlexUtility)

@@ -16,9 +16,13 @@
 """This module contains the objects for interacting with the PowerFlex 5.0+ APIs."""
 
 from PyPowerFlex.objects.gen2.storage_node import StorageNode
+from PyPowerFlex.objects.gen2.protection_domain import ProtectionDomain
+from PyPowerFlex.objects.gen2.storage_pool import StoragePool
 from PyPowerFlex.objects.gen2.utility import PowerFlexUtility
 
 __all__ = [
     'StorageNode',
+    'ProtectionDomain',
+    'StoragePool',
     'PowerFlexUtility',
 ]

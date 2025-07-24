@@ -4,3 +4,7 @@ __pycache__
 # pytest coverage
 .coverage
 htmlcov
+
+build/
+dist/
+*.egg-info

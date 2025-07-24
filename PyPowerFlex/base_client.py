@@ -24,6 +24,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
+from marshmallow import EXCLUDE, INCLUDE, Schema
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 LOG = logging.getLogger(__name__)
@@ -607,3 +608,15 @@ class EntityRequest(Request):
             LOG.error(exc.message)
             raise exc
         return response
+
+
+class BaseSchema(Schema):
+    def on_bind_field(self, field_name, field_obj):
+        field_obj.data_key = camelcase(field_obj.data_key or field_name)
+
+    class Meta:
+        unknown = EXCLUDE
+
+def camelcase(s):
+    parts = iter(s.split("_"))
+    return next(parts) + "".join(i.title() for i in parts)

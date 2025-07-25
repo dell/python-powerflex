@@ -13,16 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""This module contains the objects for interacting with the PowerFlex APIs."""
+"""Module for interacting with host APIs."""
 
-from PyPowerFlex.objects.common.system import System
-from PyPowerFlex.objects.common.host import Host
-from PyPowerFlex.objects.common.sdc import Sdc
-from PyPowerFlex.objects.common.sdt import Sdt
+import logging
+from PyPowerFlex import base_client
 
-__all__ = [
-    'Sdc',
-    'Sdt',
-    'System',
-    'Host',
-]
+
+LOG = logging.getLogger(__name__)
+
+class Host(base_client.EntityRequest):
+    """
+    A class representing Host client.
+    """
+    pass

@@ -48,4 +48,9 @@ __all__ = [
     'ManagedDevice',
     'Deployment',
     'FirmwareRepository',
+    'Host',
+    'Sdc',
+    'Sdt',
+    'System',
+    'Host',
 ]

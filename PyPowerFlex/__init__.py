@@ -102,8 +102,8 @@ class PowerFlexClient:
         Raises:
             PowerFlexClientException: If the PowerFlex API version is lower than 3.0.
         """
-        # common objects here
-        self.add_objects_common()
+        # to get system api version
+        self.add_objects_by_version(gen1)
         self.configuration.validate()
 
         utils.init_logger(self.configuration.log_level)
@@ -113,46 +113,43 @@ class PowerFlexClient:
                 '3.0 are not supported.'
             )
 
-        if version.parse(self.system.api_version()) > version.Version('3.0') and \
-           version.parse(self.system.api_version()) < version.Version('5.0'):
-            self.add_objects_gen1()
-        elif version.parse(self.system.api_version()) >= version.Version('5.0'):
-            self.add_objects_gen2()
+        api_ver = version.parse(self.system.api_version())
+
+        if api_ver < version.Version('3.0'):
+            raise exceptions.PowerFlexClientException(
+                'PowerFlex (VxFlex OS) versions lower than 3.0 are not supported.'
+            )
+        if version.Version("3.0") < api_ver < version.Version("5.0"):
+            self.add_objects_by_version(gen1)
+        elif api_ver >= version.Version("5.0"):
+            self.add_objects_by_version(gen2)
         self.__is_initialized = True
 
-    def add_objects_common(self):
-        self.__add_storage_entity('system', common.System)
-        self.__add_storage_entity('sdc', common.Sdc)
-        self.__add_storage_entity('sdt', common.Sdt)
-        self.__add_storage_entity('host', common.Host)
+    def add_objects_by_version(self, module):
+        """
+        Dynamically registers storage entities based on module version.
+        :param module: Either gen1 or gen2 module
+        """
+        entity_map = [
+            ('device', 'Device'),
+            ('fault_set', 'FaultSet'),
+            ('protection_domain', 'ProtectionDomain'),
+            ('sds', 'Sds'),
+            ('snapshot_policy', 'SnapshotPolicy'),
+            ('storage_pool', 'StoragePool'),
+            ('acceleration_pool', 'AccelerationPool'),
+            ('volume', 'Volume'),
+            ('utility', 'PowerFlexUtility'),
+            ('replication_consistency_group', 'ReplicationConsistencyGroup'),
+            ('replication_pair', 'ReplicationPair'),
+            ('service_template', 'ServiceTemplate'),
+            ('managed_device', 'ManagedDevice'),
+            ('deployment', 'Deployment'),
+            ('firmware_repository', 'FirmwareRepository'),
+            ('storage_node', 'StorageNode'),  # Only available in gen2
+        ]
 
-    def add_objects_gen1(self):
-        self.__add_storage_entity('device', gen1.Device)
-        self.__add_storage_entity(
-            'fault_set', gen1.FaultSet)
-        self.__add_storage_entity('protection_domain',
-                                  gen1.ProtectionDomain)
-        self.__add_storage_entity('sds', gen1.Sds)
-        self.__add_storage_entity(
-            'snapshot_policy', gen1.SnapshotPolicy)
-        self.__add_storage_entity('storage_pool', gen1.StoragePool)
-        self.__add_storage_entity('acceleration_pool',
-                                  gen1.AccelerationPool)
-        self.__add_storage_entity('volume', gen1.Volume)
-        self.__add_storage_entity('utility', gen1.PowerFlexUtility)
-        self.__add_storage_entity(
-            'replication_consistency_group',
-            gen1.ReplicationConsistencyGroup)
-        self.__add_storage_entity('replication_pair', gen1.ReplicationPair)
-        self.__add_storage_entity('service_template', gen1.ServiceTemplate)
-        self.__add_storage_entity('managed_device', gen1.ManagedDevice)
-        self.__add_storage_entity('deployment', gen1.Deployment)
-        self.__add_storage_entity(
-            'firmware_repository',
-            gen1.FirmwareRepository)
-
-    def add_objects_gen2(self):
-        self.__add_storage_entity('storage_node', gen2.StorageNode)
-        self.__add_storage_entity('protection_domain', gen2.ProtectionDomain)
-        self.__add_storage_entity('storage_pool', gen2.StoragePool)
-        self.__add_storage_entity('utility', gen2.PowerFlexUtility)
+        for attr_name, class_name in entity_map:
+            entity_class = getattr(module, class_name, None)
+            if entity_class:
+                self.__add_storage_entity(attr_name, entity_class)

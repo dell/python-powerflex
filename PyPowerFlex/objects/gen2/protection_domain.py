@@ -161,7 +161,6 @@ class ProtectionDomain(base_client.EntityRequest):
     """
     A class representing Protection Domain client.
     """
-
     def list(self):
         """List PowerFlex protection domains.
 
@@ -208,19 +207,17 @@ class ProtectionDomain(base_client.EntityRequest):
 
         new_pd = load_protection_domain_schema(self._create_entity(params))
         pd['id'] = new_pd['id']
-        _, pd = self.update(ProtectionDomainSchema().dump(pd))
-
+        _, pd = self.update(ProtectionDomainSchema().dump(pd), new_pd)
         return pd
 
-    def update(self, pd):
+    def update(self, pd, current_pd=None):
         """Update PowerFlex protection domain.
 
         :type pd: dict
         :rtype: dict
         """
-        current_pd = self.get_by_id(pd['id'])
-        pd = load_protection_domain_schema(
-            {**ProtectionDomainSchema().dump(current_pd), **pd})
+        current_pd = current_pd if current_pd is not None else self.get_by_id(pd['id'])
+        pd = load_protection_domain_schema({**ProtectionDomainSchema().dump(current_pd), **pd})
 
         has_update = False
 
@@ -266,7 +263,6 @@ class ProtectionDomain(base_client.EntityRequest):
             policy['bandwidthLimitOther'] = pd['bandwidth_limit_other']
         if pd['bandwidth_limit_node_network'] != current_pd['bandwidth_limit_node_network']:
             policy['bandwidthLimitNodeNetwork'] = pd['bandwidth_limit_node_network']
-
         if len(policy) > 1:
             has_update = True
             self.set_secondary_io_policy(pd['id'], policy)
@@ -465,19 +461,19 @@ class ProtectionDomain(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def get_sdss(self, protection_domain_id, filter_fields=None, fields=None):
-        """Get related PowerFlex SDSs for protection domain.
+    # def get_storage_nodes(self, protection_domain_id, filter_fields=None, fields=None):
+    #     """Get related PowerFlex Storage Nodes for protection domain.
 
-        :type protection_domain_id: str
-        :type filter_fields: dict
-        :type fields: list|tuple
-        :rtype: list[dict]
-        """
+    #     :type protection_domain_id: str
+    #     :type filter_fields: dict
+    #     :type fields: list|tuple
+    #     :rtype: list[dict]
+    #     """
 
-        return self.get_related(protection_domain_id,
-                                'Sds',
-                                filter_fields,
-                                fields)
+    #     return self.get_related(protection_domain_id,
+    #                             'StorageNode',
+    #                             filter_fields,
+    #                             fields)
 
     def get_storage_pools(self,
                           protection_domain_id,
@@ -510,22 +506,22 @@ class ProtectionDomain(base_client.EntityRequest):
 
         self._rename_entity(action, protection_domain_id, params)
 
-    def query_selected_statistics(self, properties, ids=None):
-        """Query PowerFlex protection domain statistics.
+    # def query_selected_statistics(self, properties, ids=None):
+    #     """Query PowerFlex protection domain statistics.
 
-        :type properties: list
-        :type ids: list of protection domain IDs or None for all protection
-                   domains
-        :rtype: dict
-        """
+    #     :type properties: list
+    #     :type ids: list of protection domain IDs or None for all protection
+    #                domains
+    #     :rtype: dict
+    #     """
 
-        action = "querySelectedStatistics"
+    #     action = "querySelectedStatistics"
 
-        params = {'properties': properties}
+    #     params = {'properties': properties}
 
-        if ids:
-            params["ids"] = ids
-        else:
-            params["allIds"] = ""
+    #     if ids:
+    #         params["ids"] = ids
+    #     else:
+    #         params["allIds"] = ""
 
-        return self._query_selected_statistics(action, params)
+    #     return self._query_selected_statistics(action, params)

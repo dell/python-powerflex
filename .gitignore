@@ -8,3 +8,5 @@ htmlcov
 build/
 dist/
 *.egg-info
+
+test.py

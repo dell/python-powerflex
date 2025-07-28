@@ -63,6 +63,7 @@ class StoragePoolSchema(base_client.BaseSchema):
     wrc_device_group_id = fields.Str(
         metadata={
             "description": "Device Group Id",
+            # TODO: 
             # "updatable": False,
         }
     )
@@ -110,18 +111,6 @@ class StoragePoolSchema(base_client.BaseSchema):
             "description": "Raw Size in GB",
         }
     )
-    # num_data_slices = fields.Integer(
-    #     required=True,
-    #     metadata={
-    #         "description": "Number of Data Slices",
-    #     }
-    # )
-    # numProtectionSlices = fields.Integer(
-    #     required=True,
-    #     metadata={
-    #         "description": "Number of Protection Slices",
-    #     }
-    # )
     protection_scheme = fields.Str(
         required=True,
         validate=validate.OneOf(["TwoPlusTwo", "EightPlusTwo"]),
@@ -185,8 +174,7 @@ class StoragePool(base_client.EntityRequest):
         """
         pdo = ProtectionDomain(self.token, self.configuration)
 
-        result = pdo.get_storage_pools(
-            protion_domain_id, filter_fields={'name': name})
+        result = pdo.get_storage_pools(protion_domain_id, filter_fields={'name': name})
         if len(result) >= 1:
             return load_storage_pool_schema(result[0])
         else:
@@ -225,33 +213,29 @@ class StoragePool(base_client.EntityRequest):
 
         new_sp = load_storage_pool_schema(self._create_entity(params))
         sp['id'] = new_sp['id']
-        _, sp = self.update(StoragePoolSchema().dump(sp))
+        _, sp = self.update(StoragePoolSchema().dump(sp), new_sp)
 
         return sp
 
-    def update(self, sp):
+    def update(self, sp, current_sp=None):
         """Update PowerFlex storage pool.
 
         :type sp: dict
         :rtype: dict
         """
-        current_sp = self.get_by_id(sp['id'])
-        sp = load_storage_pool_schema(
-            {**StoragePoolSchema().dump(current_sp), **sp})
+        current_sp = current_sp if current_sp is not None else self.get_by_id(sp['id'])
+        sp = load_storage_pool_schema({**StoragePoolSchema().dump(current_sp), **sp})
 
         if sp['protection_domain_id'] != current_sp['protection_domain_id']:
-            e = exceptions.nonupdatable_exception(
-                "protection_domain_id", self.entity, sp['id'])
+            e = exceptions.nonupdatable_exception("protection_domain_id", self.entity, sp['id'])
             LOG.error(e.message)
             raise e
         if sp['device_group_id'] != current_sp['device_group_id']:
-            e = exceptions.nonupdatable_exception(
-                "device_group_id", self.entity, sp['id'])
+            e = exceptions.nonupdatable_exception("device_group_id", self.entity, sp['id'])
             LOG.error(e.message)
             raise e
         if sp['protection_scheme'] != current_sp['protection_scheme']:
-            e = exceptions.nonupdatable_exception(
-                "protection_scheme", self.entity, sp['id'])
+            e = exceptions.nonupdatable_exception("protection_scheme", self.entity, sp['id'])
             LOG.error(e.message)
             raise e
 
@@ -269,18 +253,11 @@ class StoragePool(base_client.EntityRequest):
             critical_threshold = sp['capacity_alert_critical_threshold']
         if high_threshold or critical_threshold:
             has_update = True
-            self.set_capacity_alert_thresholds(
-                sp['id'], high_threshold, critical_threshold)
-
-        # TODO: add support for fragmentation, currently update would fail with error 'Could not find Storage Pool'
-        # if sp['fragmentation_enabled'] != current_sp['fragmentation_enabled']:
-        #     has_update = True
-        #     self.set_fragmentation_enabled(sp['id'], sp['fragmentation_enabled'])
+            self.set_capacity_alert_thresholds(sp['id'], high_threshold, critical_threshold)
 
         if sp['over_provisioning_factor'] != current_sp['over_provisioning_factor']:
             has_update = True
-            self.set_over_provisioning_factor(
-                sp['id'], sp['over_provisioning_factor'])
+            self.set_over_provisioning_factor(sp['id'], sp['over_provisioning_factor'])
 
         if sp['physical_size_gb'] != current_sp['physical_size_gb']:
             has_update = True
@@ -301,67 +278,67 @@ class StoragePool(base_client.EntityRequest):
 
         return self._delete_entity(storage_pool_id)
 
-    def get_devices(self, storage_pool_id, filter_fields=None, fields=None):
-        """Get related PowerFlex devices for storage pool.
+    # def get_devices(self, storage_pool_id, filter_fields=None, fields=None):
+    #     """Get related PowerFlex devices for storage pool.
 
-        :type storage_pool_id: str
-        :type filter_fields: dict
-        :type fields: list|tuple
-        :rtype: list[dict]
-        """
+    #     :type storage_pool_id: str
+    #     :type filter_fields: dict
+    #     :type fields: list|tuple
+    #     :rtype: list[dict]
+    #     """
 
-        return self.get_related(storage_pool_id,
-                                'Device',
-                                filter_fields,
-                                fields)
+    #     return self.get_related(storage_pool_id,
+    #                             'Device',
+    #                             filter_fields,
+    #                             fields)
 
-    def get_sdss(self, storage_pool_id, filter_fields=None, fields=None):
-        """Get related PowerFlex SDSs for storage pool.
+    # def get_sdss(self, storage_pool_id, filter_fields=None, fields=None):
+    #     """Get related PowerFlex SDSs for storage pool.
 
-        :type storage_pool_id: str
-        :type filter_fields: dict
-        :type fields: list|tuple
-        :rtype: list[dict]
-        """
+    #     :type storage_pool_id: str
+    #     :type filter_fields: dict
+    #     :type fields: list|tuple
+    #     :rtype: list[dict]
+    #     """
 
-        sdss_ids = self.get_related(storage_pool_id,
-                                    'SpSds',
-                                    filter_fields,
-                                    fields=('sdsId',))
-        sds_id_list = [sds['sdsId'] for sds in sdss_ids]
-        if filter_fields:
-            filter_fields.update({'id': sds_id_list})
-            filter_fields.pop('sdsId', None)
-        else:
-            filter_fields = {'id': sds_id_list}
-        return Sds(self.token, self.configuration).get(
-            filter_fields=filter_fields, fields=fields)
+    #     sdss_ids = self.get_related(storage_pool_id,
+    #                                 'SpSds',
+    #                                 filter_fields,
+    #                                 fields=('sdsId',))
+    #     sds_id_list = [sds['sdsId'] for sds in sdss_ids]
+    #     if filter_fields:
+    #         filter_fields.update({'id': sds_id_list})
+    #         filter_fields.pop('sdsId', None)
+    #     else:
+    #         filter_fields = {'id': sds_id_list}
+    #     return Sds(self.token, self.configuration).get(
+    #         filter_fields=filter_fields, fields=fields)
 
-    def get_volumes(self, storage_pool_id, filter_fields=None, fields=None):
-        """Get related PowerFlex volumes for storage pool.
+    # def get_volumes(self, storage_pool_id, filter_fields=None, fields=None):
+    #     """Get related PowerFlex volumes for storage pool.
 
-        :type storage_pool_id: str
-        :type filter_fields: dict
-        :type fields: list|tuple
-        :rtype: list[dict]
-        """
+    #     :type storage_pool_id: str
+    #     :type filter_fields: dict
+    #     :type fields: list|tuple
+    #     :rtype: list[dict]
+    #     """
 
-        return self.get_related(storage_pool_id,
-                                'Volume',
-                                filter_fields,
-                                fields)
+    #     return self.get_related(storage_pool_id,
+    #                             'Volume',
+    #                             filter_fields,
+    #                             fields)
 
-    def get_statistics(self, storage_pool_id, fields=None):
-        """Get related PowerFlex Statistics for storage pool.
+    # def get_statistics(self, storage_pool_id, fields=None):
+    #     """Get related PowerFlex Statistics for storage pool.
 
-        :type storage_pool_id: str
-        :type fields: list|tuple
-        :rtype: dict
-        """
+    #     :type storage_pool_id: str
+    #     :type fields: list|tuple
+    #     :rtype: dict
+    #     """
 
-        return self.get_related(storage_pool_id,
-                                'Statistics',
-                                fields)
+    #     return self.get_related(storage_pool_id,
+    #                             'Statistics',
+    #                             fields)
 
     def rename(self, storage_pool_id, name):
         """Rename PowerFlex storage pool.
@@ -510,133 +487,21 @@ class StoragePool(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def set_protected_maintenance_mode_io_priority_policy(
-            self, storage_pool_id, policy, concurrent_ios_per_device, bw_limit_per_device):
-        """Set protected maintenance mode I/O priority policy.
+    # def query_selected_statistics(self, properties, ids=None):
+    #     """Query PowerFlex storage pool statistics.
 
-        :type storage_pool_id: str
-        :type policy: str
-        :type concurrent_ios_per_device: str
-        :type bw_limit_per_device: str
-        :rtype: dict
-        """
+    #     :type properties: list
+    #     :type ids: list of storage pools IDs or None for all storage pools
+    #     :rtype: dict
+    #     """
 
-        action = 'setProtectedMaintenanceModeIoPriorityPolicy'
+    #     action = "querySelectedStatistics"
 
-        params = {
-            'policy': policy,
-            'numOfConcurrentIosPerDevice': concurrent_ios_per_device,
-            'bwLimitPerDeviceInKbps': bw_limit_per_device
-        }
+    #     params = {'properties': properties}
 
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set the protected maintenance mode IO priority policy for '
-                f'PowerFlex {self.entity} with id {storage_pool_id}. Error: {response}'
-            )
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
+    #     if ids:
+    #         params["ids"] = ids
+    #     else:
+    #         params["allIds"] = ""
 
-        return self.get(entity_id=storage_pool_id)
-
-    def set_vtree_migration_io_priority_policy(
-            self,
-            storage_pool_id,
-            policy,
-            concurrent_ios_per_device,
-            bw_limit_per_device):
-        """Set the vtree migration I/O priority policy on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type policy: str
-        :type concurrent_ios_per_device: str
-        :type bw_limit_per_device: str
-        :rtype: dict
-        """
-
-        action = 'setVTreeMigrationIoPriorityPolicy'
-
-        params = {
-            "policy": policy,
-            "numOfConcurrentIosPerDevice": concurrent_ios_per_device,
-            "bwLimitPerDeviceInKbps": bw_limit_per_device
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set VTree migration I/O priority policy for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def rebalance_io_priority_policy(
-            self,
-            storage_pool_id,
-            policy,
-            concurrent_ios_per_device,
-            bw_limit_per_device):
-        """Set the rebalance I/O priority policy on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type policy: str
-        :type concurrent_ios_per_device: str
-        :type bw_limit_per_device: str
-        :rtype: dict
-        """
-
-        action = 'setRebalanceIoPriorityPolicy'
-
-        params = {
-            'policy': policy,
-            'numOfConcurrentIosPerDevice': concurrent_ios_per_device,
-            'bwLimitPerDeviceInKbps': bw_limit_per_device
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to set the rebalance I/O priority policy for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=storage_pool_id)
-
-    def set_fragmentation_enabled(self, storage_pool_id, enable_fragmentation):
-        """Enable/Disable the fragmentation on the specified Storage Pool.
-
-        :type storage_pool_id: str
-        :type enable_fragmentation: bool
-        :rtype: dict
-        """
-
-        action = 'disableFragmentation'
-        if enable_fragmentation:
-            action = 'enableFragmentation'
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=storage_pool_id)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f'Failed to enable/disable fragmentation for PowerFlex {self.entity} '
-                f'with id {storage_pool_id}. Error: {response}')
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
+    #     return self._query_selected_statistics(action, params)

@@ -130,3 +130,10 @@ class PowerFlexFailEntityOperation(PowerFlexClientException):
         self.response = response
         if response:
             self.message = f"{self.message} Error: {response}"
+
+
+def nonupdatable_exception(field, entity, entity_id=None):
+    msg = (
+        f'{field} cannot be updated after creation for PowerFlex {entity} {entity_id}'
+    )
+    return PowerFlexClientException(msg)

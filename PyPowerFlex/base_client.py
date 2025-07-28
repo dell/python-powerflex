@@ -422,6 +422,9 @@ class EntityRequest(Request):
             entity_id (str): The ID of the entity.
             params (dict, optional): Parameters for the entity.
 
+        Returns:
+            dict: The response from the API.
+
         Raises:
             PowerFlexFailDeleting: If the entity fails to be deleted.
         """
@@ -437,6 +440,7 @@ class EntityRequest(Request):
                                                    response)
             LOG.error(exc.message)
             raise exc
+        return response
 
     def _rename_entity(self, action, entity_id, params=None):
         """
@@ -448,7 +452,7 @@ class EntityRequest(Request):
             params (dict, optional): Parameters for the entity.
 
         Returns:
-            dict: The renamed entity.
+            dict: The response from the API.
 
         Raises:
             PowerFlexFailRenaming: If the entity fails to be renamed.
@@ -463,8 +467,7 @@ class EntityRequest(Request):
                                                    response)
             LOG.error(exc.message)
             raise exc
-
-        return self.get(entity_id=entity_id)
+        return response
 
     def get(self, entity_id=None, filter_fields=None, fields=None):
         """
@@ -578,6 +581,7 @@ class EntityRequest(Request):
                 self.entity, entity_id, action, response)
             LOG.error(exc.message)
             raise exc
+        return response
 
     def _query_selected_statistics(self, action, params=None):
         """

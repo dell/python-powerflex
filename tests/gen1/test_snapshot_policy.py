@@ -21,7 +21,7 @@ from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen1 import snapshot_policy as sp
 from tests.common import PyPowerFlexTestCase
 
-
+@PyPowerFlexTestCase.version('4.5')
 class TestSnapshotPolicyClient(PyPowerFlexTestCase):
     """
     Test class for snapshot policy client.

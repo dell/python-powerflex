@@ -17,6 +17,7 @@
 
 # pylint: disable=too-few-public-methods
 
+
 class StoragePoolConstants:
     """
     This class holds constants related to StoragePool.
@@ -369,3 +370,47 @@ class SnapshotPolicyConstants:
         "numOfExpiredButLockedSnapshots",
         "numOfSrcVols",
         "srcVolIds"]
+
+
+class StorageNodeConstants:
+    """
+    This class holds statistics constants related to StorageNode.
+    """
+    DEFAULT_STATISTICS_PROPERTIES = [
+        "storage_fe_write_latency",
+        "device_local_read_bandwidth",
+        "device_local_read_iops",
+        "device_remote_write_bandwidth",
+        "device_remote_write_iops",
+        "total_device_write_bandwidth",
+        "total_device_write_iops",
+        "avg_device_write_io_size",
+        "storage_fe_trim_latency",
+        "device_local_write_bandwidth",
+        "device_local_write_iops",
+        "avg_device_write_latency",
+        "storage_fe_trim_bandwidth",
+        "storage_fe_trim_iops",
+        "avg_fe_trim_io_size",
+        "avg_device_pmem_write_latency",
+        "device_remote_read_bandwidth",
+        "device_remote_read_iops",
+        "avg_device_pmem_read_latency",
+        "storage_fe_write_bandwidth",
+        "storage_fe_write_iops",
+        "avg_fe_write_io_size",
+        "storage_fe_read_bandwidth",
+        "storage_fe_read_iops",
+        "avg_fe_read_io_size",
+        "total_device_pmem_write_bandwidth",
+        "total_device_pmem_write_iops",
+        "avg_device_pmem_write_io_size",
+        "total_device_pmem_read_bandwidth",
+        "total_device_pmem_read_iops",
+        "avg_device_pmem_read_io_size",
+        "total_device_read_bandwidth",
+        "total_device_read_iops",
+        "avg_device_read_io_size",
+        "raw_total",
+        "storage_fe_read_latency",
+        "avg_device_read_latency"]

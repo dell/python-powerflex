@@ -19,7 +19,7 @@
 
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects.common import system
-from tests.gen1 import PyPowerFlexTestCase
+from tests.common import PyPowerFlexTestCase
 
 
 class TestSystemClient(PyPowerFlexTestCase):

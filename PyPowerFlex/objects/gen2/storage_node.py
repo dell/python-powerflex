@@ -29,7 +29,6 @@ from PyPowerFlex import utils
 LOG = logging.getLogger(__name__)
 
 
-
 class StorageNodeIpRoles:
     """StorageNode ip roles."""
 
@@ -67,6 +66,7 @@ class StorageNode(base_client.EntityRequest):
     """
     A class representing Storage Node client.
     """
+
     def add_ip(self, node_id, node_ip):
         """Add PowerFlex Storage Node IP-address.
 
@@ -95,7 +95,7 @@ class StorageNode(base_client.EntityRequest):
     def create(self,
                name,
                node_ips,
-               protection_domain_id=None,
+               protection_domain_id,
                ):
         """Create PowerFlex Storage Node.
         :type name: str
@@ -112,7 +112,7 @@ class StorageNode(base_client.EntityRequest):
 
         return self._create_entity(params)
 
-    def delete(self, node_id, force=None):
+    def delete(self, node_id):
         """Remove PowerFlex Storage Node.
 
         :type node_id: str
@@ -120,11 +120,8 @@ class StorageNode(base_client.EntityRequest):
         :rtype: None
         """
 
-        params = {"force": force}
+        return self._delete_entity(node_id)
 
-        return self._delete_entity(node_id, params)
-
-   
     def rename(self, node_id, name):
         """Rename PowerFlex Storage Node.
 
@@ -158,7 +155,7 @@ class StorageNode(base_client.EntityRequest):
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = f"Failed to remove IP from PowerFlex Storage Node " \
-                  f"with id {node_id}. Error: {response}"
+                f"with id {node_id}. Error: {response}"
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
@@ -196,49 +193,3 @@ class StorageNode(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=node_id)
-
-    def set_performance_parameters(self, node_id, performance_profile):
-        """Set performance parameters for PowerFlex Storage Node.
-
-        :type node_id: str
-        :type performance_profile: str
-        :rtype: dict
-        """
-
-        action = 'setNodePerformanceParameters'
-
-        params = {"perfProfile": performance_profile}
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=node_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f"Failed to set performance parameters for PowerFlex "
-                f"Storage Node with id {node_id}. Error: {response}"
-            )
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=node_id)
-
-    # def query_selected_statistics(self, properties, ids=None):
-    #     """Query PowerFlex Storage Node statistics.
-
-    #     :type properties: list
-    #     :type ids: list of Storage Node IDs or None for all Storage Node
-    #     :rtype: dict
-    #     """
-
-    #     action = "querySelectedStatistics"
-
-    #     params = {'properties': properties}
-
-    #     if ids:
-    #         params["ids"] = ids
-    #     else:
-    #         params["allIds"] = ""
-
-    #     return self._query_selected_statistics(action, params)

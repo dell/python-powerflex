@@ -39,6 +39,8 @@ class TestPowerFlexUtility(PyPowerFlexTestCase):
                     {},
                 '/types/Volume/instances/action/querySelectedStatistics':
                     {},
+                '/dtapi/rest/v1/metrics/query':
+                    {},
             }
         }
 
@@ -69,3 +71,9 @@ class TestPowerFlexUtility(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.utility.get_statistics_for_all_volumes)
+
+    def test_get_statistics_for_all_storage_nodes(self):
+        """
+        Test the get_statistics_for_all_storage_nodes method.
+        """
+        self.client.utility.get_statistics_for_all_storage_nodes()

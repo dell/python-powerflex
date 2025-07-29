@@ -21,7 +21,7 @@ from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen1.device import MediaType
 from tests.common import PyPowerFlexTestCase
 
-
+@PyPowerFlexTestCase.version('4.5')
 class TestDeviceClient(PyPowerFlexTestCase):
     """
     Test class for DeviceClient.

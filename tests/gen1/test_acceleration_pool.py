@@ -21,7 +21,7 @@ from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen1 import acceleration_pool
 from tests.common import PyPowerFlexTestCase
 
-
+@PyPowerFlexTestCase.version('4.5')
 class TestAccelerationPoolClient(PyPowerFlexTestCase):
     """
     Test class for the AccelerationPoolClient.

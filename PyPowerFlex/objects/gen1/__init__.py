@@ -23,7 +23,6 @@ from PyPowerFlex.objects.gen1.snapshot_policy import SnapshotPolicy
 from PyPowerFlex.objects.gen1.storage_pool import StoragePool
 from PyPowerFlex.objects.gen1.acceleration_pool import AccelerationPool
 from PyPowerFlex.objects.gen1.volume import Volume
-from PyPowerFlex.objects.gen1.utility import PowerFlexUtility
 from PyPowerFlex.objects.gen1.replication_consistency_group import ReplicationConsistencyGroup
 from PyPowerFlex.objects.gen1.replication_pair import ReplicationPair
 from PyPowerFlex.objects.gen1.service_template import ServiceTemplate
@@ -41,7 +40,6 @@ __all__ = [
     'StoragePool',
     'AccelerationPool',
     'Volume',
-    'PowerFlexUtility',
     'ReplicationConsistencyGroup',
     'ReplicationPair',
     'ServiceTemplate',

@@ -19,9 +19,9 @@ import json
 
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
-from tests.gen1 import PyPowerFlexTestCase
+from tests.common import PyPowerFlexTestCase
 
-
+@PyPowerFlexTestCase.version('4.5')
 class TestBaseClient(PyPowerFlexTestCase):
     """
     Test class for the BaseClient.

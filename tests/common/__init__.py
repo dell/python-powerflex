@@ -18,6 +18,7 @@
 # pylint: disable=too-many-instance-attributes,keyword-arg-before-vararg,broad-exception-raised,unused-argument
 
 import collections
+import copy
 import contextlib
 import json
 import logging
@@ -85,9 +86,10 @@ class PyPowerFlexTestCase(TestCase):
     @classmethod
     def version(cls, new_version):
         def decorator(subclass):
-            cls.DEFAULT_MOCK_RESPONSES[
-                PyPowerFlexTestCase.RESPONSE_MODE.Valid
-            ][cls.VERSION_API_PATH] = new_version
+            subclass.DEFAULT_MOCK_RESPONSES = copy.deepcopy(cls.DEFAULT_MOCK_RESPONSES)
+            subclass.DEFAULT_MOCK_RESPONSES[
+                    cls.RESPONSE_MODE.Valid
+                ][cls.VERSION_API_PATH] = new_version
             return subclass
         return decorator
 
@@ -105,7 +107,7 @@ class PyPowerFlexTestCase(TestCase):
     DEFAULT_MOCK_RESPONSES = {
         RESPONSE_MODE.Valid: {
             '/login': 'token',
-            VERSION_API_PATH: '3.5',
+            VERSION_API_PATH: '4.5',
             '/logout': '',
         },
         RESPONSE_MODE.Invalid: {

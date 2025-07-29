@@ -125,6 +125,8 @@ class PowerFlexClient:
         self.__add_storage_entity('sdc', common.Sdc)
         self.__add_storage_entity('sdt', common.Sdt)
         self.__add_storage_entity('host', common.Host)
+        self.__add_storage_entity('utility', common.PowerFlexUtility)
+
 
     def add_objects_gen1(self):
         self.__add_storage_entity('device', gen1.Device)
@@ -139,7 +141,6 @@ class PowerFlexClient:
         self.__add_storage_entity('acceleration_pool',
                                   gen1.AccelerationPool)
         self.__add_storage_entity('volume', gen1.Volume)
-        self.__add_storage_entity('utility', gen1.PowerFlexUtility)
         self.__add_storage_entity(
             'replication_consistency_group',
             gen1.ReplicationConsistencyGroup)
@@ -155,4 +156,3 @@ class PowerFlexClient:
         self.__add_storage_entity('storage_node', gen2.StorageNode)
         self.__add_storage_entity('protection_domain', gen2.ProtectionDomain)
         self.__add_storage_entity('storage_pool', gen2.StoragePool)
-        self.__add_storage_entity('utility', gen2.PowerFlexUtility)

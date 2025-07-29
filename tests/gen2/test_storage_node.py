@@ -18,7 +18,7 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects.gen2 import storage_node
+from PyPowerFlex.objects.gen2.storage_node import StorageNode, StorageNodeIp, StorageNodeIpRoles
 from tests.common import PyPowerFlexTestCase
 
 
@@ -27,6 +27,7 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
     """
     Tests for the StorageNodeClient class.
     """
+
     def setUp(self):
         """
         Set up the test environment.
@@ -36,38 +37,28 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         self.fake_node_id = '1'
         self.fake_sp_id = '1'
         self.fake_pd_id = '1'
-        self.fake_node_ips = [storage_node.StorageNodeIp(
-            '1.2.3.4', storage_node.StorageNodeIpRoles.storage_and_app)]
+        self.fake_node_ips = [StorageNodeIp(
+            '1.2.3.4', StorageNodeIpRoles.storage_and_app)]
 
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
-                f'/types/{storage_node.StorageNode.entity}/instances':
+                '/types/Node/instances':
                     {'id': self.fake_node_id},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}':
+                f'/instances/Node::{self.fake_node_id}':
                     {'id': self.fake_node_id},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/addIp':
+                f'/instances/Node::{self.fake_node_id}/action/addIp':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/removestorage_node':
+                f'/instances/Node::{self.fake_node_id}/action/removeNode':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/relationships/Device':
-                    [],
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodeName':
+                f'/instances/Node::{self.fake_node_id}/action/removeIp':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/removestorage_nodeIp':
+                f'/instances/Node::{self.fake_node_id}/action/renameStorageNode':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodeIpRole':
+                f'/instances/Node::{self.fake_node_id}/action/modifyIpRole':
                     {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodePort':
-                    {},
-                f'/instances/{storage_node.StorageNode.entity}::{self.fake_node_id}/action/setstorage_nodePerformanceParameters':
-                    {},
-                f'/types/{storage_node.StorageNode.entity}'
-                '/instances/action/querySelectedStatistics': {
-                    self.fake_node_id: {'rfcacheFdReadTimeGreater5Sec': 0}
-                        },
             },
             self.RESPONSE_MODE.Invalid: {
-                f'/types/{storage_node.StorageNode.entity}/instances':
+                '/types/Node/instances':
                     {},
             }
         }
@@ -76,7 +67,8 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         """
         Test the add_ip method of the storage_node client.
         """
-        self.client.storage_node.add_ip(self.fake_node_id, self.fake_node_ips[0])
+        self.client.storage_node.add_ip(
+            self.fake_node_id, self.fake_node_ips[0])
 
     def test_storage_node_add_ip_bad_status(self):
         """
@@ -92,8 +84,11 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         """
         Test the create method of the storage_node client.
         """
-        self.client.storage_node.create(protection_domain_id=self.fake_pd_id,
-                               storage_node_ips=self.fake_node_ips)
+        self.client.storage_node.create(
+            name='fake_node_name',
+            node_ips=self.fake_node_ips,
+            protection_domain_id=self.fake_pd_id
+        )
 
     def test_storage_node_create_bad_status(self):
         """
@@ -102,8 +97,10 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailCreating,
                               self.client.storage_node.create,
-                              protection_domain_id=self.fake_pd_id,
-                              storage_node_ips=self.fake_node_ips)
+                              name='fake_node_name',
+                              node_ips=self.fake_node_ips,
+                              protection_domain_id=self.fake_pd_id
+                              )
 
     def test_storage_node_create_no_id_in_response(self):
         """
@@ -112,8 +109,9 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.Invalid):
             self.assertRaises(KeyError,
                               self.client.storage_node.create,
-                              protection_domain_id=self.fake_pd_id,
-                              storage_node_ips=self.fake_node_ips)
+                              name='fake_node_name',
+                              node_ips=[],
+                              protection_domain_id=self.fake_pd_id)
 
     def test_storage_node_delete(self):
         """
@@ -128,21 +126,6 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
                               self.client.storage_node.delete,
-                              self.fake_node_id)
-
-    def test_storage_node_get_devices(self):
-        """
-        Test the get_devices method of the storage_node client.
-        """
-        self.client.storage_node.get_devices(self.fake_node_id)
-
-    def test_storage_node_get_devices_bad_status(self):
-        """
-        Test the get_devices method of the storage_node client with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.storage_node.get_devices,
                               self.fake_node_id)
 
     def test_storage_node_rename(self):
@@ -182,9 +165,8 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
         Test the set_ip_role method.
         """
         self.client.storage_node.set_ip_role(self.fake_node_id,
-                                    ip='1.2.3.4',
-                                    role=storage_node.storage_nodeIpRoles.sdc_only,
-                                    force=True)
+                                             ip='1.2.3.4',
+                                             role=StorageNodeIpRoles.storage)
 
     def test_storage_node_set_ip_role_bad_status(self):
         """
@@ -195,112 +177,4 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
                               self.client.storage_node.set_ip_role,
                               self.fake_node_id,
                               ip='1.2.3.4',
-                              role=storage_node.storage_nodeIpRoles.sdc_only,
-                              force=True)
-
-    def test_storage_node_set_port(self):
-        """
-        Test the set_port method.
-        """
-        self.client.storage_node.set_port(self.fake_node_id, storage_node_port=4443)
-
-    def test_storage_node_set_port_bad_status(self):
-        """
-        Test the set_port method with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.storage_node.set_port,
-                              self.fake_node_id,
-                              storage_node_port=4443)
-
-    def test_storage_node_set_rfcache_enabled(self):
-        """
-        Test the set_rfcache_enabled method.
-        """
-        self.client.storage_node.set_rfcache_enabled(self.fake_node_id,
-                                            rfcache_enabled=True)
-
-    def test_storage_node_set_rfcache_enabled_bad_status(self):
-        """
-        Test the set_rfcache_enabled method with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.storage_node.set_rfcache_enabled,
-                              self.fake_node_id,
-                              rfcache_enabled=True)
-
-    def test_storage_node_set_rmcache_enabled(self):
-        """
-        Test the set_rmcache_enabled method.
-        """
-        self.client.storage_node.set_rmcache_enabled(self.fake_node_id,
-                                            rmcache_enabled=True)
-
-    def test_storage_node_set_rmcache_enabled_bad_status(self):
-        """
-        Test the set_rmcache_enabled method with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.storage_node.set_rmcache_enabled,
-                              self.fake_node_id,
-                              rmcache_enabled=True)
-
-    def test_storage_node_set_rmcache_size(self):
-        """
-        Test the set_rmcache_size method.
-        """
-        self.client.storage_node.set_rmcache_size(self.fake_node_id,
-                                         rmcache_size=128)
-
-    def test_storage_node_set_rmcache_size_bad_status(self):
-        """
-        Test the set_rmcache_size method with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.storage_node.set_rmcache_size,
-                              self.fake_node_id,
-                              rmcache_size=128)
-
-    def test_storage_node_set_performance_parameters(self):
-        """
-        Test the set_performance_parameters method.
-        """
-        self.client.storage_node.set_performance_parameters(
-            self.fake_node_id,
-            performance_profile=storage_node.PerformanceProfile.highperformance)
-
-    def test_storage_node_set_performance_parameters_bad_status(self):
-        """
-        Test the set_performance_parameters method with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(
-                exceptions.PowerFlexClientException,
-                self.client.storage_node.set_performance_parameters,
-                self.fake_node_id,
-                performance_profile=storage_node.PerformanceProfile.highperformance)
-
-    def test_storage_node_query_selected_statistics(self):
-        """
-        Test the query_selected_statistics method.
-        """
-        ret = self.client.storage_node.query_selected_statistics(
-            properties=["rfcacheFdReadTimeGreater5Sec"]
-        )
-        assert ret.get(self.fake_node_id).get(
-            "rfcacheFdReadTimeGreater5Sec") == 0
-
-    def test_storage_node_query_selected_statistics_bad_status(self):
-        """
-        Test the query_selected_statistics method with a bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(
-                exceptions.PowerFlexFailQuerying,
-                self.client.storage_node.query_selected_statistics,
-                properties=["rfcacheFdReadTimeGreater5Sec"],
-            )
+                              role=StorageNodeIpRoles.storage_and_app)

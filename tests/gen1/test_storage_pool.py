@@ -23,7 +23,7 @@ from PyPowerFlex.objects.gen1.storage_pool import ExternalAccelerationType
 from PyPowerFlex.objects.gen1.storage_pool import MediaType
 from tests.common import PyPowerFlexTestCase
 
-
+@PyPowerFlexTestCase.version('4.5')
 class TestStoragePoolClient(PyPowerFlexTestCase):
     """
     Test class for the StoragePoolClient.

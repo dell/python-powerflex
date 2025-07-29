@@ -19,10 +19,12 @@ from PyPowerFlex.objects.common.system import System
 from PyPowerFlex.objects.common.host import Host
 from PyPowerFlex.objects.common.sdc import Sdc
 from PyPowerFlex.objects.common.sdt import Sdt
+from PyPowerFlex.objects.common.utility import PowerFlexUtility
 
 __all__ = [
     'Sdc',
     'Sdt',
     'System',
     'Host',
+    'PowerFlexUtility',
 ]

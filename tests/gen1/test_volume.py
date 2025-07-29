@@ -21,6 +21,7 @@ from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen1 import volume
 from tests.common import PyPowerFlexTestCase
 
+@PyPowerFlexTestCase.version('4.5')
 class TestVolumeClient(PyPowerFlexTestCase):
     """
     Test class for the volume client.

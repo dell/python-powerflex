@@ -21,7 +21,7 @@ from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen1 import protection_domain
 from tests.common import PyPowerFlexTestCase
 
-
+@PyPowerFlexTestCase.version('4.5')
 class TestProtectionDomainClient(PyPowerFlexTestCase):
     """
     Test class for the ProtectionDomainClient.

@@ -15,35 +15,28 @@
 
 """This module contains the objects for interacting with the PowerFlex APIs."""
 
-from PyPowerFlex.objects.gen1.device import Device
-from PyPowerFlex.objects.gen1.fault_set import FaultSet
-from PyPowerFlex.objects.gen1.protection_domain import ProtectionDomain
-from PyPowerFlex.objects.gen1.sds import Sds
-from PyPowerFlex.objects.gen1.snapshot_policy import SnapshotPolicy
-from PyPowerFlex.objects.gen1.storage_pool import StoragePool
-from PyPowerFlex.objects.gen1.acceleration_pool import AccelerationPool
-from PyPowerFlex.objects.gen1.volume import Volume
-from PyPowerFlex.objects.gen1.replication_consistency_group import ReplicationConsistencyGroup
-from PyPowerFlex.objects.gen1.replication_pair import ReplicationPair
-from PyPowerFlex.objects.gen1.service_template import ServiceTemplate
-from PyPowerFlex.objects.gen1.managed_device import ManagedDevice
-from PyPowerFlex.objects.gen1.deployment import Deployment
-from PyPowerFlex.objects.gen1.firmware_repository import FirmwareRepository
+import os
+import inspect
+import importlib
+import logging
 
+from PyPowerFlex.base_client import EntityRequest
+from PyPowerFlex import exceptions
 
-__all__ = [
-    'Device',
-    'FaultSet',
-    'ProtectionDomain',
-    'Sds',
-    'SnapshotPolicy',
-    'StoragePool',
-    'AccelerationPool',
-    'Volume',
-    'ReplicationConsistencyGroup',
-    'ReplicationPair',
-    'ServiceTemplate',
-    'ManagedDevice',
-    'Deployment',
-    'FirmwareRepository',
-]
+LOG = logging.getLogger(__name__)
+__all__ = []
+
+current_dir = os.path.dirname(__file__)
+for filename in os.listdir(current_dir):
+    if filename.endswith(".py") and filename != "__init__.py":
+        module_name = filename[:-3]
+        try:
+            module = importlib.import_module(f"{__name__}.{module_name}")
+            for name, obj in inspect.getmembers(module, inspect.isclass):
+                if issubclass(obj, EntityRequest) and obj is not EntityRequest:
+                    __all__.append(name)
+                    globals()[name] = obj
+        except Exception as e:
+            msg = f"Failed to import module {module_name}: {e}"
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)

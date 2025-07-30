@@ -26,6 +26,7 @@ from PyPowerFlex import exceptions
 from PyPowerFlex.constants import (
     StoragePoolConstants,
     VolumeConstants,
+    VolumeConstantsGen2,
     SnapshotPolicyConstants,
     StorageNodeConstants
 )
@@ -110,6 +111,16 @@ class PowerFlexUtility(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return response
+
+    def query_metrics_for_all_volumes_gen2(self, ids=None, metrics=None):
+        """list volume statistics for PowerFlex 5.0+.
+
+        :param ids: list
+        :param metrics: list
+        :return: dict
+        """
+        metrics = metrics or VolumeConstantsGen2.DEFAULT_STATISTICS_METRICS
+        return self.query_metrics('volume', ids, metrics)
 
     def get_statistics_for_all_snapshot_policies(
             self, ids=None, properties=None):

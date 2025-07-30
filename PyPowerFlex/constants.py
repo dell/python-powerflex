@@ -272,6 +272,22 @@ class VolumeConstants:
         "childVolumeIds",
         "userDataSdcWriteLatency"]
 
+class VolumeConstantsGen2:
+    """
+    This class holds constants related to Volume.
+    """
+    DEFAULT_STATISTICS_METRICS = [
+        "host_trim_bandwidth",
+        "host_trim_iops",
+        "avg_host_write_latency",
+        "logical_provisioned",
+        "avg_host_read_latency",
+        "host_read_bandwidth",
+        "host_read_iops",
+        "logical_used",
+        "host_write_bandwidth",
+        "host_write_iops",
+        "avg_host_trim_latency"]
 
 class RCGConstants:
     """

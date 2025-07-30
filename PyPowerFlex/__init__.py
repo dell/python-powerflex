@@ -129,9 +129,9 @@ class PowerFlexClient:
         self.__add_storage_entity('host', common.Host)
         self.__add_storage_entity('utility', common.PowerFlexUtility)
 
-
     def add_objects_gen1(self):
         """Add gen1 objects here."""
+        self.__add_storage_entity('system', gen1.System)
         self.__add_storage_entity('device', gen1.Device)
         self.__add_storage_entity(
             'fault_set', gen1.FaultSet)
@@ -157,9 +157,11 @@ class PowerFlexClient:
 
     def add_objects_gen2(self):
         """Add gen2 objects here."""
+        self.__add_storage_entity('system', gen2.System)
         self.__add_storage_entity('storage_node', gen2.StorageNode)
         self.__add_storage_entity('protection_domain', gen2.ProtectionDomain)
         self.__add_storage_entity('storage_pool', gen2.StoragePool)
         self.__add_storage_entity('snapshot_policy', gen2.SnapshotPolicy)
         self.__add_storage_entity('device', gen2.Device)
         self.__add_storage_entity('device_group', gen2.DeviceGroup)
+        self.__add_storage_entity('volume', gen2.Volume)

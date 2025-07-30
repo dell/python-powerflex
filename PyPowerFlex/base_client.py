@@ -21,10 +21,10 @@ import logging
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
+from marshmallow import EXCLUDE, Schema
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
-from marshmallow import EXCLUDE, INCLUDE, Schema
+
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 LOG = logging.getLogger(__name__)
@@ -615,12 +615,18 @@ class EntityRequest(Request):
 
 
 class BaseSchema(Schema):
+    """Base schema."""
+    # pylint: disable=too-few-public-methods
+
     def on_bind_field(self, field_name, field_obj):
         field_obj.data_key = camelcase(field_obj.data_key or field_name)
 
     class Meta:
+        """Meta class."""
         unknown = EXCLUDE
 
+
 def camelcase(s):
+    """Convert snake case to camel case."""
     parts = iter(s.split("_"))
     return next(parts) + "".join(i.title() for i in parts)

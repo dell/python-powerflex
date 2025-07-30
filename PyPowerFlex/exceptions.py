@@ -133,6 +133,7 @@ class PowerFlexFailEntityOperation(PowerFlexClientException):
 
 
 def nonupdatable_exception(field, entity, entity_id=None):
+    """Return a PowerFlexClientException for non-updatable fields."""
     msg = (
         f'{field} cannot be updated after creation for PowerFlex {entity} {entity_id}'
     )

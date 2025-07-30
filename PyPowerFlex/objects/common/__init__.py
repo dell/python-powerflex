@@ -15,28 +15,16 @@
 
 """This module contains the objects for interacting with the PowerFlex APIs."""
 
-import os
-import inspect
-import importlib
-import logging
+from PyPowerFlex.objects.common.system import System
+from PyPowerFlex.objects.common.host import Host
+from PyPowerFlex.objects.common.sdc import Sdc
+from PyPowerFlex.objects.common.sdt import Sdt
+from PyPowerFlex.objects.common.utility import PowerFlexUtility
 
-from PyPowerFlex.base_client import EntityRequest
-from PyPowerFlex import exceptions
-
-LOG = logging.getLogger(__name__)
-__all__ = []
-
-current_dir = os.path.dirname(__file__)
-for filename in os.listdir(current_dir):
-    if filename.endswith(".py") and filename != "__init__.py":
-        module_name = filename[:-3]
-        try:
-            module = importlib.import_module(f"{__name__}.{module_name}")
-            for name, obj in inspect.getmembers(module, inspect.isclass):
-                if issubclass(obj, EntityRequest) and obj is not EntityRequest:
-                    __all__.append(name)
-                    globals()[name] = obj
-        except Exception as e:
-            msg = f"Failed to import module {module_name}: {e}"
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
+__all__ = [
+    'Sdc',
+    'Sdt',
+    'System',
+    'Host',
+    'PowerFlexUtility',
+]

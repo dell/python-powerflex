@@ -85,6 +85,9 @@ class PyPowerFlexTestCase(TestCase):
 
     @classmethod
     def version(cls, new_version):
+        """
+        Decorator for mocking the version API version.
+        """
         def decorator(subclass):
             subclass.DEFAULT_MOCK_RESPONSES = copy.deepcopy(cls.DEFAULT_MOCK_RESPONSES)
             subclass.DEFAULT_MOCK_RESPONSES[

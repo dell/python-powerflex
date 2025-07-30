@@ -18,7 +18,7 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects.gen2.storage_node import StorageNode, StorageNodeIp, StorageNodeIpRoles
+from PyPowerFlex.objects.gen2.storage_node import StorageNodeIp, StorageNodeIpRoles
 from tests.common import PyPowerFlexTestCase
 
 

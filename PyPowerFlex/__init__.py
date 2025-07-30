@@ -23,9 +23,9 @@ from PyPowerFlex import configuration
 from PyPowerFlex import exceptions
 from PyPowerFlex import token
 from PyPowerFlex import utils
-import PyPowerFlex.objects.common as common
-import PyPowerFlex.objects.gen1 as gen1
-import PyPowerFlex.objects.gen2 as gen2
+from PyPowerFlex.objects import common
+from PyPowerFlex.objects import gen1
+from PyPowerFlex.objects import gen2
 
 __all__ = [
     'PowerFlexClient'
@@ -121,6 +121,7 @@ class PowerFlexClient:
         self.__is_initialized = True
 
     def add_objects_common(self):
+        """Add common objects here."""
         self.__add_storage_entity('system', common.System)
         self.__add_storage_entity('sdc', common.Sdc)
         self.__add_storage_entity('sdt', common.Sdt)
@@ -129,6 +130,7 @@ class PowerFlexClient:
 
 
     def add_objects_gen1(self):
+        """Add gen1 objects here."""
         self.__add_storage_entity('device', gen1.Device)
         self.__add_storage_entity(
             'fault_set', gen1.FaultSet)
@@ -153,6 +155,7 @@ class PowerFlexClient:
             gen1.FirmwareRepository)
 
     def add_objects_gen2(self):
+        """Add gen2 objects here."""
         self.__add_storage_entity('storage_node', gen2.StorageNode)
         self.__add_storage_entity('protection_domain', gen2.ProtectionDomain)
         self.__add_storage_entity('storage_pool', gen2.StoragePool)

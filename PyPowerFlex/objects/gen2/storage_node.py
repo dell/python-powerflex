@@ -56,16 +56,13 @@ class StorageNodeIp(dict):
 
 
 class StorageNode(base_client.EntityRequest):
+    """PowerFlex Storage Node object."""
     @property
     def entity(self):
         """
         Returns the entity name.
         """
         return "Node"
-
-    """
-    A class representing Storage Node client.
-    """
 
     def add_ip(self, node_id, node_ip):
         """Add PowerFlex Storage Node IP-address.

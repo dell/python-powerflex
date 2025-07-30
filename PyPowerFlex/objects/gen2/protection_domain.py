@@ -45,6 +45,7 @@ LOG = logging.getLogger(__name__)
 
 
 class ProtectionDomainSchema(base_client.BaseSchema):
+    """Protection Domain schema."""
     id = fields.Str(
         metadata={
             "description": "Protection Domain Id",
@@ -154,6 +155,7 @@ class ProtectionDomainSchema(base_client.BaseSchema):
 
 
 def load_protection_domain_schema(obj):
+    """Load protection domain schema."""
     return ProtectionDomainSchema().load(obj)
 
 
@@ -161,6 +163,7 @@ class ProtectionDomain(base_client.EntityRequest):
     """
     A class representing Protection Domain client.
     """
+
     def list(self):
         """List PowerFlex protection domains.
 
@@ -168,13 +171,13 @@ class ProtectionDomain(base_client.EntityRequest):
         """
         return list(map(load_protection_domain_schema, self.get()))
 
-    def get_by_id(self, id):
+    def get_by_id(self, protection_domain_id):
         """Get PowerFlex protection domain.
 
-        :type id: str
+        :type protection_domain_id: str
         :rtype: dict
         """
-        return load_protection_domain_schema(self.get(entity_id=id))
+        return load_protection_domain_schema(self.get(entity_id=protection_domain_id))
 
     def get_by_name(self, name):
         """Get PowerFlex protection domain.
@@ -185,16 +188,15 @@ class ProtectionDomain(base_client.EntityRequest):
         result = self.get(filter_fields={'name': name})
         if len(result) >= 1:
             return load_protection_domain_schema(result[0])
-        else:
-            return None
+        return None
 
-    def delete(self, id):
+    def delete(self, protection_domain_id):
         """Remove PowerFlex protection domain.
 
-        :type id: str
+        :type protection_domain_id: str
         :rtype: None
         """
-        return self._delete_entity(id)
+        return self._delete_entity(protection_domain_id)
 
     def create(self, pd):
         """Create PowerFlex protection domain.
@@ -216,8 +218,10 @@ class ProtectionDomain(base_client.EntityRequest):
         :type pd: dict
         :rtype: dict
         """
-        current_pd = current_pd if current_pd is not None else self.get_by_id(pd['id'])
-        pd = load_protection_domain_schema({**ProtectionDomainSchema().dump(current_pd), **pd})
+        current_pd = current_pd if current_pd is not None else self.get_by_id(
+            pd['id'])
+        pd = load_protection_domain_schema(
+            {**ProtectionDomainSchema().dump(current_pd), **pd})
 
         has_update = False
 
@@ -245,24 +249,23 @@ class ProtectionDomain(base_client.EntityRequest):
             # TODO: unlimited, favorApplication
             "policy": "favorApplication",
         }
-        if pd['overall_concurrent_io_limit'] != current_pd['overall_concurrent_io_limit']:
-            policy['overallConcurrentIoLimit'] = pd['overall_concurrent_io_limit']
-        if pd['bandwidth_limit_overall_ios'] != current_pd['bandwidth_limit_overall_ios']:
-            policy['bandwidthLimitOverallIos'] = pd['bandwidth_limit_overall_ios']
-        if pd['bandwidth_limit_bg_dev_scanner'] != current_pd['bandwidth_limit_bg_dev_scanner']:
-            policy['bandwidthLimitBgDevScanner'] = pd['bandwidth_limit_bg_dev_scanner']
-        if pd['bandwidth_limit_garbage_collector'] != current_pd['bandwidth_limit_garbage_collector']:
-            policy['bandwidthLimitGarbageCollector'] = pd['bandwidth_limit_garbage_collector']
-        if pd['bandwidth_limit_singly_impacted_rebuild'] != current_pd['bandwidth_limit_singly_impacted_rebuild']:
-            policy['bandwidthLimitSinglyImpactedRebuild'] = pd['bandwidth_limit_singly_impacted_rebuild']
-        if pd['bandwidth_limit_doubly_impacted_rebuild'] != current_pd['bandwidth_limit_doubly_impacted_rebuild']:
-            policy['bandwidthLimitDoublyImpactedRebuild'] = pd['bandwidth_limit_doubly_impacted_rebuild']
-        if pd['bandwidth_limit_rebalance'] != current_pd['bandwidth_limit_rebalance']:
-            policy['bandwidthLimitRebalance'] = pd['bandwidth_limit_rebalance']
-        if pd['bandwidth_limit_other'] != current_pd['bandwidth_limit_other']:
-            policy['bandwidthLimitOther'] = pd['bandwidth_limit_other']
-        if pd['bandwidth_limit_node_network'] != current_pd['bandwidth_limit_node_network']:
-            policy['bandwidthLimitNodeNetwork'] = pd['bandwidth_limit_node_network']
+
+        field_map = {
+            'overall_concurrent_io_limit': 'overallConcurrentIoLimit',
+            'bandwidth_limit_overall_ios': 'bandwidthLimitOverallIos',
+            'bandwidth_limit_bg_dev_scanner': 'bandwidthLimitBgDevScanner',
+            'bandwidth_limit_garbage_collector': 'bandwidthLimitGarbageCollector',
+            'bandwidth_limit_singly_impacted_rebuild': 'bandwidthLimitSinglyImpactedRebuild',
+            'bandwidth_limit_doubly_impacted_rebuild': 'bandwidthLimitDoublyImpactedRebuild',
+            'bandwidth_limit_rebalance': 'bandwidthLimitRebalance',
+            'bandwidth_limit_other': 'bandwidthLimitOther',
+            'bandwidth_limit_node_network': 'bandwidthLimitNodeNetwork',
+        }
+
+        for py_key, api_key in field_map.items():
+            if pd[py_key] != current_pd[py_key]:
+                policy[api_key] = pd[py_key]
+
         if len(policy) > 1:
             has_update = True
             self.set_secondary_io_policy(pd['id'], policy)
@@ -323,7 +326,7 @@ class ProtectionDomain(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def enable_inflight_bandwidth_flow_control(self, id):
+    def enable_inflight_bandwidth_flow_control(self, protection_domain_id):
         """Enable inflight bandwidth flow control.
 
         :type id: str
@@ -335,19 +338,19 @@ class ProtectionDomain(base_client.EntityRequest):
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
-                                             entity_id=id)
+                                             entity_id=protection_domain_id)
         if r.status_code != requests.codes.ok:
             msg = (
                 f"Failed to enable inflight bandwidth flow control in PowerFlex {self.entity} "
-                f"with id {id}. Error: {response}"
+                f"with id {protection_domain_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def disable_inflight_bandwidth_flow_control(self, id):
+    def disable_inflight_bandwidth_flow_control(self, protection_domain_id):
         """Disable inflight bandwidth flow control.
 
-        :type id: str
+        :type protection_domain_id: str
         :rtype: None
         """
 
@@ -356,19 +359,19 @@ class ProtectionDomain(base_client.EntityRequest):
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
-                                             entity_id=id)
+                                             entity_id=protection_domain_id)
         if r.status_code != requests.codes.ok:
             msg = (
                 f"Failed to disable inflight bandwidth flow control in PowerFlex {self.entity} "
-                f"with id {id}. Error: {response}"
+                f"with id {protection_domain_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def set_rebuild_enabled(self, id, enabled):
+    def set_rebuild_enabled(self, protection_domain_id, enabled):
         """Set rebuild state.
 
-        :type id: str
+        :type protection_domain_id: str
         :type enabled: bool
         :rtype: None
         """
@@ -381,20 +384,20 @@ class ProtectionDomain(base_client.EntityRequest):
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
-                                             entity_id=id,
+                                             entity_id=protection_domain_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = (
                 f"Failed to set rebuild state in PowerFlex {self.entity} "
-                f"with id {id}. Error: {response}"
+                f"with id {protection_domain_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def set_rebalance_enabled(self, id, enabled):
+    def set_rebalance_enabled(self, protection_domain_id, enabled):
         """Set rebalance state.
 
-        :type id: str
+        :type protection_domain_id: str
         :type enabled: bool
         :rtype: None
         """
@@ -407,20 +410,20 @@ class ProtectionDomain(base_client.EntityRequest):
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
-                                             entity_id=id,
+                                             entity_id=protection_domain_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = (
                 f"Failed to set rebalance state in PowerFlex {self.entity} "
-                f"with id {id}. Error: {response}"
+                f"with id {protection_domain_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def set_secondary_io_policy(self, id, policy):
+    def set_secondary_io_policy(self, protection_domain_id, policy):
         """Set secondary I/O policy.
 
-        :type id: str
+        :type protection_domain_id: str
         :type policy: Dict
         :rtype: None
         """
@@ -429,34 +432,31 @@ class ProtectionDomain(base_client.EntityRequest):
         params = {
             "policy": policy["policy"],
         }
-        if 'overallConcurrentIoLimit' in policy:
-            params["overallConcurrentIoLimit"] = policy["overallConcurrentIoLimit"]
-        if 'bandwidwith_limit_overall_ios' in policy:
-            params['bandwidthLimitOverallIos'] = policy['bandwidwith_limit_overall_ios']
-        if 'bandwidth_limit_bg_dev_scanner' in policy:
-            params['bandwidthLimitBgDevScanner'] = policy['bandwidth_limit_bg_dev_scanner']
-        if 'bandwidth_limit_garbage_collector' in policy:
-            params['bandwidthLimitGarbageCollector'] = policy['bandwidth_limit_garbage_collector']
-        if 'bandwidth_limit_singly_impacted_rebuild' in policy:
-            params['bandwidthLimitSinglyImpactedRebuild'] = policy['bandwidth_limit_singly_impacted_rebuild']
-        if 'bandwidth_limit_doubly_impacted_rebuild' in policy:
-            params['bandwidthLimitDoublyImpactedRebuild'] = policy['bandwidth_limit_doubly_impacted_rebuild']
-        if 'bandwidth_limit_rebalance' in policy:
-            params['bandwidthLimitRebalance'] = policy['bandwidth_limit_rebalance']
-        if 'bandwidth_limit_other' in policy:
-            params['bandwidthLimitOther'] = policy['bandwidth_limit_other']
-        if 'bandwidth_limit_node_network' in policy:
-            params['bandwidthLimitNodeNetwork'] = policy['bandwidth_limit_node_network']
+        field_map = {
+            'overall_concurrent_io_limit': 'overallConcurrentIoLimit',
+            'bandwidth_limit_overall_ios': 'bandwidthLimitOverallIos',
+            'bandwidth_limit_bg_dev_scanner': 'bandwidthLimitBgDevScanner',
+            'bandwidth_limit_garbage_collector': 'bandwidthLimitGarbageCollector',
+            'bandwidth_limit_singly_impacted_rebuild': 'bandwidthLimitSinglyImpactedRebuild',
+            'bandwidth_limit_doubly_impacted_rebuild': 'bandwidthLimitDoublyImpactedRebuild',
+            'bandwidth_limit_rebalance': 'bandwidthLimitRebalance',
+            'bandwidth_limit_other': 'bandwidthLimitOther',
+            'bandwidth_limit_node_network': 'bandwidthLimitNodeNetwork',
+        }
+
+        for py_key, api_key in field_map.items():
+            if py_key in policy:
+                params[api_key] = policy[py_key]
 
         r, response = self.send_post_request(self.base_action_url,
                                              action=action,
                                              entity=self.entity,
-                                             entity_id=id,
+                                             entity_id=protection_domain_id,
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = (
                 f"Failed to set secondary I/O policy in PowerFlex {self.entity} "
-                f"with id {id}. Error: {response}"
+                f"with id {protection_domain_id}. Error: {response}"
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
@@ -478,19 +478,19 @@ class ProtectionDomain(base_client.EntityRequest):
     def get_storage_pools(self,
                           protection_domain_id,
                           filter_fields=None,
-                          fields=None):
+                          response_field=None):
         """Get related PowerFlex storage pools for protection domain.
 
         :type protection_domain_id: str
         :type filter_fields: dict
-        :type fields: list|tuple
+        :type response_field: list|tuple
         :rtype: list[dict]
         """
 
         return self.get_related(protection_domain_id,
                                 'StoragePool',
                                 filter_fields,
-                                fields)
+                                response_field)
 
     def rename(self, protection_domain_id, name):
         """Rename PowerFlex protection domain.

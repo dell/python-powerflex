@@ -376,7 +376,7 @@ class StorageNodeConstants:
     """
     This class holds statistics constants related to StorageNode.
     """
-    DEFAULT_STATISTICS_PROPERTIES = [
+    DEFAULT_STATISTICS_METRICS = [
         "storage_fe_write_latency",
         "device_local_read_bandwidth",
         "device_local_read_iops",

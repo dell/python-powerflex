@@ -21,7 +21,7 @@ from packaging import version
 
 from PyPowerFlex import configuration
 from PyPowerFlex import exceptions
-from PyPowerFlex import token
+from PyPowerFlex import powerflex_token
 from PyPowerFlex import utils
 from PyPowerFlex.objects import common
 from PyPowerFlex.objects import gen1
@@ -84,7 +84,7 @@ class PowerFlexClient:
                                                          certificate_path,
                                                          timeout,
                                                          log_level)
-        self.token = token.Token()
+        self.token = powerflex_token.PowerFlexToken()
         self.__is_initialized = False
 
     def __getattr__(self, item):

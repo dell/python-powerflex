@@ -37,6 +37,7 @@ class MockResponse(requests.Response):
 
     Defines http replies from mocked calls to do_request().
     """
+
     def __init__(self, content, status_code=200):
         """
         Initialize a MockResponse.
@@ -88,12 +89,15 @@ class PyPowerFlexTestCase(TestCase):
         """
         Decorator for mocking the version API version.
         """
+
         def decorator(subclass):
-            subclass.DEFAULT_MOCK_RESPONSES = copy.deepcopy(cls.DEFAULT_MOCK_RESPONSES)
+            subclass.DEFAULT_MOCK_RESPONSES = copy.deepcopy(
+                cls.DEFAULT_MOCK_RESPONSES)
             subclass.DEFAULT_MOCK_RESPONSES[
-                    cls.RESPONSE_MODE.Valid
-                ][cls.VERSION_API_PATH] = new_version
+                cls.RESPONSE_MODE.Valid
+            ][cls.VERSION_API_PATH] = new_version
             return subclass
+
         return decorator
 
     RESPONSE_MODE = (
@@ -191,6 +195,36 @@ class PyPowerFlexTestCase(TestCase):
         yield
         self.__http_response_mode = previous_response_mode
 
+    def extract_path_segment(self, url, request_url):
+        """
+        Return the REST path from a URL, removing the domain and optional '/api' prefix.
+        If `url` lacks domain info, fallback to `request_url`. Ensures output starts with '/'.
+        """
+
+        def strip_domain(u):
+            """
+            Strip scheme and domain from a full URL, keeping only the path.
+            """
+            if '://' in u:
+                parts = u.split('://', 1)[-1].split('/', 1)
+                return '/' + parts[1] if len(parts) > 1 else '/'
+            if u.startswith('/'):
+                return u
+            parts = request_url.split('://', 1)[-1].split('/', 1)
+            return '/' + parts[1] if len(parts) > 1 else '/'
+
+        path = strip_domain(url)
+
+        if path.startswith('/api/'):
+            path = path[4:]  # remove /api
+        elif path == '/api':
+            path = '/'
+
+        if not path.startswith('/'):
+            path = '/' + path
+
+        return path
+
     def get_mock_response(self, url, request_url=None, mode=None, *args, **kwargs):
         """
         Get a mock HTTP response.
@@ -208,7 +242,7 @@ class PyPowerFlexTestCase(TestCase):
         if mode is None:
             mode = self.__http_response_mode
 
-        api_path = url.split('/api')[1] if ('/api' in url) else request_url.split('/api')[1]
+        api_path = self.extract_path_segment(url, request_url)
         try:
             if api_path == "/login":
                 response = self.RESPONSE_MODE.Valid[0]

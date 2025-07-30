@@ -18,7 +18,6 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects.gen2.protection_domain import ProtectionDomain
 from tests.common import PyPowerFlexTestCase
 
 
@@ -145,7 +144,7 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
                               self.client.protection_domain.delete,
                               self.fake_pd_id)
-    
+
     def test_protection_domain_activate(self):
         """
         Test the activation of a protection domain.
@@ -180,7 +179,8 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
         """
         Test the rebuild of a protection domain.
         """
-        self.client.protection_domain.set_rebuild_enabled(self.fake_pd_id, False)
+        self.client.protection_domain.set_rebuild_enabled(
+            self.fake_pd_id, False)
 
     def test_protection_domain_rebuild_bad_status(self):
         """
@@ -190,12 +190,13 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.protection_domain.set_rebuild_enabled,
                               self.fake_pd_id, False)
-    
+
     def test_protection_domain_rebalance(self):
         """
         Test the rebalance of a protection domain.
         """
-        self.client.protection_domain.set_rebalance_enabled(self.fake_pd_id, False)
+        self.client.protection_domain.set_rebalance_enabled(
+            self.fake_pd_id, False)
 
     def test_protection_domain_rebalance_bad_status(self):
         """
@@ -205,7 +206,7 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.protection_domain.set_rebalance_enabled,
                               self.fake_pd_id, False)
-    
+
     def test_protection_domain_set_secondary_io_policy(self):
         """
         Test the set_secondary_io_policy of a protection domain.

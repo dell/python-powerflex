@@ -111,13 +111,14 @@ class Request:
             'content-type': 'application/json'
         }
 
-    def send_request(self, method, url, params=None, **url_params):
+    def send_request(self, method, url, params=None, use_base_url=True, **url_params):
         """
         Send a request to the PowerFlex API.
 
         Args:
             method (str): The HTTP method.
             url (str): The URL.
+            use_base_url (bool, optional): Whether to use the base URL. Defaults to True.
             params (dict): The parameters.
             url_params (dict): The URL parameters.
 
@@ -125,7 +126,12 @@ class Request:
             Response: The response object.
         """
         params = params or {}
-        request_url = f"{self.base_url}{url.format(**url_params)}"
+        use_base_url = True if use_base_url is None else use_base_url
+        if use_base_url:
+            request_url = f"{self.base_url}{url.format(**url_params)}"
+        else:
+            request_url = f"{self.base_url.removesuffix('/api')}{url.format(**url_params)}"
+
         version = self.login()
         request_params = {
             'headers': self.get_auth_headers(method),
@@ -158,19 +164,21 @@ class Request:
         response = self.send_request(self.GET, url, params, **url_params)
         return response, response.json()
 
-    def send_post_request(self, url, params=None, **url_params):
+    def send_post_request(self, url, use_base_url=True, params=None, **url_params):
         """
         Send a POST request to the PowerFlex API.
 
         Args:
             url (str): The URL.
+            use_base_url (bool, optional): Whether to use the base URL. Defaults to True.
             params (dict): The parameters.
             url_params (dict): The URL parameters.
 
         Returns:
             tuple: The response object and the response content.
         """
-        response = self.send_request(self.POST, url, params, **url_params)
+        response = self.send_request(
+            self.POST, url, params, use_base_url, ** url_params)
         return response, response.json()
 
     def send_put_request(self, url, params=None, **url_params):

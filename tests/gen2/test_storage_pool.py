@@ -18,7 +18,6 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects.gen2.storage_pool import StoragePool
 from tests.common import PyPowerFlexTestCase
 
 
@@ -28,6 +27,7 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
     Tests for the StoragePoolClient class.
     """
 
+    # pylint: disable=R0801
     def setUp(self):
         """
         Set up the test environment.
@@ -94,7 +94,8 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
         """
         Test the get_by_name of a storage pool.
         """
-        self.client.storage_pool.get_by_name(self.fake_pd_id, self.fake_sp_name)
+        self.client.storage_pool.get_by_name(
+            self.fake_pd_id, self.fake_sp_name)
 
     def test_storage_pool_update(self):
         """
@@ -134,8 +135,8 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'zeroPaddingEnabled': True,
         }
         self.assertRaises(exceptions.PowerFlexClientException,
-                            self.client.storage_pool.update,
-                            sp)
+                          self.client.storage_pool.update,
+                          sp)
 
     def test_storage_pool_update_bad_status_1(self):
         """
@@ -158,8 +159,8 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'zeroPaddingEnabled': True,
         }
         self.assertRaises(exceptions.PowerFlexClientException,
-                            self.client.storage_pool.update,
-                            sp)
+                          self.client.storage_pool.update,
+                          sp)
 
     def test_storage_pool_update_bad_status_2(self):
         """
@@ -182,8 +183,8 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'zeroPaddingEnabled': True,
         }
         self.assertRaises(exceptions.PowerFlexClientException,
-                            self.client.storage_pool.update,
-                            sp)
+                          self.client.storage_pool.update,
+                          sp)
 
     def test_storage_pool_create(self):
         """
@@ -232,6 +233,7 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
                               self.client.storage_pool.create,
                               sp)
 
+    # pylint: disable=R0801
     def test_storage_pool_delete(self):
         """
         Test the deletion of a storage pool.
@@ -246,12 +248,13 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexFailDeleting,
                               self.client.storage_pool.delete,
                               self.fake_sp_id)
-    
+
     def test_storage_pool_set_capacity_alert_thresholds(self):
         """
         Test the set_capacity_alert_thresholds of a storage pool.
         """
-        self.client.storage_pool.set_capacity_alert_thresholds(self.fake_sp_id, 1, 2)
+        self.client.storage_pool.set_capacity_alert_thresholds(
+            self.fake_sp_id, 1, 2)
 
     def test_storage_pool_set_capacity_alert_thresholds_bad_status(self):
         """
@@ -266,7 +269,8 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
         """
         Test the set_over_provisioning_factor of a storage pool.
         """
-        self.client.storage_pool.set_over_provisioning_factor(self.fake_sp_id, 0)
+        self.client.storage_pool.set_over_provisioning_factor(
+            self.fake_sp_id, 0)
 
     def test_storage_pool_set_over_provisioning_factor_bad_status(self):
         """
@@ -291,12 +295,13 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.storage_pool.resize,
                               self.fake_sp_id, 1)
-    
+
     def test_storage_pool_set_compression_method(self):
         """
         Test the set_compression_method of a storage pool.
         """
-        self.client.storage_pool.set_compression_method(self.fake_sp_id, "None")
+        self.client.storage_pool.set_compression_method(
+            self.fake_sp_id, "None")
 
     def test_storage_pool_set_compression_method_bad_status(self):
         """
@@ -306,12 +311,13 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.storage_pool.set_compression_method,
                               self.fake_sp_id, "None")
-    
+
     def test_storage_pool_set_zero_padding_policy(self):
         """
         Test the set_zero_padding_policy of a storage pool.
         """
-        self.client.storage_pool.set_zero_padding_policy(self.fake_sp_id, False)
+        self.client.storage_pool.set_zero_padding_policy(
+            self.fake_sp_id, False)
 
     def test_storage_pool_set_zero_padding_policy_bad_status(self):
         """
@@ -322,6 +328,7 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
                               self.client.storage_pool.set_zero_padding_policy,
                               self.fake_sp_id, False)
 
+    # pylint: disable=R0801
     def test_storage_pool_rename(self):
         """
         Test the rename method of a storage pool.

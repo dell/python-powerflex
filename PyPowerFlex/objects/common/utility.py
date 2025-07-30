@@ -146,27 +146,39 @@ class PowerFlexUtility(base_client.EntityRequest):
 
         return response
 
-    def get_statistics_for_all_storage_nodes(self, ids=None, properties=None):
+    def get_statistics_for_all_storage_nodes(self, ids=None, metrics=None):
         """list storage node statistics for PowerFlex 5.0+.
 
         :param ids: list
-        :param properties: list
+        :param metrics: list
+        :return: dict
+        """
+        metrics = metrics or StorageNodeConstants.DEFAULT_STATISTICS_METRICS
+        return self.query_metrics('storage_node', ids, metrics)
+
+    def query_metrics(self, resource_type, ids=None, metrics=None):
+        """Query PowerFlex resource metrics.
+
+        :param resource_type: str
+        :param ids: list
+        :param metrics: list
         :return: dict
         """
 
-        default_properties = StorageNodeConstants.DEFAULT_STATISTICS_PROPERTIES
         params = {
-            'properties': default_properties if properties is None else properties}
+            'resource_type': resource_type
+        }
         if ids is not None:
             params['ids'] = ids
-
-        params['resource_type'] = 'storage_node'
+        if metrics is not None:
+            params['metrics'] = metrics
 
         r, response = self.send_post_request(self.metrics_query_url,
+                                             use_base_url=False,
                                              params=params)
         if r.status_code != requests.codes.ok:
             msg = (
-                f"Failed to list storage node statistics for PowerFlex. "
+                f"Failed to query {resource_type} statistics. "
                 f"Error: {response}"
             )
             LOG.error(msg)

@@ -15,7 +15,7 @@
 
 """This module is used for the management of token."""
 
-class Token:
+class PowerFlexToken:
     """
     A class to manage a token.
     """

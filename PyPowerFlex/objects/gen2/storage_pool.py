@@ -66,12 +66,11 @@ class StoragePoolSchema(base_client.BaseSchema):
     wrc_device_group_id = fields.Str(
         metadata={
             "description": "Device Group Id",
-            # TODO:
-            # "updatable": False,
         }
     )
     gen_type = fields.Str(
-        # required=True,  # 5.0.0 only supports EC type
+        # 5.0.0 only supports EC type, so during creation, just pass EC to gen
+        # required=True,
         metadata={
             "description": "Gen Type, EC or MIRRORING",
         }
@@ -222,7 +221,6 @@ class StoragePool(base_client.EntityRequest):
             params["physicalSizeGB"] = sp["physical_size_gb"]
 
         new_sp = load_storage_pool_schema(self._create_entity(params))
-        sp["id"] = new_sp["id"]
         _, sp = self.update(StoragePoolSchema().dump(sp), new_sp)
 
         return sp

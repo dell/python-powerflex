@@ -27,7 +27,7 @@ from PyPowerFlex import base_client, exceptions
 LOG = logging.getLogger(__name__)
 
 
-# class LinkSchema(Schema):
+# class LinkSchema(base_client.BaseSchema):
 #     rel = fields.Str(
 #         metadata={
 #             "description": "Rel",
@@ -38,10 +38,6 @@ LOG = logging.getLogger(__name__)
 #             "description": "Href",
 #         }
 #     )
-#     def on_bind_field(self, field_name, field_obj):
-#         field_obj.data_key = camelcase(field_obj.data_key or field_name)
-#     class Meta:
-#         unknown = EXCLUDE
 
 
 class ProtectionDomainSchema(base_client.BaseSchema):
@@ -206,9 +202,7 @@ class ProtectionDomain(base_client.EntityRequest):
         """
         pd = load_protection_domain_schema(pd)
         params = {"name": pd['name']}
-
         new_pd = load_protection_domain_schema(self._create_entity(params))
-        pd['id'] = new_pd['id']
         _, pd = self.update(ProtectionDomainSchema().dump(pd), new_pd)
         return pd
 
@@ -246,7 +240,9 @@ class ProtectionDomain(base_client.EntityRequest):
         # self.enable_inflight_bandwidth_flow_control(pd['id'])
 
         policy = {
-            # TODO: unlimited, favorApplication
+            # this value may change as the development gose on
+            # will fix in formal releases
+            # In additional, this value cannot be validated currently
             "policy": "favorApplication",
         }
 
@@ -326,47 +322,47 @@ class ProtectionDomain(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-    def enable_inflight_bandwidth_flow_control(self, protection_domain_id):
-        """Enable inflight bandwidth flow control.
+    # def enable_inflight_bandwidth_flow_control(self, id):
+    #     """Enable inflight bandwidth flow control.
 
-        :type id: str
-        :rtype: None
-        """
+    #     :type id: str
+    #     :rtype: None
+    #     """
 
-        action = 'enableInflightBandwidthFlowControl'
+    #     action = 'enableInflightBandwidthFlowControl'
 
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=protection_domain_id)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f"Failed to enable inflight bandwidth flow control in PowerFlex {self.entity} "
-                f"with id {protection_domain_id}. Error: {response}"
-            )
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
+    #     r, response = self.send_post_request(self.base_action_url,
+    #                                          action=action,
+    #                                          entity=self.entity,
+    #                                          entity_id=id)
+    #     if r.status_code != requests.codes.ok:
+    #         msg = (
+    #             f"Failed to enable inflight bandwidth flow control in PowerFlex {self.entity} "
+    #             f"with id {id}. Error: {response}"
+    #         )
+    #         LOG.error(msg)
+    #         raise exceptions.PowerFlexClientException(msg)
 
-    def disable_inflight_bandwidth_flow_control(self, protection_domain_id):
-        """Disable inflight bandwidth flow control.
+    # def disable_inflight_bandwidth_flow_control(self, id):
+    #     """Disable inflight bandwidth flow control.
 
-        :type protection_domain_id: str
-        :rtype: None
-        """
+    #     :type id: str
+    #     :rtype: None
+    #     """
 
-        action = 'disableInflightBandwidthFlowControl'
+    #     action = 'disableInflightBandwidthFlowControl'
 
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=protection_domain_id)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f"Failed to disable inflight bandwidth flow control in PowerFlex {self.entity} "
-                f"with id {protection_domain_id}. Error: {response}"
-            )
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
+    #     r, response = self.send_post_request(self.base_action_url,
+    #                                          action=action,
+    #                                          entity=self.entity,
+    #                                          entity_id=id)
+    #     if r.status_code != requests.codes.ok:
+    #         msg = (
+    #             f"Failed to disable inflight bandwidth flow control in PowerFlex {self.entity} "
+    #             f"with id {id}. Error: {response}"
+    #         )
+    #         LOG.error(msg)
+    #         raise exceptions.PowerFlexClientException(msg)
 
     def set_rebuild_enabled(self, protection_domain_id, enabled):
         """Set rebuild state.

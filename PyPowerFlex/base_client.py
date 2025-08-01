@@ -621,6 +621,35 @@ class EntityRequest(Request):
             raise exc
         return response
 
+    def query_metrics(self, resource_type, ids=None, metrics=None):
+        """Query PowerFlex resource metrics.
+
+        :param resource_type: str
+        :param ids: list
+        :param metrics: list
+        :return: dict
+        """
+
+        params = {
+            'resource_type': resource_type
+        }
+        if ids is not None:
+            params['ids'] = ids
+        if metrics is not None:
+            params['metrics'] = metrics
+
+        r, response = self.send_post_request(self.metrics_query_url,
+                                             use_base_url=False,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (
+                f"Failed to query {resource_type} statistics. "
+                f"Error: {response}"
+            )
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
 
 class BaseSchema(Schema):
     """Base schema."""

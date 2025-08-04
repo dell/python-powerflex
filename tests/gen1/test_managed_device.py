@@ -13,17 +13,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Module for testing firmware repository client."""
+"""Module for testing managed device client."""
 
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-import tests
+from tests.common import PyPowerFlexTestCase
 
-
-class TestFirmwareRepositoryClient(tests.PyPowerFlexTestCase):
+@PyPowerFlexTestCase.version('4.5')
+class TestManagedDeviceClient(PyPowerFlexTestCase):
     """
-    Test class for FirmwareRepositoryClient.
+    Test class for the ManagedDeviceClient.
     """
     def setUp(self):
         """
@@ -34,27 +34,27 @@ class TestFirmwareRepositoryClient(tests.PyPowerFlexTestCase):
 
         self.MOCK_RESPONSES = {
             self.RESPONSE_MODE.Valid: {
-                '/V1/FirmwareRepository': {},
-                '/V1/FirmwareRepository?related=False&bundles=False&components=False': {}
+                '/V1/ManagedDevice': {},
+                '/V1/ManagedDevice?filter=eq,deviceType,scaleio&sort=state': {}
             }
         }
 
-    def test_firmware_repository_get(self):
+    def test_managed_device_get(self):
         """
-        Test the get method of the FirmwareRepositoryClient.
+        Test the managed_device.get() method.
         """
-        self.client.firmware_repository.get()
+        self.client.managed_device.get()
 
-    def test_firmware_repository_get_with_query_params(self):
+    def test_managed_device_get_with_query_params(self):
         """
-        Test the get method of the FirmwareRepositoryClient with query parameters.
+        Test the managed_device.get() method with query parameters.
         """
-        self.client.firmware_repository.get(related=False, bundles=False, components=False)
+        self.client.managed_device.get(filters=['eq,deviceType,scaleio'], sort="state")
 
-    def test_firmware_repository_get_bad_status(self):
+    def test_managed_device_get_bad_status(self):
         """
-        Test the get method of the FirmwareRepositoryClient with a bad status.
+        Test the managed_device.get() method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.firmware_repository.get)
+                              self.client.managed_device.get)

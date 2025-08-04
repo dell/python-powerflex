@@ -21,9 +21,10 @@ import logging
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-
+from marshmallow import EXCLUDE, Schema
 from PyPowerFlex import exceptions
 from PyPowerFlex import utils
+
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 LOG = logging.getLogger(__name__)
@@ -110,13 +111,14 @@ class Request:
             'content-type': 'application/json'
         }
 
-    def send_request(self, method, url, params=None, **url_params):
+    def send_request(self, method, url, params=None, use_base_url=True, **url_params):
         """
         Send a request to the PowerFlex API.
 
         Args:
             method (str): The HTTP method.
             url (str): The URL.
+            use_base_url (bool, optional): Whether to use the base URL. Defaults to True.
             params (dict): The parameters.
             url_params (dict): The URL parameters.
 
@@ -124,7 +126,12 @@ class Request:
             Response: The response object.
         """
         params = params or {}
-        request_url = f"{self.base_url}{url.format(**url_params)}"
+        use_base_url = True if use_base_url is None else use_base_url
+        if use_base_url:
+            request_url = f"{self.base_url}{url.format(**url_params)}"
+        else:
+            request_url = f"{self.base_url.removesuffix('/api')}{url.format(**url_params)}"
+
         version = self.login()
         request_params = {
             'headers': self.get_auth_headers(method),
@@ -157,19 +164,21 @@ class Request:
         response = self.send_request(self.GET, url, params, **url_params)
         return response, response.json()
 
-    def send_post_request(self, url, params=None, **url_params):
+    def send_post_request(self, url, use_base_url=True, params=None, **url_params):
         """
         Send a POST request to the PowerFlex API.
 
         Args:
             url (str): The URL.
+            use_base_url (bool, optional): Whether to use the base URL. Defaults to True.
             params (dict): The parameters.
             url_params (dict): The URL parameters.
 
         Returns:
             tuple: The response object and the response content.
         """
-        response = self.send_request(self.POST, url, params, **url_params)
+        response = self.send_request(
+            self.POST, url, params, use_base_url, ** url_params)
         return response, response.json()
 
     def send_put_request(self, url, params=None, **url_params):
@@ -373,6 +382,7 @@ class EntityRequest(Request):
     base_type_special_action_url = '/types/{entity}/instances/action/{action}'
     query_mdm_cluster_url = '/instances/{entity}/queryMdmCluster'
     list_statistics_url = '/types/{entity}/instances/action/{action}'
+    metrics_query_url = '/dtapi/rest/v1/metrics/query'
     service_template_url = '/V1/ServiceTemplate'
     managed_device_url = '/V1/ManagedDevice'
     deployment_url = '/V1/Deployment'
@@ -420,6 +430,9 @@ class EntityRequest(Request):
             entity_id (str): The ID of the entity.
             params (dict, optional): Parameters for the entity.
 
+        Returns:
+            dict: The response from the API.
+
         Raises:
             PowerFlexFailDeleting: If the entity fails to be deleted.
         """
@@ -435,6 +448,7 @@ class EntityRequest(Request):
                                                    response)
             LOG.error(exc.message)
             raise exc
+        return response
 
     def _rename_entity(self, action, entity_id, params=None):
         """
@@ -446,7 +460,7 @@ class EntityRequest(Request):
             params (dict, optional): Parameters for the entity.
 
         Returns:
-            dict: The renamed entity.
+            dict: The response from the API.
 
         Raises:
             PowerFlexFailRenaming: If the entity fails to be renamed.
@@ -461,8 +475,7 @@ class EntityRequest(Request):
                                                    response)
             LOG.error(exc.message)
             raise exc
-
-        return self.get(entity_id=entity_id)
+        return response
 
     def get(self, entity_id=None, filter_fields=None, fields=None):
         """
@@ -576,6 +589,7 @@ class EntityRequest(Request):
                 self.entity, entity_id, action, response)
             LOG.error(exc.message)
             raise exc
+        return response
 
     def _query_selected_statistics(self, action, params=None):
         """
@@ -606,3 +620,50 @@ class EntityRequest(Request):
             LOG.error(exc.message)
             raise exc
         return response
+
+    def query_metrics(self, resource_type, ids=None, metrics=None):
+        """Query PowerFlex resource metrics.
+
+        :param resource_type: str
+        :param ids: list
+        :param metrics: list
+        :return: dict
+        """
+
+        params = {
+            'resource_type': resource_type
+        }
+        if ids is not None:
+            params['ids'] = ids
+        if metrics is not None:
+            params['metrics'] = metrics
+
+        r, response = self.send_post_request(self.metrics_query_url,
+                                             use_base_url=False,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (
+                f"Failed to query {resource_type} statistics. "
+                f"Error: {response}"
+            )
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return response
+
+class BaseSchema(Schema):
+    """Base schema."""
+    # pylint: disable=too-few-public-methods
+
+    def on_bind_field(self, field_name, field_obj):
+        field_obj.data_key = camelcase(field_obj.data_key or field_name)
+
+    class Meta:
+        """Meta class."""
+        unknown = EXCLUDE
+
+
+def camelcase(s):
+    """Convert snake case to camel case."""
+    parts = iter(s.split("_"))
+    return next(parts) + "".join(i.title() for i in parts)

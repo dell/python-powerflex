@@ -18,10 +18,10 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-import tests
+from tests.common import PyPowerFlexTestCase
 
-
-class TestDeploymentClient(tests.PyPowerFlexTestCase):
+@PyPowerFlexTestCase.version('4.5')
+class TestDeploymentClient(PyPowerFlexTestCase):
     """
     Test class for the DeploymentClient.
     """

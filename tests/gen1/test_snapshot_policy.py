@@ -18,11 +18,11 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects import snapshot_policy as sp
-import tests
+from PyPowerFlex.objects.gen1 import snapshot_policy as sp
+from tests.common import PyPowerFlexTestCase
 
-
-class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
+@PyPowerFlexTestCase.version('4.5')
+class TestSnapshotPolicyClient(PyPowerFlexTestCase):
     """
     Test class for snapshot policy client.
     """
@@ -59,7 +59,7 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
                     {},
                 '/types/SnapshotPolicy'
                 '/instances/action/querySelectedStatistics': {
-                    self.fake_policy_id: {'numOfSrcVols': 1}
+                    self.fake_policy_id: {'numOfpypowerflexVols': 1}
                 },
             },
             self.RESPONSE_MODE.Invalid: {
@@ -231,9 +231,9 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
         Tests the behavior of the query_selected_statistics method.
         """
         ret = self.client.snapshot_policy.query_selected_statistics(
-            properties=["numOfSrcVols"]
+            properties=["numOfpypowerflexVols"]
         )
-        assert ret.get(self.fake_policy_id).get("numOfSrcVols") == 1
+        assert ret.get(self.fake_policy_id).get("numOfpypowerflexVols") == 1
 
     def test_snapshot_policy_query_selected_statistics_bad_status(self):
         """
@@ -244,5 +244,5 @@ class TestSnapshotPolicyClient(tests.PyPowerFlexTestCase):
             self.assertRaises(
                 exceptions.PowerFlexFailQuerying,
                 self.client.snapshot_policy.query_selected_statistics,
-                properties=["numOfSrcVols"],
+                properties=["numOfpypowerflexVols"],
             )

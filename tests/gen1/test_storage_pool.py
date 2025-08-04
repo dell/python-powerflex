@@ -18,13 +18,13 @@
 # pylint: disable=invalid-name,too-many-public-methods
 
 from PyPowerFlex import exceptions
-from PyPowerFlex.objects.storage_pool import CompressionMethod
-from PyPowerFlex.objects.storage_pool import ExternalAccelerationType
-from PyPowerFlex.objects.storage_pool import MediaType
-import tests
+from PyPowerFlex.objects.gen1.storage_pool import CompressionMethod
+from PyPowerFlex.objects.gen1.storage_pool import ExternalAccelerationType
+from PyPowerFlex.objects.gen1.storage_pool import MediaType
+from tests.common import PyPowerFlexTestCase
 
-
-class TestStoragePoolClient(tests.PyPowerFlexTestCase):
+@PyPowerFlexTestCase.version('4.5')
+class TestStoragePoolClient(PyPowerFlexTestCase):
     """
     Test class for the StoragePoolClient.
     """

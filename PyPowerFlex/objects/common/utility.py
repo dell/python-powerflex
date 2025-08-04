@@ -22,7 +22,13 @@ import requests
 
 from PyPowerFlex import base_client
 from PyPowerFlex import exceptions
-from PyPowerFlex.constants import StoragePoolConstants, VolumeConstants, SnapshotPolicyConstants
+
+from PyPowerFlex.constants import (
+    StoragePoolConstants,
+    VolumeConstants,
+    SnapshotPolicyConstants,
+    StorageNodeConstants
+)
 
 
 LOG = logging.getLogger(__name__)
@@ -30,6 +36,7 @@ LOG = logging.getLogger(__name__)
 
 class PowerFlexUtility(base_client.EntityRequest):
     "Utility class for PowerFlex"
+
     def __init__(self, token, configuration):
         super().__init__(token, configuration)
 
@@ -138,3 +145,13 @@ class PowerFlexUtility(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return response
+
+    def query_metrics_for_all_storage_nodes(self, ids=None, metrics=None):
+        """list storage node statistics for PowerFlex 5.0+.
+
+        :param ids: list
+        :param metrics: list
+        :return: dict
+        """
+        metrics = metrics or StorageNodeConstants.DEFAULT_STATISTICS_METRICS
+        return self.query_metrics('storage_node', ids, metrics)

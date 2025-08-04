@@ -13,37 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""This module is used for the management of token."""
+"""This module contains the objects for interacting with the PowerFlex 5.0+ APIs."""
 
-class Token:
-    """
-    A class to manage a token.
-    """
-    def __init__(self):
-        """
-        Initialize the Token object.
+from PyPowerFlex.objects.gen2.storage_node import StorageNode
+from PyPowerFlex.objects.gen2.protection_domain import ProtectionDomain
+from PyPowerFlex.objects.gen2.storage_pool import StoragePool
 
-        The initial value of the token is None.
-        """
-        self.__token = None
-
-    def get(self):
-        """
-        Get the current token.
-
-        Returns:
-            The current token.
-        """
-        return self.__token
-
-    def set(self, token):
-        """
-        Set the token.
-
-        Args:
-            token (Any): The new token.
-
-        Returns:
-            None
-        """
-        self.__token = token
+__all__ = [
+    'StorageNode',
+    'ProtectionDomain',
+    'StoragePool',
+]

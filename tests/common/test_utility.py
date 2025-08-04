@@ -18,10 +18,10 @@
 # pylint: disable=invalid-name
 
 from PyPowerFlex import exceptions
-import tests
+from tests.common import PyPowerFlexTestCase
 
 
-class TestPowerFlexUtility(tests.PyPowerFlexTestCase):
+class TestPowerFlexUtility(PyPowerFlexTestCase):
     """
     Test class for the PowerFlex utility.
     """
@@ -38,6 +38,8 @@ class TestPowerFlexUtility(tests.PyPowerFlexTestCase):
                 '/types/StoragePool/instances/action/querySelectedStatistics':
                     {},
                 '/types/Volume/instances/action/querySelectedStatistics':
+                    {},
+                '/dtapi/rest/v1/metrics/query':
                     {},
             }
         }
@@ -69,3 +71,9 @@ class TestPowerFlexUtility(tests.PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.utility.get_statistics_for_all_volumes)
+
+    def test_query_metrics_for_all_storage_nodes(self):
+        """
+        Test the query_metrics_for_all_storage_nodes method.
+        """
+        self.client.utility.query_metrics_for_all_storage_nodes()

@@ -27,19 +27,6 @@ from PyPowerFlex import base_client, exceptions
 LOG = logging.getLogger(__name__)
 
 
-# class LinkSchema(base_client.BaseSchema):
-#     rel = fields.Str(
-#         metadata={
-#             "description": "Rel",
-#         }
-#     )
-#     href = fields.Str(
-#         metadata={
-#             "description": "Href",
-#         }
-#     )
-
-
 class ProtectionDomainSchema(base_client.BaseSchema):
     """Protection Domain schema."""
     id = fields.Str(
@@ -143,11 +130,6 @@ class ProtectionDomainSchema(base_client.BaseSchema):
             "updatable": True,
         }
     )
-    # links = fields.List(fields.Nested(LinkSchema),
-    #     metadata={
-    #         "description": "Links",
-    #     }
-    # )
 
 
 def load_protection_domain_schema(obj):
@@ -501,23 +483,3 @@ class ProtectionDomain(base_client.EntityRequest):
         params = {"name": name}
 
         self._rename_entity(action, protection_domain_id, params)
-
-    # def query_selected_statistics(self, properties, ids=None):
-    #     """Query PowerFlex protection domain statistics.
-
-    #     :type properties: list
-    #     :type ids: list of protection domain IDs or None for all protection
-    #                domains
-    #     :rtype: dict
-    #     """
-
-    #     action = "querySelectedStatistics"
-
-    #     params = {'properties': properties}
-
-    #     if ids:
-    #         params["ids"] = ids
-    #     else:
-    #         params["allIds"] = ""
-
-    #     return self._query_selected_statistics(action, params)

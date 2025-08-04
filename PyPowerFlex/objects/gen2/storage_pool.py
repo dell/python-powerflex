@@ -150,6 +150,7 @@ class StoragePoolSchema(base_client.BaseSchema):
     # class Meta:
     #     unknown = INCLUDE
 
+
 def load_storage_pool_schema(obj):
     """Load storage pool schema."""
     return StoragePoolSchema().load(obj)
@@ -184,7 +185,8 @@ class StoragePool(base_client.EntityRequest):
         """
         pdo = ProtectionDomain(self.token, self.configuration)
 
-        result = pdo.get_storage_pools(protion_domain_id, filter_fields={"name": name})
+        result = pdo.get_storage_pools(
+            protion_domain_id, filter_fields={"name": name})
         if len(result) >= 1:
             return load_storage_pool_schema(result[0])
         return None
@@ -231,8 +233,10 @@ class StoragePool(base_client.EntityRequest):
         :type sp: dict
         :rtype: dict
         """
-        current_sp = current_sp if current_sp is not None else self.get_by_id(sp["id"])
-        sp = load_storage_pool_schema({**StoragePoolSchema().dump(current_sp), **sp})
+        current_sp = current_sp if current_sp is not None else self.get_by_id(
+            sp["id"])
+        sp = load_storage_pool_schema(
+            {**StoragePoolSchema().dump(current_sp), **sp})
 
         if sp["protection_domain_id"] != current_sp["protection_domain_id"]:
             e = exceptions.nonupdatable_exception(
@@ -282,7 +286,8 @@ class StoragePool(base_client.EntityRequest):
 
         if sp["over_provisioning_factor"] != current_sp["over_provisioning_factor"]:
             has_update = True
-            self.set_over_provisioning_factor(sp["id"], sp["over_provisioning_factor"])
+            self.set_over_provisioning_factor(
+                sp["id"], sp["over_provisioning_factor"])
 
         if sp["physical_size_gb"] != current_sp["physical_size_gb"]:
             has_update = True
@@ -302,68 +307,6 @@ class StoragePool(base_client.EntityRequest):
         """
 
         return self._delete_entity(storage_pool_id)
-
-    # def get_devices(self, storage_pool_id, filter_fields=None, fields=None):
-    #     """Get related PowerFlex devices for storage pool.
-
-    #     :type storage_pool_id: str
-    #     :type filter_fields: dict
-    #     :type fields: list|tuple
-    #     :rtype: list[dict]
-    #     """
-
-    #     return self.get_related(storage_pool_id,
-    #                             'Device',
-    #                             filter_fields,
-    #                             fields)
-
-    # def get_sdss(self, storage_pool_id, filter_fields=None, fields=None):
-    #     """Get related PowerFlex SDSs for storage pool.
-
-    #     :type storage_pool_id: str
-    #     :type filter_fields: dict
-    #     :type fields: list|tuple
-    #     :rtype: list[dict]
-    #     """
-
-    #     sdss_ids = self.get_related(storage_pool_id,
-    #                                 'SpSds',
-    #                                 filter_fields,
-    #                                 fields=('sdsId',))
-    #     sds_id_list = [sds['sdsId'] for sds in sdss_ids]
-    #     if filter_fields:
-    #         filter_fields.update({'id': sds_id_list})
-    #         filter_fields.pop('sdsId', None)
-    #     else:
-    #         filter_fields = {'id': sds_id_list}
-    #     return Sds(self.token, self.configuration).get(
-    #         filter_fields=filter_fields, fields=fields)
-
-    # def get_volumes(self, storage_pool_id, filter_fields=None, fields=None):
-    #     """Get related PowerFlex volumes for storage pool.
-
-    #     :type storage_pool_id: str
-    #     :type filter_fields: dict
-    #     :type fields: list|tuple
-    #     :rtype: list[dict]
-    #     """
-
-    #     return self.get_related(storage_pool_id,
-    #                             'Volume',
-    #                             filter_fields,
-    #                             fields)
-
-    # def get_statistics(self, storage_pool_id, fields=None):
-    #     """Get related PowerFlex Statistics for storage pool.
-
-    #     :type storage_pool_id: str
-    #     :type fields: list|tuple
-    #     :rtype: dict
-    #     """
-
-    #     return self.get_related(storage_pool_id,
-    #                             'Statistics',
-    #                             fields)
 
     def rename(self, storage_pool_id, name):
         """Rename PowerFlex storage pool.
@@ -520,22 +463,3 @@ class StoragePool(base_client.EntityRequest):
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-
-    # def query_selected_statistics(self, properties, ids=None):
-    #     """Query PowerFlex storage pool statistics.
-
-    #     :type properties: list
-    #     :type ids: list of storage pools IDs or None for all storage pools
-    #     :rtype: dict
-    #     """
-
-    #     action = "querySelectedStatistics"
-
-    #     params = {'properties': properties}
-
-    #     if ids:
-    #         params["ids"] = ids
-    #     else:
-    #         params["allIds"] = ""
-
-    #     return self._query_selected_statistics(action, params)

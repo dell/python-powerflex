@@ -72,8 +72,8 @@ class TestPowerFlexUtility(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.utility.get_statistics_for_all_volumes)
 
-    def test_get_statistics_for_all_storage_nodes(self):
+    def test_query_metrics_for_all_storage_nodes(self):
         """
-        Test the get_statistics_for_all_storage_nodes method.
+        Test the query_metrics_for_all_storage_nodes method.
         """
-        self.client.utility.get_statistics_for_all_storage_nodes()
+        self.client.utility.query_metrics_for_all_storage_nodes()

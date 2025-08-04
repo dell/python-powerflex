@@ -146,7 +146,7 @@ class PowerFlexUtility(base_client.EntityRequest):
 
         return response
 
-    def get_statistics_for_all_storage_nodes(self, ids=None, metrics=None):
+    def query_metrics_for_all_storage_nodes(self, ids=None, metrics=None):
         """list storage node statistics for PowerFlex 5.0+.
 
         :param ids: list

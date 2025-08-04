@@ -52,14 +52,10 @@ class TestDeviceClient(PyPowerFlexTestCase):
                     {},
                 f'/instances/Device::{self.fake_device_id}'
                 '/action/setDeviceCapacityLimit':
-                    {
-                        # TODO TTHE update this API after the latest build is ready
-                    },
+                    {},
                 f'/instances/Device::{self.fake_device_id}'
                 '/action/updateDeviceOriginalPathname':
-                    {
-                        # TODO TTHE update this API after the latest build is ready
-                    },
+                    {},
                 f'/instances/Device::{self.fake_device_id}'
                 '/action/clearDeviceError':
                     {},

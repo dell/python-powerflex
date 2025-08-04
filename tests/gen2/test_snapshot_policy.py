@@ -57,7 +57,6 @@ class TestSnapshotPolicyClient(PyPowerFlexTestCase):
                 f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/resumeSnapshotPolicy':
                     {},
                 '/dtapi/rest/v1/metrics/query': {
-                    # TODO TTHE update this API after the latest build is ready
                     self.fake_policy_id: {'numOfpypowerflexVols': 1}
                 },
             },

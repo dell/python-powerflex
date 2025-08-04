@@ -15,7 +15,7 @@
 
 """Module for testing device group client."""
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,duplicate-code
 
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen2.device_group import MediaType
@@ -152,7 +152,7 @@ class TestDeviceClient(PyPowerFlexTestCase):
         """
         Test device group query selected metrics.
         """
-        ret = self.client.device_group.query_metrics(self.fake_device_group_id)
+        ret = self.client.device_group.query_device_group_metrics(self.fake_device_group_id)
         assert ret.get(self.fake_device_group_id).get("physical_total") == 10995116277760
 
     def test_device_group_query_metrics_bad_status(self):
@@ -161,8 +161,8 @@ class TestDeviceClient(PyPowerFlexTestCase):
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
-                exceptions.PowerFlexFailQuerying,
-                self.client.device_group.query_metrics,
+                exceptions.PowerFlexClientException,
+                self.client.device_group.query_device_group_metrics,
                 self.fake_device_group_id)
 
     def test_device_group_query_usable_capacity(self):
@@ -172,7 +172,7 @@ class TestDeviceClient(PyPowerFlexTestCase):
         ret = self.client.device_group.query_usable_capacity(self.fake_device_group_id)
         assert ret.get(self.fake_device_group_id).get("numProtectionSlices") == 2
 
-    def test_device_group_query_metrics_bad_status(self):
+    def test_device_group_query_usable_capacity_bad_status(self):
         """
         Test device group query_usable_capacity with bad status.
         """

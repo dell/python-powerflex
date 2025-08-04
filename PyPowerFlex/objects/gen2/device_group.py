@@ -41,7 +41,7 @@ class DeviceGroup(base_client.EntityRequest):
     def create(self,
                name,
                protection_domain_id,
-               media_type,     
+               media_type,
                spare_node_count=None,
                spare_device_count=None):
         """Create PowerFlex device group.
@@ -71,12 +71,12 @@ class DeviceGroup(base_client.EntityRequest):
 
     def delete(self, device_group_id, force=None):
         """Remove PowerFlex device group.
+        TODO TTHE make sure this `force` field is valid after the latest dev build is ready
 
         :type device_group_id: str
         :type force: bool
         :rtype: None
         """
-        # TODO TTHE make sure this `force` field is valid after the latest dev build is ready
         params = {
             "force": force
         }
@@ -141,11 +141,11 @@ class DeviceGroup(base_client.EntityRequest):
 
         return response
 
-    def query_metrics(self, device_group_id, metrics=None):
+    def query_device_group_metrics(self, device_group_id, metrics=None):
         """Query PowerFlex Metrics for device group.
 
         :type device_group_id: str
         :type metrics: list|tuple
         :rtype: dict
         """
-        return super().query_metrics('device_group', [device_group_id], metrics)
+        return self.query_metrics('device_group', [device_group_id], metrics)

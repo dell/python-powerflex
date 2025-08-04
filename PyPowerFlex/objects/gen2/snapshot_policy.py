@@ -107,15 +107,15 @@ class SnapshotPolicy(SnapshotPolicyGen1):
 
         return self.get(entity_id=snapshot_policy_id)
 
-    # TODO TTHE make sure this API is valid after new dev build is ready
-    def query_metrics(self, snapshot_policy_id, metrics=None):
+    def query_snapshot_policy_metrics(self, snapshot_policy_id, metrics=None):
         """Query PowerFlex Metrics for snapshot policy.
+        TODO TTHE make sure this API is valid after new dev build is ready
 
         :type snapshot_policy_id: str
         :type metrics: list|tuple
         :rtype: dict
         """
-        return super().query_metrics('snapshot_policy', [snapshot_policy_id], metrics)
+        return self.query_metrics('snapshot_policy', [snapshot_policy_id], metrics)
 
     def get_statistics(self, snapshot_policy_id, fields=None):
         """Get PowerFlex Snapshot Policy Statistics not supported in PowerFlex 5.x.
@@ -125,7 +125,6 @@ class SnapshotPolicy(SnapshotPolicyGen1):
         :rtype: dict
         """
         LOG.error("Get PowerFlex Snapshot Policy Statistics not supported in PowerFlex 5.x.")
-        return None
 
     def query_selected_statistics(self, properties, ids=None):
         """Query PowerFlex snapshot policy statistics not supported in PowerFlex 5.x.
@@ -136,4 +135,3 @@ class SnapshotPolicy(SnapshotPolicyGen1):
         :rtype: dict
         """
         LOG.error("Query PowerFlex snapshot policy statistics not supported in PowerFlex 5.x.")
-        return None

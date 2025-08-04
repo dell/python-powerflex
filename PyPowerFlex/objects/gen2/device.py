@@ -98,9 +98,9 @@ class Device(base_client.EntityRequest):
 
         return self._rename_entity(action, device_id, params)
 
-    # TODO TTHE make sure this API is valid after the latest dev build is ready
     def update_pathname(self, device_id, new_pathname):
         """Update PowerFlex device pathname.
+        TODO TTHE make sure this API is valid after the latest dev build is ready
 
         :type device_id: str
         :type new_pathname: str
@@ -125,9 +125,9 @@ class Device(base_client.EntityRequest):
 
         return self.get(entity_id=device_id)
 
-    # TODO TTHE make sure this API is valid after the latest dev build is ready
     def set_capacity_limit(self, device_id, capacity_limit_gb):
         """Update PowerFlex device capacity limit in GB.
+        TODO TTHE make sure this API is valid after the latest dev build is ready
 
         :type device_id: str
         :type capacity_limit_gb: int
@@ -154,6 +154,7 @@ class Device(base_client.EntityRequest):
 
     def clear_errors(self, device_id, force=None):
         """Clear PowerFlex device errors.
+        TODO TTHE make sure this field - `forceClear` is valid after the latest dev build is ready
 
         :type device_id: str
         :rtype: dict
@@ -161,7 +162,6 @@ class Device(base_client.EntityRequest):
 
         action = 'clearDeviceError'
 
-        # TODO TTHE make sure this field is valid after the latest dev build is ready
         params = {"forceClear": force}
 
         return self._perform_entity_operation_based_on_action(
@@ -169,7 +169,7 @@ class Device(base_client.EntityRequest):
             entity_id=device_id,
             params=params,
             add_entity=False)
-    
+
     def activate(self, device_id, node_id):
         """Activate PowerFlex device.
 
@@ -188,11 +188,11 @@ class Device(base_client.EntityRequest):
             params=params,
             add_entity=False)
 
-    def query_metrics(self, device_id, metrics=None):
+    def query_device_metrics(self, device_id, metrics=None):
         """Query PowerFlex Metrics for device.
 
         :type device_id: str
         :type metrics: list|tuple
         :rtype: dict
         """
-        return super().query_metrics('device', [device_id], metrics)
+        return self.query_metrics('device', [device_id], metrics)

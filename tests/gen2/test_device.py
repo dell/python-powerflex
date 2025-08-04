@@ -15,7 +15,7 @@
 
 """Module for testing device client."""
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,duplicate-code
 
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen2.device import MediaType
@@ -51,11 +51,15 @@ class TestDeviceClient(PyPowerFlexTestCase):
                 '/action/setDeviceName':
                     {},
                 f'/instances/Device::{self.fake_device_id}'
-                '/action/setDeviceCapacityLimit': # TODO TTHE update this API after the latest build is ready
-                    {},
+                '/action/setDeviceCapacityLimit':
+                    {
+                        # TODO TTHE update this API after the latest build is ready
+                    },
                 f'/instances/Device::{self.fake_device_id}'
-                '/action/updateDeviceOriginalPathname': # TODO TTHE update this API after the latest build is ready
-                    {},
+                '/action/updateDeviceOriginalPathname':
+                    {
+                        # TODO TTHE update this API after the latest build is ready
+                    },
                 f'/instances/Device::{self.fake_device_id}'
                 '/action/clearDeviceError':
                     {},
@@ -227,7 +231,7 @@ class TestDeviceClient(PyPowerFlexTestCase):
         """
         Test device query selected metrics.
         """
-        ret = self.client.device.query_metrics(self.fake_device_id)
+        ret = self.client.device.query_device_metrics(self.fake_device_id)
         assert ret.get(self.fake_device_id).get("raw_total") == 1099511627776
 
     def test_device_query_metrics_bad_status(self):
@@ -237,5 +241,5 @@ class TestDeviceClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
-                self.client.device.query_metrics,
+                self.client.device.query_device_metrics,
                 self.fake_device_id)

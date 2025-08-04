@@ -15,7 +15,7 @@
 
 """Module for testing snapshot policy client."""
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-public-methods,duplicate-code
 
 from PyPowerFlex import exceptions
 from PyPowerFlex.objects.gen2 import snapshot_policy as sp
@@ -227,7 +227,7 @@ class TestSnapshotPolicyClient(PyPowerFlexTestCase):
         """
         Test snapshot policy query selected metrics.
         """
-        ret = self.client.snapshot_policy.query_metrics(self.fake_policy_id)
+        ret = self.client.snapshot_policy.query_snapshot_policy_metrics(self.fake_policy_id)
         assert ret.get(self.fake_policy_id).get("numOfpypowerflexVols") == 1
 
     def test_snapshot_policy_query_metrics_bad_status(self):
@@ -237,7 +237,7 @@ class TestSnapshotPolicyClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(
                 exceptions.PowerFlexClientException,
-                self.client.snapshot_policy.query_metrics,
+                self.client.snapshot_policy.query_snapshot_policy_metrics,
                 self.fake_policy_id)
 
     def test_snapshot_policy_query_selected_statistics_not_supported(self):

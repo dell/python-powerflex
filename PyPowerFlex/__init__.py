@@ -65,6 +65,7 @@ class PowerFlexClient:
         'host',
         # gen2
         'storage_node',
+        'device_group',
     )
 
     def __init__(self,
@@ -159,3 +160,6 @@ class PowerFlexClient:
         self.__add_storage_entity('storage_node', gen2.StorageNode)
         self.__add_storage_entity('protection_domain', gen2.ProtectionDomain)
         self.__add_storage_entity('storage_pool', gen2.StoragePool)
+        self.__add_storage_entity('snapshot_policy', gen2.SnapshotPolicy)
+        self.__add_storage_entity('device', gen2.Device)
+        self.__add_storage_entity('device_group', gen2.DeviceGroup)

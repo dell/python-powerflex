@@ -107,8 +107,6 @@ class Volume(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-        return self.get(entity_id=volume_id)
-
     def create(self,
                storage_pool_id,
                size_in_gb,
@@ -184,8 +182,6 @@ class Volume(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-        return self.get(entity_id=volume_id)
-
     def get_statistics(self, volume_id, metrics=None):
         """Get related PowerFlex Statistics for volume.
 
@@ -237,8 +233,6 @@ class Volume(base_client.EntityRequest):
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=volume_id)
 
     def rename(self, volume_id, name,
                volume_class=VolumeClass.defaultclass):
@@ -296,8 +290,6 @@ class Volume(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-        return self.get(entity_id=volume_id)
-
     def set_access_mode_for_sdc(self, volume_id, sdc_id, access_mode):
         """
         Set the volume access mode for the specified
@@ -333,8 +325,6 @@ class Volume(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-        return self.get(entity_id=volume_id)
-
     def set_retention_period(self, snap_id, retention_period):
         """
         Set a new retention period for the given snapshot. If the snapshot
@@ -366,8 +356,6 @@ class Volume(base_client.EntityRequest):
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
 
-        return self.get(entity_id=snap_id)
-
     def refresh(self, dest_vol_id, src_vol_id):
         """
         Refresh a destination volume from a source volume.
@@ -397,7 +385,6 @@ class Volume(base_client.EntityRequest):
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-        return self.get(entity_id=dest_vol_id)
 
     def restore(self, dest_vol_id, src_vol_id):
         """
@@ -428,4 +415,3 @@ class Volume(base_client.EntityRequest):
             )
             LOG.error(msg)
             raise exceptions.PowerFlexClientException(msg)
-        return self.get(entity_id=dest_vol_id)

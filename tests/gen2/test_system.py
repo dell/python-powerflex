@@ -22,6 +22,7 @@ from PyPowerFlex.objects.common import system
 from tests.common import PyPowerFlexTestCase
 
 
+@PyPowerFlexTestCase.version('5.0')
 class TestSystemClient(PyPowerFlexTestCase):
     """
     Test class for the SystemClient.
@@ -43,7 +44,10 @@ class TestSystemClient(PyPowerFlexTestCase):
                 '/action/removeConsistencyGroupSnapshots':
                     {},
                 f'/instances/System::{self.fake_system_id}'
-                '/action/snapshotVolumes':
+                '/action/createSnapshot':
+                    {},
+                f'/instances/System::{self.fake_system_id}'
+                '/action/createThinClone':
                     {},
                 '/instances/System'
                 '/action'
@@ -93,7 +97,7 @@ class TestSystemClient(PyPowerFlexTestCase):
         Test the API version.
         """
         self.client.system.api_version()
-        self.assertEqual(4, self.get_mock.call_count)
+        self.assertEqual(8, self.get_mock.call_count)
 
     def test_system_api_version_bad_status(self):
         """
@@ -120,7 +124,7 @@ class TestSystemClient(PyPowerFlexTestCase):
         self.client.system.api_version()
         self.client.system.api_version()
         self.client.system.api_version()
-        self.assertEqual(4, self.get_mock.call_count)
+        self.assertEqual(8, self.get_mock.call_count)
 
     def test_system_remove_cg_snapshots(self):
         """
@@ -139,20 +143,39 @@ class TestSystemClient(PyPowerFlexTestCase):
                               self.fake_system_id,
                               self.fake_cg_id)
 
-    def test_system_snapshot_volumes(self):
+    def test_snapshot_create(self):
         """
-        Test snapshotting volumes.
+        Test the create_snapshot method.
         """
-        self.client.system.snapshot_volumes(self.fake_system_id,
-                                            self.fake_snapshot_defs)
+        self.client.system.create_snapshot(self.fake_system_id,
+                                           self.fake_snapshot_defs,
+                                           retention_period=10)
 
-    def test_system_snapshot_volumes_bad_status(self):
+    def test_snapshot_create_bad_status(self):
         """
-        Test snapshotting volumes with a bad status.
+        Test the create_snapshot method with a bad status.
         """
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
-                              self.client.system.snapshot_volumes,
+                              self.client.system.create_snapshot,
+                              self.fake_system_id,
+                              self.fake_snapshot_defs,
+                              retention_period=10)
+
+    def test_thin_clone_create(self):
+        """
+        Test the create_thin_clone method.
+        """
+        self.client.system.create_thin_clone(self.fake_system_id,
+                                           self.fake_snapshot_defs)
+
+    def test_thin_clone_create_bad_status(self):
+        """
+        Test the create_thin_clone method with a bad status.
+        """
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.system.create_thin_clone,
                               self.fake_system_id,
                               self.fake_snapshot_defs)
 

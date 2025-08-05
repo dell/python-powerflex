@@ -21,6 +21,8 @@ from PyPowerFlex.objects.gen2.storage_pool import StoragePool
 from PyPowerFlex.objects.gen2.snapshot_policy import SnapshotPolicy
 from PyPowerFlex.objects.gen2.device import Device
 from PyPowerFlex.objects.gen2.device_group import DeviceGroup
+from PyPowerFlex.objects.gen2.volume import Volume
+from PyPowerFlex.objects.gen2.system import System
 
 __all__ = [
     'StorageNode',
@@ -29,4 +31,6 @@ __all__ = [
     'SnapshotPolicy',
     'Device',
     'DeviceGroup',
+    'Volume',
+    'System'
 ]

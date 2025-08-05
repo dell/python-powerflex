@@ -119,46 +119,6 @@ class System(base_client.EntityRequest):
 
         return response
 
-    def snapshot_volumes(self,
-                         system_id,
-                         snapshot_defs,
-                         access_mode=None,
-                         retention_period=None,
-                         allow_ext_managed=None):
-        """Create snapshots of PowerFlex volumes.
-
-        :type retention_period: str
-        :type access_mode: str
-        :type system_id: str
-        :type snapshot_defs: list[dict]
-        :type allow_ext_managed: bool
-        :rtype: dict
-        """
-
-        action = 'snapshotVolumes'
-
-        params = {
-            'snapshotDefs': snapshot_defs,
-            'allowOnExtManagedVol': allow_ext_managed,
-            'accessModeLimit': access_mode,
-            'retentionPeriodInMin': retention_period
-        }
-
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=system_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f"Failed to snapshot volumes on PowerFlex {self.entity} "
-                f"with id {system_id}. Error: {response}"
-            )
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return response
-
     def add_standby_mdm(self, mdm_ips, role, management_ips=None, port=None,
                         mdm_name=None, allow_multiple_ips=None, clean=None,
                         virtual_interface=None):

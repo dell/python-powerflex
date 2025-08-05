@@ -21,6 +21,7 @@ from PyPowerFlex.objects.gen1.protection_domain import ProtectionDomain
 from PyPowerFlex.objects.gen1.sds import Sds
 from PyPowerFlex.objects.gen1.snapshot_policy import SnapshotPolicy
 from PyPowerFlex.objects.gen1.storage_pool import StoragePool
+from PyPowerFlex.objects.gen1.system import System
 from PyPowerFlex.objects.gen1.acceleration_pool import AccelerationPool
 from PyPowerFlex.objects.gen1.volume import Volume
 from PyPowerFlex.objects.gen1.replication_consistency_group import ReplicationConsistencyGroup
@@ -38,6 +39,7 @@ __all__ = [
     'Sds',
     'SnapshotPolicy',
     'StoragePool',
+    'System',
     'AccelerationPool',
     'Volume',
     'ReplicationConsistencyGroup',

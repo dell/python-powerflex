@@ -387,6 +387,7 @@ class EntityRequest(Request):
     managed_device_url = '/V1/ManagedDevice'
     deployment_url = '/V1/Deployment'
     firmware_repository_url = '/V1/FirmwareRepository'
+    pfmp_version_url = '/v1/corelcm/status'
     entity_name = None
 
     @property

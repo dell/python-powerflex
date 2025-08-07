@@ -27,6 +27,7 @@ class TestSystemClient(PyPowerFlexTestCase):
     """
     Test class for the SystemClient.
     """
+
     def setUp(self):
         """
         Set up the test environment.
@@ -82,6 +83,11 @@ class TestSystemClient(PyPowerFlexTestCase):
                 '/types/System'
                 '/instances/action/querySelectedStatistics': {
                     'rplTransmitBwc': {'numSeconds': 0, 'totalWeightInKb': 0, 'numOccured': 0}
+                },
+                '/v1/corelcm/status': {
+                    "lcmStatus": "READY",
+                    "clusterVersion": "4.8.0.0",
+                    "clusterBuild": "1262"
                 },
             },
             self.RESPONSE_MODE.Invalid: {
@@ -333,4 +339,21 @@ class TestSystemClient(PyPowerFlexTestCase):
                 exceptions.PowerFlexFailQuerying,
                 self.client.system.query_selected_statistics,
                 properties=["rplTransmitBwc"],
+            )
+
+    def test_pfmp_version(self):
+        """
+        Test the pfmp_version method.
+        """
+        version = self.client.system.pfmp_version()
+        self.assertEqual(version, "4.8.0.0")
+
+    def test_pfmp_version_bad_status(self):
+        """
+        Test the pfmp_version method with a bad status.
+        """
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexFailQuerying,
+                self.client.system.pfmp_version,
             )

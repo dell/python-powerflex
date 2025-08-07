@@ -58,6 +58,7 @@ class System(base_client.EntityRequest):
     """Client for system operations"""
     def __init__(self, token, configuration):
         self.__api_version = None
+        self.__pfmp_version = None
         super().__init__(token, configuration)
 
     def api_version(self, cached=True):
@@ -86,6 +87,23 @@ class System(base_client.EntityRequest):
                 raise exceptions.PowerFlexClientException(msg)
             self.__api_version = response
         return self.__api_version
+
+    def pfmp_version(self, cached=True):
+        """
+        Get PowerFlex Management Platform version.
+        :param cached: get PFMP version from cache or send API response
+        :type cached: bool
+        :rtype: str
+        """
+
+        if not self.__pfmp_version or not cached:
+            r, response = self.send_get_request(self.pfmp_version_url)
+            if r.status_code != requests.codes.ok:
+                exc = exceptions.PowerFlexFailQuerying('PFMP version')
+                LOG.error(exc.message)
+                raise exc
+            self.__pfmp_version = response.get('clusterVersion')
+        return self.__pfmp_version
 
     def remove_cg_snapshots(self, system_id, cg_id, allow_ext_managed=None):
         """Remove PowerFlex ConsistencyGroup snapshots.

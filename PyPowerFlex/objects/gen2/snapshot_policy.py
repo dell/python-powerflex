@@ -107,16 +107,6 @@ class SnapshotPolicy(SnapshotPolicyGen1):
 
         return self.get(entity_id=snapshot_policy_id)
 
-    def query_snapshot_policy_metrics(self, snapshot_policy_id, metrics=None):
-        """Query PowerFlex Metrics for snapshot policy.
-        TODO TTHE make sure this API is valid after new dev build is ready
-
-        :type snapshot_policy_id: str
-        :type metrics: list|tuple
-        :rtype: dict
-        """
-        return self.query_metrics('snapshot_policy', [snapshot_policy_id], metrics)
-
     def get_statistics(self, snapshot_policy_id, fields=None):
         """Get PowerFlex Snapshot Policy Statistics not supported in PowerFlex 5.x.
 

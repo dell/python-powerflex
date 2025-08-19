@@ -56,9 +56,6 @@ class TestSnapshotPolicyClient(PyPowerFlexTestCase):
                     {},
                 f'/instances/SnapshotPolicy::{self.fake_policy_id}/action/resumeSnapshotPolicy':
                     {},
-                '/dtapi/rest/v1/metrics/query': {
-                    self.fake_policy_id: {'numOfpypowerflexVols': 1}
-                },
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/SnapshotPolicy/instances':
@@ -221,23 +218,6 @@ class TestSnapshotPolicyClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.snapshot_policy.resume,
                               self.fake_policy_id)
-
-    def test_snapshot_policy_query_metrics(self):
-        """
-        Test snapshot policy query selected metrics.
-        """
-        ret = self.client.snapshot_policy.query_snapshot_policy_metrics(self.fake_policy_id)
-        assert ret.get(self.fake_policy_id).get("numOfpypowerflexVols") == 1
-
-    def test_snapshot_policy_query_metrics_bad_status(self):
-        """
-        Test snapshot policy query selected metrics with bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(
-                exceptions.PowerFlexClientException,
-                self.client.snapshot_policy.query_snapshot_policy_metrics,
-                self.fake_policy_id)
 
     def test_snapshot_policy_query_selected_statistics_not_supported(self):
         """

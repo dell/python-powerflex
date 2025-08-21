@@ -190,3 +190,31 @@ class StorageNode(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
         return self.get(entity_id=node_id)
+
+    def update_original_pathnames(self, node_id, force=None):
+        """Update original pathnames for PowerFlex Storage Node.
+
+        :type node_id: str
+        :type force: bool
+        :rtype: dict
+        """
+
+        action = 'updateNodeOriginalPathnames'
+
+        params = {"forceFailedDevices": force}
+
+        r, response = self.send_post_request(self.base_action_url,
+                                             action=action,
+                                             entity=self.entity,
+                                             entity_id=node_id,
+                                             params=params)
+        if r.status_code != requests.codes.ok:
+            msg = (
+                f"Failed to update original pathnames for PowerFlex {self.entity} "
+                f"with id {node_id}. "
+                f"Error: {response}"
+            )
+            LOG.error(msg)
+            raise exceptions.PowerFlexClientException(msg)
+
+        return self.get(entity_id=node_id)

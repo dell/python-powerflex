@@ -56,6 +56,8 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
                     {},
                 f'/instances/Node::{self.fake_node_id}/action/modifyIpRole':
                     {},
+                f'/instances/Node::{self.fake_node_id}/action/updateNodeOriginalPathnames':
+                    {},
             },
             self.RESPONSE_MODE.Invalid: {
                 '/types/Node/instances':
@@ -178,3 +180,19 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
                               self.fake_node_id,
                               ip='1.2.3.4',
                               role=StorageNodeIpRoles.storage_and_app)
+
+    def test_storage_node_update_original_pathnames(self):
+        """
+        Test storage_node update_original_pathnames.
+        """
+        self.client.storage_node.update_original_pathnames(self.fake_node_id)
+
+    def test_storage_node_update_original_pathnames_bad_status(self):
+        """
+        Test storage_node update_original_pathnames with a bad status.
+        """
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(
+                exceptions.PowerFlexClientException,
+                self.client.storage_node.update_original_pathnames,
+                self.fake_node_id)

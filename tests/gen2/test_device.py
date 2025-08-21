@@ -54,9 +54,6 @@ class TestDeviceClient(PyPowerFlexTestCase):
                 '/action/setDeviceCapacityLimit':
                     {},
                 f'/instances/Device::{self.fake_device_id}'
-                '/action/updateDeviceOriginalPathname':
-                    {},
-                f'/instances/Device::{self.fake_device_id}'
                 '/action/clearDeviceError':
                     {},
                 f'/instances/Device::{self.fake_device_id}'
@@ -151,25 +148,6 @@ class TestDeviceClient(PyPowerFlexTestCase):
                               self.client.device.rename,
                               self.fake_device_id,
                               name='new_name')
-
-    def test_device_update_pathname(self):
-        """
-        Test device update_pathname.
-        """
-        self.client.device.update_pathname(
-            self.fake_device_id,
-            new_pathname='/dev/sdb')
-
-    def test_device_update_pathname_bad_status(self):
-        """
-        Test device update_pathname with bad status.
-        """
-        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
-            self.assertRaises(
-                exceptions.PowerFlexClientException,
-                self.client.device.update_pathname,
-                self.fake_device_id,
-                new_pathname='/dev/sdb')
 
     def test_device_set_capacity_limit(self):
         """

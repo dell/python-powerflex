@@ -97,10 +97,39 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
         self.client.storage_pool.get_by_name(
             self.fake_pd_id, self.fake_sp_name)
 
+    def test_storage_pool_need_update(self):
+        """
+        Test the update of a storage pool.
+        """
+        sp_params = {
+            'id': self.fake_sp_id,
+            'name': "name",
+            'capacityAlertHighThreshold': 80,
+            'capacityAlertCriticalThreshold': 95,
+            'fragmentationEnabled': True,
+            'overProvisioningFactor': 1000,
+            'physicalSizeGB': 2,
+            'protectionScheme': 'TwoPlusEight',
+            'compressionMethod': 'Normal',
+            'zeroPaddingEnabled': False,
+        }
+        self.client.storage_pool.need_update(sp_params, None)
+
     def test_storage_pool_update(self):
         """
         Test the update of a storage pool.
         """
+        sp_params = {
+            'id': self.fake_sp_id,
+            'name': "name",
+            'capacityAlertHighThreshold': 70,
+            'capacityAlertCriticalThreshold': 85,
+            'fragmentationEnabled': True,
+            'overProvisioningFactor': 100,
+            'physicalSizeGB': 1,
+            'compressionMethod': 'None',
+            'zeroPaddingEnabled': True,
+        }
         sp = {
             'id': self.fake_sp_id,
             'name': "new_name",
@@ -109,15 +138,32 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'fragmentationEnabled': True,
             'overProvisioningFactor': 1000,
             'physicalSizeGB': 2,
+            'protectionScheme': 'TwoPlusEight',
             'compressionMethod': 'Normal',
             'zeroPaddingEnabled': False,
         }
-        self.client.storage_pool.update(sp)
+        self.client.storage_pool.update(sp_params, sp)
 
     def test_storage_pool_update_bad_status(self):
         """
         Test the update of a storage pool with a bad status.
         """
+        sp_params = {
+            'id': self.fake_sp_id,
+            'name': self.fake_sp_name,
+            'protectionDomainId': "pd_id",
+            'deviceGroupId': "1",
+            'protectionScheme': 'TwoPlusTwo',
+            'wrcDeviceGroupId': "1",
+            'genType': 'EC',
+            'capacityAlertHighThreshold': 70,
+            'capacityAlertCriticalThreshold': 90,
+            'fragmentationEnabled': False,
+            'overProvisioningFactor': 0,
+            'physicalSizeGB': 10,
+            'compressionMethod': 'None',
+            'zeroPaddingEnabled': True,
+        }
         sp = {
             'id': self.fake_sp_id,
             'name': self.fake_sp_name,
@@ -135,13 +181,30 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'zeroPaddingEnabled': True,
         }
         self.assertRaises(exceptions.PowerFlexClientException,
-                          self.client.storage_pool.update,
+                          self.client.storage_pool.check_update_params,
+                          sp_params,
                           sp)
 
     def test_storage_pool_update_bad_status_1(self):
         """
         Test the update of a storage pool with a bad status.
         """
+        sp_params = {
+            'id': self.fake_sp_id,
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': "1",
+            'protectionScheme': 'TwoPlusTwo',
+            'wrcDeviceGroupId': "1",
+            'genType': 'EC',
+            'capacityAlertHighThreshold': 70,
+            'capacityAlertCriticalThreshold': 90,
+            'fragmentationEnabled': False,
+            'overProvisioningFactor': 0,
+            'physicalSizeGB': 10,
+            'compressionMethod': 'None',
+            'zeroPaddingEnabled': True,
+        }
         sp = {
             'id': self.fake_sp_id,
             'name': self.fake_sp_name,
@@ -159,13 +222,30 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'zeroPaddingEnabled': True,
         }
         self.assertRaises(exceptions.PowerFlexClientException,
-                          self.client.storage_pool.update,
+                          self.client.storage_pool.check_update_params,
+                          sp_params,
                           sp)
 
     def test_storage_pool_update_bad_status_2(self):
         """
         Test the update of a storage pool with a bad status.
         """
+        sp_params = {
+            'id': self.fake_sp_id,
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': "1",
+            'protectionScheme': 'TwoPlusTwo',
+            'wrcDeviceGroupId': "1",
+            'genType': 'EC',
+            'capacityAlertHighThreshold': 70,
+            'capacityAlertCriticalThreshold': 90,
+            'fragmentationEnabled': False,
+            'overProvisioningFactor': 0,
+            'physicalSizeGB': 10,
+            'compressionMethod': 'None',
+            'zeroPaddingEnabled': True,
+        }
         sp = {
             'id': self.fake_sp_id,
             'name': self.fake_sp_name,
@@ -183,7 +263,8 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
             'zeroPaddingEnabled': True,
         }
         self.assertRaises(exceptions.PowerFlexClientException,
-                          self.client.storage_pool.update,
+                          self.client.storage_pool.check_update_params,
+                          sp_params,
                           sp)
 
     def test_storage_pool_create(self):
@@ -231,6 +312,51 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexFailCreating,
                               self.client.storage_pool.create,
+                              sp)
+
+    def test_storage_pool_create_bad_status_1(self):
+        """
+        Test the creation of a storage pool with a bad status.
+        """
+        sp = {
+            'deviceGroupId': "1",
+            'wrcDeviceGroupId': "1",
+            'genType': 'EC',
+            'capacityAlertHighThreshold': 70,
+            'capacityAlertCriticalThreshold': 90,
+            'fragmentationEnabled': False,
+            'overProvisioningFactor': 0,
+            'physicalSizeGB': 10,
+            'protectionScheme': 'TwoPlusTwo',
+            'compressionMethod': 'None',
+            'zeroPaddingEnabled': True,
+        }
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.storage_pool.check_create_params,
+                              sp)
+
+    def test_storage_pool_create_bad_status_2(self):
+        """
+        Test the creation of a storage pool with a bad status.
+        """
+        sp = {
+            'name': self.fake_sp_name,
+            'protection_domain_id': self.fake_sp_id,
+            'deviceGroupId': "1",
+            'wrcDeviceGroupId': "1",
+            'genType': 'EC',
+            'capacityAlertHighThreshold': 70,
+            'capacityAlertCriticalThreshold': 90,
+            'fragmentationEnabled': False,
+            'overProvisioningFactor': 0,
+            'protectionScheme': 'TwoPlusTwo',
+            'compressionMethod': 'None',
+            'zeroPaddingEnabled': True,
+        }
+        with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+            self.assertRaises(exceptions.PowerFlexClientException,
+                              self.client.storage_pool.check_create_params,
                               sp)
 
     # pylint: disable=R0801

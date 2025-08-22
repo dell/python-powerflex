@@ -20,140 +20,10 @@
 import logging
 import requests
 
-from marshmallow import fields, validate, ValidationError
 from PyPowerFlex import base_client, exceptions
 from PyPowerFlex.objects.gen2.protection_domain import ProtectionDomain
 
-
 LOG = logging.getLogger(__name__)
-
-
-def validate_over_provisioning_factor(value):
-    """Validate over provisioning factor."""
-    if value != 0 and (value < 100 or value > 10000):
-        raise ValidationError("Not an valid value.")
-
-
-class StoragePoolSchema(base_client.BaseSchema):
-    """Storage Pool Schema."""
-
-    id = fields.Str(
-        metadata={
-            "description": "Storage Pool Id",
-        }
-    )
-    name = fields.Str(
-        allow_none=True,
-        metadata={
-            "description": "Storage Pool Name",
-            "updatable": True,
-        },
-    )
-    protection_domain_id = fields.Str(
-        required=True,
-        metadata={
-            "description": "Protection Domain Id",
-            "updatable": False,
-        },
-    )
-    device_group_id = fields.Str(
-        required=True,
-        metadata={
-            "description": "Device Group Id",
-            "updatable": False,
-        },
-    )
-    wrc_device_group_id = fields.Str(
-        metadata={
-            "description": "Device Group Id",
-        }
-    )
-    gen_type = fields.Str(
-        # 5.0.0 only supports EC type, so during creation, just pass EC to gen
-        # required=True,
-        metadata={
-            "description": "Gen Type, EC or MIRRORING",
-        }
-    )
-    capacity_alert_high_threshold = fields.Integer(
-        metadata={
-            "description": "Capacity Alert High Threshold, default: 80",
-            "updatable": True,
-        }
-    )
-    capacity_alert_critical_threshold = fields.Integer(
-        metadata={
-            "description": "Capacity Alert Critical Threshold, default: 90",
-            "updatable": True,
-        }
-    )
-    fragmentation_enabled = fields.Boolean(
-        metadata={
-            "description": "Enable Fragmentation, default: False",
-            # "updatable": True,
-        }
-    )
-    over_provisioning_factor = fields.Integer(
-        validate=validate.And(validate_over_provisioning_factor),
-        metadata={
-            "description": (
-                "Over Provisioning Factor, range: 0, 100-10000, "
-                "set 0 to disable over provisioning. Default: 0"
-            ),
-        },
-    )
-    physical_size_gb = fields.Integer(
-        required=True,
-        data_key="physicalSizeGB",
-        metadata={
-            "description": (
-                "Physical Size in GB, set -1 to use all available capacity. "
-                "It only accepts larger value during update."
-            ),
-            "updatable": True,
-        },
-    )
-    raw_size_gb = fields.Integer(
-        data_key="rawSizeGB",
-        metadata={
-            "description": "Raw Size in GB",
-        },
-    )
-    protection_scheme = fields.Str(
-        required=True,
-        validate=validate.OneOf(["TwoPlusTwo", "EightPlusTwo"]),
-        metadata={
-            "description": "Protection Scheme: TwoPlusTwo/EightPlusTwo",
-            "updatable": False,
-        },
-    )
-    compression_method = fields.Str(
-        validate=validate.OneOf(["None", "Normal"]),
-        metadata={
-            "description": "Compression Method: None/Normal. Default: Normal",
-            "updatable": True,
-        },
-    )
-    zero_padding_enabled = fields.Boolean(
-        metadata={
-            "description": "Zero padding enabled. Default: True",
-        }
-    )
-    # @validates_schema
-    # def validate_capacity_alert_threshold(self, data, **kwargs):
-    #     if data["capacity_alert_high_threshold"] >= data["capacity_alert_critical_threshold"]:
-    #         raise ValidationError(
-    #             "capacity_alert_critical_threshold must be greater than "
-    #             "capacity_alert_high_threshold"
-    #         )
-
-    # class Meta:
-    #     unknown = INCLUDE
-
-
-def load_storage_pool_schema(obj):
-    """Load storage pool schema."""
-    return StoragePoolSchema().load(obj)
 
 
 class StoragePool(base_client.EntityRequest):
@@ -166,7 +36,7 @@ class StoragePool(base_client.EntityRequest):
 
         :rtype: list[dict]
         """
-        return list(map(load_storage_pool_schema, self.get()))
+        return list(self.get())
 
     def get_by_id(self, storage_pool_id):
         """Get PowerFlex storage pool.
@@ -174,7 +44,7 @@ class StoragePool(base_client.EntityRequest):
         :type storage_pool_id: str
         :rtype: dict
         """
-        return load_storage_pool_schema(self.get(entity_id=storage_pool_id))
+        return self.get(entity_id=storage_pool_id)
 
     def get_by_name(self, protion_domain_id, name):
         """Get PowerFlex storage pool.
@@ -187,9 +57,24 @@ class StoragePool(base_client.EntityRequest):
 
         result = pdo.get_storage_pools(
             protion_domain_id, filter_fields={"name": name})
-        if len(result) >= 1:
-            return load_storage_pool_schema(result[0])
-        return None
+        return result[0] if len(result) > 0 else None
+
+    def check_create_params(self, sp):
+        """Check create parameters."""
+        required_fields = ["name", "protectionDomainId", "deviceGroupId", "protectionScheme"]
+        missing_fields = [field for field in required_fields if field not in sp]
+
+        if missing_fields:
+            msg = ("name, protection_domain_id, device_group_id, protection_scheme are required "
+                   "for creating a storage pool.")
+            raise exceptions.InvalidInput(msg)
+
+        if "useAllAvailableCapacity" not in sp and "physicalSizeGB" not in sp:
+            msg = (
+                'use_all_available_capacity or physical_size_gb is required '
+                'for creating a storage pool.'
+            )
+            raise exceptions.InvalidInput(msg)
 
     def create(self, sp):
         """Create PowerFlex storage pool.
@@ -197,107 +82,156 @@ class StoragePool(base_client.EntityRequest):
         :type sp: dict
         :rtype: dict
         """
-        sp = load_storage_pool_schema(sp)
+        self.check_create_params(sp)
 
         params = {
-            "protectionDomainId": sp["protection_domain_id"],
-            "deviceGroupId": sp["device_group_id"],
+            "protectionDomainId": sp["protectionDomainId"],
+            "deviceGroupId": sp["deviceGroupId"],
             "gen": "EC",
         }
 
         if "name" in sp:
             params["name"] = sp["name"]
-        if "compression_method" in sp:
-            params["compressionMethod"] = sp["compression_method"]
+        if "compressionMethod" in sp:
+            params["compressionMethod"] = sp["compressionMethod"]
 
-        if sp["protection_scheme"] == "TwoPlusTwo":
+        if sp["protectionScheme"] == "TwoPlusTwo":
             params["numDataSlices"] = 2
             params["numProtectionSlices"] = 2
         else:
             params["numDataSlices"] = 8
             params["numProtectionSlices"] = 2
 
-        if sp["physical_size_gb"] == -1:
-            params["useAllAvailableCapacity"] = True
+        if sp.get("useAllAvailableCapacity"):
+            params["useAllAvailableCapacity"] = sp["useAllAvailableCapacity"]
         else:
-            params["physicalSizeGB"] = sp["physical_size_gb"]
+            params["physicalSizeGB"] = sp["physicalSizeGB"]
 
-        new_sp = load_storage_pool_schema(self._create_entity(params))
-        _, sp = self.update(StoragePoolSchema().dump(sp), new_sp)
+        new_sp = self._create_entity(params)
+        _, sp = self.update(sp, new_sp)
 
         return sp
 
-    def update(self, sp, current_sp=None):
+    def check_update_params(self, sp_params, current_sp):
+        """Check update parameters."""
+        protection_domain_id = sp_params.get("protectionDomainId")
+        if protection_domain_id and protection_domain_id != current_sp["protectionDomainId"]:
+            e = exceptions.nonupdatable_exception(
+                "protection domain ID", self.entity, sp_params["id"]
+            )
+            LOG.error(e.message)
+            raise e
+        device_group_id = sp_params.get("deviceGroupId")
+        if device_group_id and device_group_id != current_sp["deviceGroupId"]:
+            e = exceptions.nonupdatable_exception(
+                "device group ID", self.entity, sp_params["id"]
+            )
+            LOG.error(e.message)
+            raise e
+        protection_scheme = sp_params.get("protectionScheme")
+        if protection_scheme and protection_scheme != current_sp["protectionScheme"]:
+            e = exceptions.nonupdatable_exception(
+                "protection scheme", self.entity, sp_params["id"]
+            )
+            LOG.error(e.message)
+            raise e
+
+    def _compare_update_params(self, sp_params, current_sp):
+        """Compare parameters and determine if an update is needed.
+
+        :type sp_params: dict
+        :type current_sp: dict
+        :rtype: tuple[bool, dict]
+        """
+        need_update = False
+        changes = {}  # Store the changes to be applied
+
+        new_name = sp_params.get("storage_pool_new_name")
+        if new_name and new_name != current_sp["name"]:
+            need_update = True
+            changes["name"] = new_name
+
+        high_threshold = sp_params.get("capacityAlertHighThreshold", None)
+        if high_threshold and high_threshold != current_sp["capacityAlertHighThreshold"]:
+            need_update = True
+            changes["capacityAlertHighThreshold"] = high_threshold
+
+        critical_threshold = sp_params.get("capacityAlertCriticalThreshold", None)
+        current_critical = current_sp["capacityAlertCriticalThreshold"]
+        if critical_threshold and critical_threshold != current_critical:
+            need_update = True
+            changes["capacityAlertCriticalThreshold"] = critical_threshold
+
+        over_provisioning_factor = sp_params.get("overProvisioningFactor", None)
+        current_over_provisioning = current_sp["overProvisioningFactor"]
+        if over_provisioning_factor and over_provisioning_factor != current_over_provisioning:
+            need_update = True
+            changes["overProvisioningFactor"] = sp_params["overProvisioningFactor"]
+
+        physical_size_gb = sp_params.get("physicalSizeGB", None)
+        if physical_size_gb and physical_size_gb != current_sp["physicalSizeGB"]:
+            need_update = True
+            changes["physicalSizeGB"] = sp_params["physicalSizeGB"]
+
+        compression_method = sp_params.get("compressionMethod", None)
+        if compression_method and compression_method != current_sp["compressionMethod"]:
+            need_update = True
+            changes["compressionMethod"] = sp_params["compressionMethod"]
+
+        return need_update, changes
+
+    def need_update(self, sp_params, current_sp=None):
+        """Check if PowerFlex storage pool needs to be updated.
+
+        :type sp_params: dict
+        :type current_sp: dict
+        :rtype: bool, dict
+        """
+        current_sp = current_sp if current_sp is not None else self.get_by_id(sp_params["id"])
+        need_update, changes = self._compare_update_params(sp_params, current_sp)
+        return need_update, changes
+
+    def update(self, sp_params, current_sp):
         """Update PowerFlex storage pool.
 
-        :type sp: dict
+        :type sp_params: dict
+        :rtype: dict
+        :type current_sp: dict
         :rtype: dict
         """
-        current_sp = current_sp if current_sp is not None else self.get_by_id(
-            sp["id"])
-        sp = load_storage_pool_schema(
-            {**StoragePoolSchema().dump(current_sp), **sp})
+        need_update, changes = self._compare_update_params(sp_params, current_sp)
 
-        if sp["protection_domain_id"] != current_sp["protection_domain_id"]:
-            e = exceptions.nonupdatable_exception(
-                "protection_domain_id", self.entity, sp["id"]
-            )
-            LOG.error(e.message)
-            raise e
-        if sp["device_group_id"] != current_sp["device_group_id"]:
-            e = exceptions.nonupdatable_exception(
-                "device_group_id", self.entity, sp["id"]
-            )
-            LOG.error(e.message)
-            raise e
-        if sp["protection_scheme"] != current_sp["protection_scheme"]:
-            e = exceptions.nonupdatable_exception(
-                "protection_scheme", self.entity, sp["id"]
-            )
-            LOG.error(e.message)
-            raise e
+        if need_update:
+            has_update = False
+            if "name" in changes:
+                self.rename(sp_params["id"], changes["name"])
+                has_update = True
+            if ("capacityAlertHighThreshold" in changes or
+                    "capacityAlertCriticalThreshold" in changes):
+                high_threshold = changes.get("capacityAlertHighThreshold",
+                                             current_sp["capacityAlertHighThreshold"])
+                critical_threshold = changes.get("capacityAlertCriticalThreshold",
+                                                 current_sp["capacityAlertCriticalThreshold"])
+                self.set_capacity_alert_thresholds(
+                    current_sp["id"], high_threshold, critical_threshold
+                )
+                has_update = True
+            if "overProvisioningFactor" in changes:
+                self.set_over_provisioning_factor(
+                    current_sp["id"],
+                    changes["overProvisioningFactor"]
+                )
+                has_update = True
+            if "physicalSizeGB" in changes:
+                self.resize(current_sp["id"], changes["physicalSizeGB"])
+                has_update = True
+            if "compressionMethod" in changes:
+                self.set_compression_method(current_sp["id"], changes["compressionMethod"])
+                has_update = True
 
-        has_update = False
-
-        if sp["name"] != current_sp["name"]:
-            has_update = True
-            self.rename(sp["id"], sp["name"])
-
-        high_threshold = None
-        critical_threshold = None
-
-        if (
-            sp["capacity_alert_high_threshold"]
-            != current_sp["capacity_alert_high_threshold"]
-        ):
-            high_threshold = sp["capacity_alert_high_threshold"]
-
-        if (
-            sp["capacity_alert_critical_threshold"]
-            != current_sp["capacity_alert_critical_threshold"]
-        ):
-            critical_threshold = sp["capacity_alert_critical_threshold"]
-
-        if high_threshold or critical_threshold:
-            has_update = True
-            self.set_capacity_alert_thresholds(
-                sp["id"], high_threshold, critical_threshold
-            )
-
-        if sp["over_provisioning_factor"] != current_sp["over_provisioning_factor"]:
-            has_update = True
-            self.set_over_provisioning_factor(
-                sp["id"], sp["over_provisioning_factor"])
-
-        if sp["physical_size_gb"] != current_sp["physical_size_gb"]:
-            has_update = True
-            self.resize(sp["id"], sp["physical_size_gb"])
-
-        if sp["compression_method"] != current_sp["compression_method"]:
-            has_update = True
-            self.set_compression_method(sp["id"], sp["compression_method"])
-
-        return has_update, self.get_by_id(sp["id"])
+            sp = self.get_by_id(current_sp["id"])
+            return has_update, sp
+        return False, current_sp
 
     def delete(self, storage_pool_id):
         """Remove PowerFlex storage pool.
@@ -322,7 +256,7 @@ class StoragePool(base_client.EntityRequest):
         self._rename_entity(action, storage_pool_id, params)
 
     def set_capacity_alert_thresholds(
-        self, storage_pool_id, high_threshold, critical_threshold
+            self, storage_pool_id, high_threshold, critical_threshold
     ):
         """Set the capacity alert thresholds for the specified Storage Pool.
 
@@ -381,19 +315,24 @@ class StoragePool(base_client.EntityRequest):
             raise exceptions.PowerFlexClientException(msg)
 
     def resize(self, storage_pool_id, size_in_gb):
-        """Set the size for PowerFlex storage pool.
+        """
+        Set the size for PowerFlex storage pool.
 
+        :param storage_pool_id: The ID of the storage pool.
         :type storage_pool_id: str
-        :type size: int
+        :param size_in_gb: Size in GB to set.
+                          If set to -1, it means to use all available capacity
+                          (equivalent to setting 'useAllAvailableCapacity' to true).
+        :type size_in_gb: int
         :rtype: None
         """
 
         action = "modifyStoragePoolSize"
 
-        params = {"physicalSizeGB": size_in_gb}
-
         if size_in_gb == -1:
             params = {"useAllAvailableCapacity": True}
+        else:
+            params = {"physicalSizeGB": size_in_gb}
 
         r, response = self.send_post_request(
             self.base_action_url,

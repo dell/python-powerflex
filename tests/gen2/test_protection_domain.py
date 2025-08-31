@@ -93,16 +93,18 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
         """
         self.client.protection_domain.get_by_name(self.fake_pd_name)
 
-    def test_protection_domain_update(self):
+    def test_protection_domain_need_update(self):
         """
-        Test the update of a protection domain.
+        Test the update of a protection domain
         """
-        pd = {
+        pd_params = {
             'id': self.fake_pd_id,
-            'name': "new_name",
-            'protectionDomainState': 'Inactive',
-            'rebuildEnabled': True,
-            'rebalanceEnabled': True,
+            'name': "name",
+            'newName': "new_name",
+            'protectionDomainState': 'Active',
+            'rebuildEnabled': False,
+            'rebalanceEnabled': False,
+            'policy': 'unlimited',
             'overallConcurrentIoLimit': 1,
             'bandwidthLimitOverallIos': 1,
             'bandwidthLimitBgDevScanner': 1,
@@ -113,7 +115,90 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
             'bandwidthLimitOther': 1,
             'bandwidthLimitNodeNetwork': 1,
         }
-        self.client.protection_domain.update(pd)
+        current_pd = {
+            'id': self.fake_pd_id,
+            'name': "name",
+            'protectionDomainState': 'Inactive',
+            'rebuildEnabled': True,
+            'rebalanceEnabled': True,
+            'policy': 'favorApplication',
+            'overallConcurrentIoLimit': 10,
+            'bandwidthLimitOverallIos': 10,
+            'bandwidthLimitBgDevScanner': 10,
+            'bandwidthLimitGarbageCollector': 10,
+            'bandwidthLimitSinglyImpactedRebuild': 10,
+            'bandwidthLimitDoublyImpactedRebuild': 10,
+            'bandwidthLimitRebalance': 10,
+            'bandwidthLimitOther': 10,
+            'bandwidthLimitNodeNetwork': 10,
+        }
+        self.client.protection_domain.need_update(pd_params, current_pd)
+
+    def test_protection_domain_update(self):
+        """
+        Test the update of a protection domain.
+        """
+        pd_params = {
+            'id': self.fake_pd_id,
+            'name': "name",
+            'newName': "new_name",
+            'protectionDomainState': 'Active',
+            'rebuildEnabled': False,
+            'rebalanceEnabled': False,
+            'policy': 'unlimited',
+            'overallConcurrentIoLimit': 1,
+            'bandwidthLimitOverallIos': 1,
+            'bandwidthLimitBgDevScanner': 1,
+            'bandwidthLimitGarbageCollector': 1,
+            'bandwidthLimitSinglyImpactedRebuild': 1,
+            'bandwidthLimitDoublyImpactedRebuild': 1,
+            'bandwidthLimitRebalance': 1,
+            'bandwidthLimitOther': 1,
+            'bandwidthLimitNodeNetwork': 1,
+        }
+        current_pd = {
+            'id': self.fake_pd_id,
+            'name': "name",
+            'protectionDomainState': 'Inactive',
+            'rebuildEnabled': True,
+            'rebalanceEnabled': True,
+            'policy': 'favorApplication',
+            'overallConcurrentIoLimit': 10,
+            'bandwidthLimitOverallIos': 10,
+            'bandwidthLimitBgDevScanner': 10,
+            'bandwidthLimitGarbageCollector': 10,
+            'bandwidthLimitSinglyImpactedRebuild': 10,
+            'bandwidthLimitDoublyImpactedRebuild': 10,
+            'bandwidthLimitRebalance': 10,
+            'bandwidthLimitOther': 10,
+            'bandwidthLimitNodeNetwork': 10,
+        }
+        self.client.protection_domain.update(pd_params, current_pd)
+
+    def test_check_update_params(self):
+        """
+        Test the check_update_params
+        """
+        pd_params = {
+            'id': self.fake_pd_id,
+            'name': "name",
+            'protectionDomainState': 'Active',
+            'rebuildEnabled': False,
+            'rebalanceEnabled': True,
+            'policy': 'unlimited',
+        }
+        current_pd = {
+            'id': self.fake_pd_id+"_new",
+            'name': "name",
+            'newName': "new_name",
+            'protectionDomainState': 'Inactive',
+            'rebuildEnabled': True,
+            'rebalanceEnabled': True,
+            'policy': 'favorApplication',
+        }
+        self.assertRaises(exceptions.PowerFlexClientException,
+                          self.client.protection_domain.check_update_params,
+                          pd_params, current_pd)
 
     def test_protection_domain_create(self):
         """
@@ -129,6 +214,15 @@ class TestProtectionDomainClient(PyPowerFlexTestCase):
             self.assertRaises(exceptions.PowerFlexFailCreating,
                               self.client.protection_domain.create,
                               {"name": self.fake_pd_name})
+
+        # with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
+    def test_protection_domain_create_invalid_input(self):
+        """
+        Test the creation of a protection domain with invalid input.
+        """
+        self.assertRaises(exceptions.InvalidInput,
+                          self.client.protection_domain.create,
+                          {})
 
     def test_protection_domain_delete(self):
         """

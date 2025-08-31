@@ -1,3 +1,2 @@
 requests
 packaging
-marshmallow==4.0.0

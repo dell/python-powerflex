@@ -41,10 +41,10 @@ class Device(base_client.EntityRequest):
 
     def create(self,
                current_pathname,
+               media_type,
                device_group_id,
                node_id,
                force=None,
-               media_type=None,
                name=None):
         """Create PowerFlex device.
 
@@ -58,8 +58,8 @@ class Device(base_client.EntityRequest):
         :rtype: dict
         """
 
-        if not all([current_pathname, device_group_id, node_id]):
-            msg = 'current_pathname, device_group_id and node_id must be set.'
+        if not all([current_pathname, media_type, device_group_id, node_id]):
+            msg = 'current_pathname, media_type, device_group_id and node_id must be set.'
             raise exceptions.InvalidInput(msg)
 
         params = {
@@ -98,37 +98,8 @@ class Device(base_client.EntityRequest):
 
         return self._rename_entity(action, device_id, params)
 
-    def update_pathname(self, device_id, new_pathname):
-        """Update PowerFlex device pathname.
-        TODO TTHE make sure this API is valid after the latest dev build is ready
-
-        :type device_id: str
-        :type new_pathname: str
-        :rtype: dict
-        """
-
-        action = 'updateDeviceOriginalPathname'
-        params = {"updateDeviceOriginalPathname": new_pathname}
-        r, response = self.send_post_request(self.base_action_url,
-                                             action=action,
-                                             entity=self.entity,
-                                             entity_id=device_id,
-                                             params=params)
-        if r.status_code != requests.codes.ok:
-            msg = (
-                f"Failed to update pathname for PowerFlex {self.entity} "
-                f"with id {device_id}. "
-                f"Error: {response}"
-            )
-            LOG.error(msg)
-            raise exceptions.PowerFlexClientException(msg)
-
-        return self.get(entity_id=device_id)
-
     def set_capacity_limit(self, device_id, capacity_limit_gb):
         """Update PowerFlex device capacity limit in GB.
-        TODO TTHE make sure this API is valid after the latest dev build is ready
-
         :type device_id: str
         :type capacity_limit_gb: int
         :rtype: dict
@@ -154,9 +125,8 @@ class Device(base_client.EntityRequest):
 
     def clear_errors(self, device_id, force=None):
         """Clear PowerFlex device errors.
-        TODO TTHE make sure this field - `forceClear` is valid after the latest dev build is ready
-
         :type device_id: str
+        :type force: bool
         :rtype: dict
         """
 

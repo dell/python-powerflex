@@ -69,19 +69,12 @@ class DeviceGroup(base_client.EntityRequest):
 
         return self._create_entity(params)
 
-    def delete(self, device_group_id, force=None):
+    def delete(self, device_group_id):
         """Remove PowerFlex device group.
-        TODO TTHE make sure this `force` field is valid after the latest dev build is ready
-
         :type device_group_id: str
-        :type force: bool
         :rtype: None
         """
-        params = {
-            "force": force
-        }
-
-        return self._delete_entity(device_group_id, params)
+        return self._delete_entity(device_group_id)
 
     def modify(self,
                device_group_id,

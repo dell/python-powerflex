@@ -97,7 +97,7 @@ class TestSystemClient(PyPowerFlexTestCase):
         Test the API version.
         """
         self.client.system.api_version()
-        self.assertEqual(8, self.get_mock.call_count)
+        self.assertEqual(6, self.get_mock.call_count)
 
     def test_system_api_version_bad_status(self):
         """
@@ -124,7 +124,7 @@ class TestSystemClient(PyPowerFlexTestCase):
         self.client.system.api_version()
         self.client.system.api_version()
         self.client.system.api_version()
-        self.assertEqual(8, self.get_mock.call_count)
+        self.assertEqual(6, self.get_mock.call_count)
 
     def test_system_remove_cg_snapshots(self):
         """

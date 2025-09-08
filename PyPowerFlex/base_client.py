@@ -269,7 +269,11 @@ class Request:
             dict: The JSON response containing the API version.
         """
         request_url = self.base_url + '/version'
-        self._login()
+        try:
+            self._appliance_login()
+        except exceptions.PowerFlexClientException as e:
+            LOG.error("Failed to login: %s. Revert to 3.x authentication.", e)
+            self._login()
         r = requests.get(request_url,
                          auth=(
                              self.configuration.username,

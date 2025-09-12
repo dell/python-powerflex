@@ -26,10 +26,6 @@ from PyPowerFlex.objects.gen1.acceleration_pool import AccelerationPool
 from PyPowerFlex.objects.gen1.volume import Volume
 from PyPowerFlex.objects.gen1.replication_consistency_group import ReplicationConsistencyGroup
 from PyPowerFlex.objects.gen1.replication_pair import ReplicationPair
-from PyPowerFlex.objects.gen1.service_template import ServiceTemplate
-from PyPowerFlex.objects.gen1.managed_device import ManagedDevice
-from PyPowerFlex.objects.gen1.deployment import Deployment
-from PyPowerFlex.objects.gen1.firmware_repository import FirmwareRepository
 
 
 __all__ = [
@@ -44,8 +40,4 @@ __all__ = [
     'Volume',
     'ReplicationConsistencyGroup',
     'ReplicationPair',
-    'ServiceTemplate',
-    'ManagedDevice',
-    'Deployment',
-    'FirmwareRepository',
 ]

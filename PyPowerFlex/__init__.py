@@ -128,6 +128,10 @@ class PowerFlexClient:
         self.__add_storage_entity('sdt', common.Sdt)
         self.__add_storage_entity('host', common.Host)
         self.__add_storage_entity('utility', common.PowerFlexUtility)
+        self.__add_storage_entity('service_template', common.ServiceTemplate)
+        self.__add_storage_entity('managed_device', common.ManagedDevice)
+        self.__add_storage_entity('deployment', common.Deployment)
+        self.__add_storage_entity('firmware_repository', common.FirmwareRepository)
 
     def add_objects_gen1(self):
         """Add gen1 objects here."""
@@ -148,12 +152,6 @@ class PowerFlexClient:
             'replication_consistency_group',
             gen1.ReplicationConsistencyGroup)
         self.__add_storage_entity('replication_pair', gen1.ReplicationPair)
-        self.__add_storage_entity('service_template', gen1.ServiceTemplate)
-        self.__add_storage_entity('managed_device', gen1.ManagedDevice)
-        self.__add_storage_entity('deployment', gen1.Deployment)
-        self.__add_storage_entity(
-            'firmware_repository',
-            gen1.FirmwareRepository)
 
     def add_objects_gen2(self):
         """Add gen2 objects here."""

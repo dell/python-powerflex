@@ -20,6 +20,10 @@ from PyPowerFlex.objects.common.host import Host
 from PyPowerFlex.objects.common.sdc import Sdc
 from PyPowerFlex.objects.common.sdt import Sdt
 from PyPowerFlex.objects.common.utility import PowerFlexUtility
+from PyPowerFlex.objects.common.service_template import ServiceTemplate
+from PyPowerFlex.objects.common.managed_device import ManagedDevice
+from PyPowerFlex.objects.common.deployment import Deployment
+from PyPowerFlex.objects.common.firmware_repository import FirmwareRepository
 
 __all__ = [
     'Sdc',
@@ -27,4 +31,8 @@ __all__ = [
     'System',
     'Host',
     'PowerFlexUtility',
+    'ServiceTemplate',
+    'ManagedDevice',
+    'Deployment',
+    'FirmwareRepository',
 ]

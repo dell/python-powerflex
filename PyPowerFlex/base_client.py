@@ -271,9 +271,10 @@ class Request:
         request_url = self.base_url + '/version'
         try:
             self._appliance_login()
-        except exceptions.PowerFlexClientException as e:
+        except (exceptions.PowerFlexClientException, requests.exceptions.RequestException) as e:
             LOG.error("Failed to login: %s. Revert to 3.x authentication.", e)
             self._login()
+
         r = requests.get(request_url,
                          auth=(
                              self.configuration.username,

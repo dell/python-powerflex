@@ -273,6 +273,8 @@ class Request:
             self._appliance_login()
         except exceptions.PowerFlexClientException as e:
             LOG.error("Failed to login: %s. Revert to 3.x authentication.", e)
+            if e.response is not None and "UNAUTHORIZED" in e.response:
+                raise Exception(f'Login failed with error: {e.response}')
             self._login()
         r = requests.get(request_url,
                          auth=(
@@ -297,7 +299,7 @@ class Request:
                           timeout=self.configuration.timeout
                           )
         if r.status_code != requests.codes.ok:
-            exc = exceptions.PowerFlexFailQuerying('token')
+            exc = exceptions.PowerFlexFailQuerying('token', response=r.text)
             LOG.error(exc.message)
             raise exc
         response = r.json()

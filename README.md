@@ -29,24 +29,37 @@ python setup.py install
 
 #### Available resources
 
-* Device
-* ProtectionDomain
-* Sds
+Common
+* Deployment
+* FirmwareRepository
+* NvmeHost
+* ManagedDevice
+* Sdc
 * Sdt
-* SnapshotPolicy
+* ServiceTemplate
+
+Gen1
+* AccelerationPool
+* Device
+* FaultSet
+* ProtectionDomain
 * ReplicationConsistencyGroup
 * ReplicationPair
-* System
+* Sds
+* SnapshotPolicy
 * StoragePool
-* AccelerationPool
-* Sdc
-* NvmeHost
-* FaultSet
+* System
 * Volume
-* ManagedDevice
-* Deployment
-* ServiceTemplate
-* FirmwareRepository
+
+Gen2
+* DeviceGroup
+* Device
+* ProtectionDomain
+* SnapshotPolicy
+* StorageNode
+* StoragePool
+* System
+* Volume
 
 #### Initialize PowerFlex client
 

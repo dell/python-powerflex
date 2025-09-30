@@ -1,5 +1,10 @@
 # PyPowerFlex Change Log
 
+## Version 2.0.0 - released on 30/09/25
+- Refactor the codebase to support both GEN1 and GEN2 architectures.
+- Added support for GEN2 resources including volume, snapshot, thin clone, snapshot policy,
+  device, device group, storage node, storage pool, protection domain.
+
 ## Version 1.14.1 - released on 26/06/25
 - Added support for custom volume type for volume operations.
 

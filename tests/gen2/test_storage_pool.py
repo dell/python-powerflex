@@ -17,6 +17,8 @@
 
 # pylint: disable=invalid-name,too-many-public-methods
 
+from unittest import mock
+
 from PyPowerFlex import exceptions
 from tests.common import PyPowerFlexTestCase
 
@@ -470,3 +472,114 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
                               self.client.storage_pool.rename,
                               self.fake_sp_id,
                               name='new_name')
+
+    # ------------------------------------------------------------------
+    # Flexible data slices (FEAT-23070) — added by TDD Writer (Stage 07)
+    # ------------------------------------------------------------------
+
+    def _capture_create_payload(self, sp):
+        """Call create() while capturing the payload sent to _create_entity."""
+        captured = {}
+
+        def fake_create_entity(params=None):
+            captured.update(params or {})
+            return {'id': self.fake_sp_id}
+
+        with mock.patch.object(self.client.storage_pool, '_create_entity',
+                               side_effect=fake_create_entity), \
+                mock.patch.object(self.client.storage_pool, 'update',
+                                  return_value=(False, {'id': self.fake_sp_id})):
+            self.client.storage_pool.create(sp)
+        return captured
+
+    def test_storage_pool_create_with_num_data_slices(self):
+        """U-001: explicit num_data_slices is sent verbatim in the create payload."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'numDataSlices': 4,
+            'physicalSizeGB': 10,
+            'compressionMethod': 'None',
+        }
+        captured = self._capture_create_payload(sp)
+        self.assertEqual(captured.get('numDataSlices'), 4)
+        self.assertEqual(captured.get('numProtectionSlices'), 2)
+
+    def test_storage_pool_create_with_explicit_protection_slices(self):
+        """U-004: explicit numProtectionSlices is honored."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'numDataSlices': 6,
+            'numProtectionSlices': 3,
+            'physicalSizeGB': 10,
+        }
+        captured = self._capture_create_payload(sp)
+        self.assertEqual(captured.get('numDataSlices'), 6)
+        self.assertEqual(captured.get('numProtectionSlices'), 3)
+
+    def test_storage_pool_create_preset_twoplustwo(self):
+        """U-002: backward-compat preset TwoPlusTwo -> 2/2."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'protectionScheme': 'TwoPlusTwo',
+            'physicalSizeGB': 10,
+        }
+        captured = self._capture_create_payload(sp)
+        self.assertEqual(captured.get('numDataSlices'), 2)
+        self.assertEqual(captured.get('numProtectionSlices'), 2)
+
+    def test_storage_pool_create_preset_eightplustwo(self):
+        """U-003: backward-compat preset EightPlusTwo -> 8/2."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'protectionScheme': 'EightPlusTwo',
+            'physicalSizeGB': 10,
+        }
+        captured = self._capture_create_payload(sp)
+        self.assertEqual(captured.get('numDataSlices'), 8)
+        self.assertEqual(captured.get('numProtectionSlices'), 2)
+
+    def test_check_create_params_invalid_num_data_slices(self):
+        """U-005: num_data_slices <= 0 raises InvalidInput."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'protectionScheme': 'TwoPlusTwo',
+            'numDataSlices': 0,
+            'useAllAvailableCapacity': True,
+        }
+        self.assertRaises(exceptions.InvalidInput,
+                          self.client.storage_pool.check_create_params,
+                          sp)
+
+    def test_check_create_params_requires_slices_or_scheme(self):
+        """U-006: neither num_data_slices nor protectionScheme raises InvalidInput."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'useAllAvailableCapacity': True,
+        }
+        self.assertRaises(exceptions.InvalidInput,
+                          self.client.storage_pool.check_create_params,
+                          sp)
+
+    def test_check_create_params_num_data_slices_only(self):
+        """U-007: num_data_slices without protectionScheme is valid (one-of)."""
+        sp = {
+            'name': self.fake_sp_name,
+            'protectionDomainId': self.fake_pd_id,
+            'deviceGroupId': '1',
+            'numDataSlices': 4,
+            'useAllAvailableCapacity': True,
+        }
+        # Should not raise once one-of validation is implemented.
+        self.client.storage_pool.check_create_params(sp)

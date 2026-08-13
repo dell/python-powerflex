@@ -73,7 +73,7 @@ class PowerFlexClient:
                  gateway_port=443,
                  username=None,
                  password=None,
-                 verify_certificate=False,
+                 verify_certificate=True,
                  certificate_path=None,
                  timeout=120,
                  log_level=None):

@@ -216,7 +216,6 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :param rcg_id: str
         :return: dict
         """
-
         return self._perform_entity_operation_based_on_action(
             rcg_id, "reverse")
 

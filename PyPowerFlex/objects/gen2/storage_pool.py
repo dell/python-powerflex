@@ -61,11 +61,22 @@ class StoragePool(base_client.EntityRequest):
 
     def check_create_params(self, sp):
         """Check create parameters."""
-        required_fields = ["name", "protectionDomainId", "deviceGroupId", "protectionScheme"]
+        required_fields = ["name", "protectionDomainId", "deviceGroupId"]
         missing_fields = [field for field in required_fields if field not in sp]
 
         if missing_fields:
-            msg = ("name, protection_domain_id, device_group_id, protection_scheme are required "
+            msg = ("name, protection_domain_id, device_group_id are required "
+                   "for creating a storage pool.")
+            raise exceptions.InvalidInput(msg)
+
+        num_data_slices = sp.get("numDataSlices")
+        if num_data_slices is not None:
+            if (not isinstance(num_data_slices, int) or isinstance(num_data_slices, bool)
+                    or num_data_slices <= 0):
+                msg = "num_data_slices must be a positive integer."
+                raise exceptions.InvalidInput(msg)
+        elif sp.get("protectionScheme") is None:
+            msg = ("Either num_data_slices or protection_scheme must be specified "
                    "for creating a storage pool.")
             raise exceptions.InvalidInput(msg)
 
@@ -95,7 +106,10 @@ class StoragePool(base_client.EntityRequest):
         if "compressionMethod" in sp:
             params["compressionMethod"] = sp["compressionMethod"]
 
-        if sp["protectionScheme"] == "TwoPlusTwo":
+        if sp.get("numDataSlices") is not None:
+            params["numDataSlices"] = sp["numDataSlices"]
+            params["numProtectionSlices"] = sp.get("numProtectionSlices", 2)
+        elif sp.get("protectionScheme") == "TwoPlusTwo":
             params["numDataSlices"] = 2
             params["numProtectionSlices"] = 2
         else:

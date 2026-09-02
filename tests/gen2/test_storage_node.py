@@ -52,7 +52,7 @@ class TestStorageNodeClient(PyPowerFlexTestCase):
                     {},
                 f'/instances/Node::{self.fake_node_id}/action/removeIp':
                     {},
-                f'/instances/Node::{self.fake_node_id}/action/renameStorageNode':
+                f'/instances/Node::{self.fake_node_id}/action/renameNode':
                     {},
                 f'/instances/Node::{self.fake_node_id}/action/modifyIpRole':
                     {},

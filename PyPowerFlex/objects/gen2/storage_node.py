@@ -127,9 +127,9 @@ class StorageNode(base_client.EntityRequest):
         :rtype: dict
         """
 
-        action = 'renameStorageNode'
+        action = 'renameNode'
 
-        params = {"name": name}
+        params = {"newName": name}
 
         return self._rename_entity(action, node_id, params)
 

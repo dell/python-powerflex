@@ -59,6 +59,7 @@ class System(base_client.EntityRequest):
     def __init__(self, token, configuration):
         self.__api_version = None
         self.__pfmp_version = None
+        self.__component_version = None
         super().__init__(token, configuration)
 
     def api_version(self, cached=True):
@@ -104,6 +105,70 @@ class System(base_client.EntityRequest):
                 raise exc
             self.__pfmp_version = response.get('clusterVersion')
         return self.__pfmp_version
+
+    def component_version(self, cached=True):
+        """Get the PowerFlex component (Core/MDM) version.
+
+        The component version is the version of the PowerFlex software itself,
+        which may differ from the REST API version reported by
+        :meth:`api_version`. For example, a system can expose API version 5.1
+        while still running component version 4.5.x, because the API and the
+        components are upgraded independently.
+
+        The version is read from the MDM cluster master (``versionInfo``) and
+        falls back to ``systemVersionName``. Values such as ``R4_5.6000.162``
+        or ``DellEMC PowerFlex Version: R4_5.6000.162`` are normalised to
+        ``4.5.6000.162``.
+
+        If the component version cannot be determined, the API version is
+        returned so that callers keep the previous API-version based
+        behaviour instead of guessing a generation.
+
+        :param cached: get component version from cache or send API response
+        :type cached: bool
+        :rtype: str
+        """
+
+        if self.__component_version and cached:
+            return self.__component_version
+
+        raw_version = None
+        try:
+            system_info = self.get()
+            if system_info:
+                system = system_info[0]
+                raw_version = (
+                    system.get('mdmCluster', {}).get('master', {}).get('versionInfo')
+                    or system.get('systemVersionName')
+                )
+        except Exception as e:
+            LOG.debug("Failed to query the component version: %s", e)
+
+        self.__component_version = self.__normalize_version(raw_version) \
+            or self.api_version()
+        return self.__component_version
+
+    @staticmethod
+    def __normalize_version(raw_version):
+        """Normalise a PowerFlex version string to a comparable version.
+
+        e.g. ``DellEMC PowerFlex Version: R4_5.6000.162`` -> ``4.5.6000.162``
+
+        :param raw_version: version string reported by the system
+        :type raw_version: str
+        :rtype: str
+        """
+
+        if not raw_version:
+            return None
+        match = re.search(r'R\s*(\d+)[._](\d+)([\d.]*)', raw_version)
+        if not match:
+            LOG.warning(
+                "Could not determine the component version from '%s'.",
+                raw_version
+            )
+            return None
+        return f"{match.group(1)}.{match.group(2)}{match.group(3)}"
 
     def remove_cg_snapshots(self, system_id, cg_id, allow_ext_managed=None):
         """Remove PowerFlex ConsistencyGroup snapshots.

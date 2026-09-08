@@ -17,6 +17,8 @@
 
 # pylint: disable=invalid-name,too-many-arguments,too-many-positional-arguments
 
+import logging
+
 from packaging import version
 
 from PyPowerFlex import configuration
@@ -26,6 +28,8 @@ from PyPowerFlex import utils
 from PyPowerFlex.objects import common
 from PyPowerFlex.objects import gen1
 from PyPowerFlex.objects import gen2
+
+LOG = logging.getLogger(__name__)
 
 __all__ = [
     'PowerFlexClient'
@@ -114,12 +118,39 @@ class PowerFlexClient:
                 '3.0 are not supported.'
             )
 
-        if version.parse(self.system.api_version()) > version.Version('3.0') and \
-           version.parse(self.system.api_version()) < version.Version('5.0'):
-            self.add_objects_gen1()
-        elif version.parse(self.system.api_version()) >= version.Version('5.0'):
+        if self.__is_gen2():
             self.add_objects_gen2()
+        else:
+            self.add_objects_gen1()
         self.__is_initialized = True
+
+    def __is_gen2(self):
+        """Check whether the system must be handled as a Gen2 system.
+
+        The API version alone is not sufficient: the REST API and the
+        PowerFlex components are upgraded independently, so a Gen1 system
+        running components 4.5.x can already expose API version 5.1. Such a
+        system must still be driven with the Gen1 objects.
+
+        An API version below 5.0 is only served by Gen1 systems, so it is
+        conclusive on its own. From API 5.0 onwards the component version
+        decides, since that is the version of PowerFlex itself.
+
+        :rtype: bool
+        """
+
+        api_version = self.system.api_version()
+        if version.parse(api_version) < version.Version('5.0'):
+            return False
+
+        component_version = self.system.component_version()
+        is_gen2 = version.parse(component_version) >= version.Version('5.0')
+        if not is_gen2:
+            LOG.info(
+                "PowerFlex API version %s is served by component version %s, "
+                "handling the system as Gen1.", api_version, component_version
+            )
+        return is_gen2
 
     def add_objects_common(self):
         """Add common objects here."""

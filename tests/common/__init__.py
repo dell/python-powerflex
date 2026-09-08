@@ -83,11 +83,39 @@ class PyPowerFlexTestCase(TestCase):
     Provides a mocked HTTP response for testing.
     """
     VERSION_API_PATH = '/version'
+    SYSTEM_API_PATH = '/types/System/instances'
+
+    @staticmethod
+    def system_instances(component_version):
+        """
+        Build a System instances response reporting the given component version.
+
+        Args:
+            component_version (str): Component version, e.g. '4.5'.
+
+        Returns:
+            list: The mocked System instances response.
+        """
+        version_info = f"R{component_version.replace('.', '_', 1)}.0.0"
+        return [
+            {
+                'id': '1',
+                'mdmCluster': {'master': {'versionInfo': version_info}},
+                'systemVersionName':
+                    f'DellEMC PowerFlex Version: {version_info}',
+            }
+        ]
 
     @classmethod
-    def version(cls, new_version):
+    def version(cls, new_version, component_version=None):
         """
         Decorator for mocking the version API version.
+
+        Args:
+            new_version (str): The REST API version of the system.
+            component_version (str): Optional component (Core/MDM) version,
+                when it differs from the API version. Defaults to the API
+                version, i.e. a system whose API and components are in sync.
         """
 
         def decorator(subclass):
@@ -96,6 +124,10 @@ class PyPowerFlexTestCase(TestCase):
             subclass.DEFAULT_MOCK_RESPONSES[
                 cls.RESPONSE_MODE.Valid
             ][cls.VERSION_API_PATH] = new_version
+            subclass.DEFAULT_MOCK_RESPONSES[
+                cls.RESPONSE_MODE.Valid
+            ][cls.SYSTEM_API_PATH] = cls.system_instances(
+                component_version or new_version)
             return subclass
 
         return decorator

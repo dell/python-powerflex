@@ -177,15 +177,18 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
 
         return self._perform_entity_operation_based_on_action(rcg_id, "resume")
 
-    def failover(self, rcg_id):
+    def failover(self, rcg_id, force=False):
         """Failover PowerFlex RCG.
 
         :param rcg_id: str
+        :param force: bool
         :return: dict
         """
-
+        url_params = {
+            'force': force
+        }
         return self._perform_entity_operation_based_on_action(
-            rcg_id, "failover")
+            rcg_id, "failover", **url_params)
 
     def sync(self, rcg_id):
         """Synchronize PowerFlex RCG.
@@ -213,7 +216,6 @@ class ReplicationConsistencyGroup(base_client.EntityRequest):
         :param rcg_id: str
         :return: dict
         """
-
         return self._perform_entity_operation_based_on_action(
             rcg_id, "reverse")
 

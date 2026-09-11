@@ -92,12 +92,18 @@ class TestSystemClient(PyPowerFlexTestCase):
             },
         }
 
+    # Initializing a client whose API version is 5.0 or above also queries the
+    # component version, to tell a Gen2 system apart from a Gen1 system that
+    # already exposes the 5.x API.
+    EXPECTED_INITIALIZE_CALL_COUNT = 12
+
     def test_system_api_version(self):
         """
         Test the API version.
         """
         self.client.system.api_version()
-        self.assertEqual(8, self.get_mock.call_count)
+        self.assertEqual(self.EXPECTED_INITIALIZE_CALL_COUNT,
+                         self.get_mock.call_count)
 
     def test_system_api_version_bad_status(self):
         """
@@ -124,7 +130,8 @@ class TestSystemClient(PyPowerFlexTestCase):
         self.client.system.api_version()
         self.client.system.api_version()
         self.client.system.api_version()
-        self.assertEqual(8, self.get_mock.call_count)
+        self.assertEqual(self.EXPECTED_INITIALIZE_CALL_COUNT,
+                         self.get_mock.call_count)
 
     def test_system_remove_cg_snapshots(self):
         """

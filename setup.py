@@ -27,7 +27,8 @@ setup(
     author_email='ansible.team@dell.com',
     install_requires=[
         'packaging>=20.4',
-        'requests>=2.23.0',
+        'requests>=2.34.2',
+        'idna>=3.19',
     ],
     license_files = ('LICENSE',),
     classifiers=['License :: OSI Approved :: Apache Software License'],
@@ -37,5 +38,5 @@ setup(
         'PyPowerFlex.objects.gen1',
         'PyPowerFlex.objects.gen2',
     ],
-    python_requires='>=3.5'
+    python_requires='>=3.10'
 )

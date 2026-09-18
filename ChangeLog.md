@@ -1,6 +1,6 @@
 # PyPowerFlex Change Log
 
-## Version 2.0.1
+## Version 2.0.1 - released on 30/09/26
 - Fixed default value of verify_certificate to True to address CWE-295 (improper certificate validation).
 - Detect PowerFlex generation from the component version instead of the API version alone, since the REST
   API and PowerFlex components can be upgraded independently.

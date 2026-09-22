@@ -4,6 +4,8 @@ Python SDK for Dell PowerFlex.
 
 Supports PowerFlex (VxFlex OS) version 3.0 and later.
 
+Requires Python 3.10 or later.
+
 ## Installation and usage
 
 ### Installation

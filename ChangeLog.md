@@ -1,5 +1,14 @@
 # PyPowerFlex Change Log
 
+## Version 2.0.1 - released on 30/09/26
+- Fixed default value of verify_certificate to True to address CWE-295 (improper certificate validation).
+- Detect PowerFlex generation from the component version instead of the API version alone, since the REST
+  API and PowerFlex components can be upgraded independently.
+- Added support for the force parameter in the failover operation of the replication consistency group.
+- Fixed storage node rename to use the correct renameNode action and newName parameter on PowerFlex 5.1.
+- Fixed BlackDuck-flagged vulnerabilities by upgrading idna and requests, and raised the minimum supported
+  Python version to 3.10.
+
 ## Version 2.0.0 - released on 30/09/25
 - Refactor the codebase to support both GEN1 and GEN2 architectures.
 - Added support for GEN2 resources including volume, snapshot, thin clone, snapshot policy,

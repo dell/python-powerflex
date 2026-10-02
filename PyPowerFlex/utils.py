@@ -19,6 +19,7 @@ import json
 import logging
 import numbers
 import sys
+from urllib.parse import urlencode
 
 from PyPowerFlex import exceptions
 
@@ -160,13 +161,11 @@ def build_uri_with_params(uri, **url_params):
     :return: URI with query parameters
     """
     query_params = [
-        f"{key}={item}" if isinstance(
-            value,
-            list) else f"{key}={value}" for key,
-        value in url_params.items() for item in (
-            value if isinstance(
-                value,
-                list) else [value]) if item is not None]
+        (key, item)
+        for key, value in url_params.items()
+        for item in (value if isinstance(value, list) else [value])
+        if item is not None
+    ]
     if query_params:
-        uri += '?' + '&'.join(query_params)
+        uri += '?' + urlencode(query_params, safe=',')
     return uri

@@ -17,7 +17,10 @@
 
 # pylint: disable=invalid-name
 
+from urllib.parse import parse_qs, urlsplit
+
 from PyPowerFlex import exceptions
+from PyPowerFlex import utils
 from tests.common import PyPowerFlexTestCase
 
 @PyPowerFlexTestCase.version('4.5')
@@ -58,3 +61,21 @@ class TestManagedDeviceClient(PyPowerFlexTestCase):
         with self.http_response_mode(self.RESPONSE_MODE.BadStatus):
             self.assertRaises(exceptions.PowerFlexClientException,
                               self.client.managed_device.get)
+
+    def test_query_values_round_trip(self):
+        """Keep reserved characters inside their original query values."""
+        filters = ['eq,name,R&D #1', 'eq,name,A+B%20', 'eq,name,caf\u00e9']
+        uri = utils.build_uri_with_params(
+            '/V1/ManagedDevice', filter=filters, offset=0, limit=None)
+        parsed = urlsplit(uri)
+        self.assertEqual(parsed.fragment, '')
+        self.assertEqual(parse_qs(parsed.query), {
+            'filter': filters, 'offset': ['0']})
+
+    def test_query_omits_none_list_items(self):
+        """Keep list ordering and omit unset scalar and list values."""
+        uri = utils.build_uri_with_params(
+            '/V1/ManagedDevice', filter=[None, 'eq,name,A&B', None],
+            sort=None, limit=10)
+        self.assertEqual(parse_qs(urlsplit(uri).query), {
+            'filter': ['eq,name,A&B'], 'limit': ['10']})

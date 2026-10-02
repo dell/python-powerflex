@@ -177,6 +177,29 @@ class TestStoragePoolClient(PyPowerFlexTestCase):
         """
         self.client.storage_pool.get_sdss(self.fake_sp_id)
 
+    def test_storage_pool_get_sdss_reuses_filter(self):
+        """Repeated SDS queries must not rewrite the caller's filters."""
+        responses = self.MOCK_RESPONSES[self.RESPONSE_MODE.Valid]
+        relationship = (f'/instances/StoragePool::{self.fake_sp_id}'
+                        '/relationships/SpSds')
+        responses[relationship] = [
+            {'id': 'relationship-1', 'sdsId': 'sds-1'},
+            {'id': 'relationship-2', 'sdsId': 'sds-2'},
+        ]
+        responses['/types/Sds/instances'] = [
+            {'id': 'sds-1', 'name': 'first'},
+            {'id': 'sds-2', 'name': 'second'},
+        ]
+        for sds_filter in ('sds-1', ['sds-1']):
+            with self.subTest(sds_filter=sds_filter):
+                filters = {'sdsId': sds_filter}
+                for _ in range(2):
+                    result = self.client.storage_pool.get_sdss(
+                        self.fake_sp_id, filter_fields=filters,
+                        fields=['name'])
+                    self.assertEqual(result, [{'name': 'first'}])
+                self.assertEqual(filters, {'sdsId': sds_filter})
+
     def test_storage_pool_get_sdss_bad_status(self):
         """
         Test the get_sdss method of the StoragePoolClient with a bad status.

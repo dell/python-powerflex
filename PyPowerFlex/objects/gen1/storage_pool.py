@@ -171,6 +171,7 @@ class StoragePool(base_client.EntityRequest):
                                     fields=('sdsId',))
         sds_id_list = [sds['sdsId'] for sds in sdss_ids]
         if filter_fields:
+            filter_fields = filter_fields.copy()
             filter_fields.update({'id': sds_id_list})
             filter_fields.pop('sdsId', None)
         else:
